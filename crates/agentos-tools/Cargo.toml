@@ -1,0 +1,10 @@
+[package]
+name = "agentos-tools"
+description = "AgentOS tool and capability abstractions."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

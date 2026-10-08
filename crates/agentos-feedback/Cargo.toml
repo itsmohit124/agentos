@@ -1,0 +1,10 @@
+[package]
+name = "agentos-feedback"
+description = "AgentOS feedback engine (validation providers, architecture analysis)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

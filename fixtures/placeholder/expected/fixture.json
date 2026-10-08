@@ -1,0 +1,4 @@
+{
+  "fixture": "placeholder",
+  "files": ["README.md", "src/hello.txt"]
+}

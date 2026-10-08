@@ -1,0 +1,29 @@
+[package]
+name = "agentos-cli"
+description = "The agentos command-line interface."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "agentos"
+path = "src/main.rs"
+
+[dependencies]
+agentos-config.workspace = true
+agentos-core.workspace = true
+anyhow.workspace = true
+clap.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
+[dev-dependencies]
+agentos-testkit.workspace = true
+predicates.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

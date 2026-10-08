@@ -1,1 +1,13 @@
-/agentos-cursor-pack
+/target
+.DS_Store
+
+# Local build-process instructions (never pushed)
+/.cursor/
+/START_CURSOR.md
+/AGENTS.md
+/PROGRESS.md
+/docs/BUILD_PACK.md
+/docs/PHASE_PROTOCOL.md
+/docs/phases/
+/docs/templates/
+/docs/phase-reports/

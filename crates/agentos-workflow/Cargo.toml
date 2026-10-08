@@ -1,0 +1,10 @@
+[package]
+name = "agentos-workflow"
+description = "AgentOS workflow engine (task graph, planner, scheduler)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true

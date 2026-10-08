@@ -1,0 +1,10 @@
+[package]
+name = "agentos-permissions"
+description = "AgentOS default-deny permission model and enforcement."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lints]
+workspace = true
