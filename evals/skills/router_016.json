@@ -1,0 +1,10 @@
+{
+  "id": "router_016",
+  "kind": "route",
+  "description": "The model never gets the user-invoked-only improve-codebase-architecture skill",
+  "fixture": "builtin:skills",
+  "oracle": "skills that must not be ranked",
+  "task": "Improve the codebase architecture by deepening shallow modules",
+  "invoker": "model",
+  "must_not_rank": ["improve-codebase-architecture"]
+}

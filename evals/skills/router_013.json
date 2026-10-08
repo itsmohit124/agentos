@@ -1,0 +1,10 @@
+{
+  "id": "router_013",
+  "kind": "route",
+  "description": "Implementing a scoped feature routes to implementation",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Implement retry support for the payment webhook handler",
+  "invoker": "model",
+  "expect_top": "implementation"
+}

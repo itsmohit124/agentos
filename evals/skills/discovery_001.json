@@ -1,0 +1,18 @@
+{
+  "id": "discovery_001",
+  "kind": "discovery",
+  "description": "Priority project > agentos > user > builtin; overrides recorded highest first",
+  "fixture": "skills/override",
+  "oracle": "exact winning level per skill, exact overrides, exact diagnostic code set",
+  "expect_skills": {
+    "base": "builtin",
+    "helper": "user",
+    "notes": "agentos",
+    "tdd": "project"
+  },
+  "expect_overrides": {
+    "helper": ["builtin"],
+    "tdd": ["user", "builtin"]
+  },
+  "expect_codes": []
+}

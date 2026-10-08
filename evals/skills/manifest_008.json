@@ -1,0 +1,9 @@
+{
+  "id": "manifest_008",
+  "kind": "manifest",
+  "description": "Manifest name must equal its directory name",
+  "fixture": "skills/manifests/name-mismatch",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["name_mismatch"]
+}

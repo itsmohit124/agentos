@@ -1,0 +1,9 @@
+{
+  "id": "validate_004",
+  "kind": "validate",
+  "description": "A model-invocable skill requiring a user-invoked-only skill is rejected (no implicit upgrade)",
+  "fixture": "skills/implicit-model",
+  "oracle": "validation fails; exact diagnostic code set",
+  "expect_ok": false,
+  "expect_codes": ["implicit_model_invocation"]
+}

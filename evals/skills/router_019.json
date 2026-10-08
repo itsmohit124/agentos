@@ -1,0 +1,11 @@
+{
+  "id": "router_019",
+  "kind": "route",
+  "description": "engineering-router recommends grilling for a stress-test request",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill among the router's routes",
+  "task": "I want to stress test my rollout plan",
+  "invoker": "user",
+  "router": "engineering-router",
+  "expect_top": "grilling"
+}

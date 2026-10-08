@@ -1,0 +1,9 @@
+{
+  "id": "resolve_007",
+  "kind": "resolve",
+  "description": "Constraint ^0.1 against installed 0.1.0 resolves",
+  "fixture": "skills/version-mismatch",
+  "oracle": "exact topological order",
+  "target": "ok-old",
+  "expect_order": ["base", "ok-old"]
+}

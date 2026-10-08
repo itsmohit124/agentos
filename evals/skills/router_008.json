@@ -1,0 +1,10 @@
+{
+  "id": "router_008",
+  "kind": "route",
+  "description": "A human asking to be grilled gets grilling",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Grill me on my database migration plan",
+  "invoker": "user",
+  "expect_top": "grilling"
+}

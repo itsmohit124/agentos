@@ -1,0 +1,9 @@
+{
+  "id": "resolve_002",
+  "kind": "resolve",
+  "description": "improve-codebase-architecture runs after architecture-review",
+  "fixture": "builtin:skills",
+  "oracle": "exact topological order",
+  "target": "improve-codebase-architecture",
+  "expect_order": ["architecture-review", "improve-codebase-architecture"]
+}

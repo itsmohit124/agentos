@@ -1,0 +1,9 @@
+{
+  "id": "manifest_007",
+  "kind": "manifest",
+  "description": "Misspelled field (requries) is rejected instead of ignored",
+  "fixture": "skills/manifests/unknown-field",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["schema"]
+}

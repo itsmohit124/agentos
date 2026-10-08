@@ -1,0 +1,11 @@
+{
+  "id": "router_020",
+  "kind": "route",
+  "description": "The model cannot use the user-invoked-only engineering-router",
+  "fixture": "builtin:skills",
+  "oracle": "routing error code",
+  "task": "Write tests first for the parser",
+  "invoker": "model",
+  "router": "engineering-router",
+  "expect_error": "router_not_invocable"
+}

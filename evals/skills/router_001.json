@@ -1,0 +1,10 @@
+{
+  "id": "router_001",
+  "kind": "route",
+  "description": "\"write tests first\" routes to tdd",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Write tests first for the invoice parser",
+  "invoker": "user",
+  "expect_top": "tdd"
+}

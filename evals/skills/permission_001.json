@@ -1,0 +1,10 @@
+{
+  "id": "permission_001",
+  "kind": "permission",
+  "description": "research does not declare shell, so shell is denied",
+  "fixture": "builtin:skills",
+  "oracle": "check(skill, capability) verdict",
+  "skill": "research",
+  "capability": "shell",
+  "expect": "deny"
+}

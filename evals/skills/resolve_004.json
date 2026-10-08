@@ -1,0 +1,10 @@
+{
+  "id": "resolve_004",
+  "kind": "resolve",
+  "description": "The same cycle resolved from B reports the path starting at B",
+  "fixture": "skills/cycle",
+  "oracle": "error code and exact cycle path",
+  "target": "b",
+  "expect_error": "dependency_cycle",
+  "expect_cycle": ["b", "a", "b"]
+}

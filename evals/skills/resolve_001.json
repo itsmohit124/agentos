@@ -1,0 +1,9 @@
+{
+  "id": "resolve_001",
+  "kind": "resolve",
+  "description": "tdd resolves to [interface-design, tdd]",
+  "fixture": "builtin:skills",
+  "oracle": "exact topological order",
+  "target": "tdd",
+  "expect_order": ["interface-design", "tdd"]
+}

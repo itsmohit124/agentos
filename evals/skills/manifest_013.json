@@ -1,0 +1,9 @@
+{
+  "id": "manifest_013",
+  "kind": "manifest",
+  "description": "Declared reference file must exist",
+  "fixture": "skills/manifests/missing-reference",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["missing_reference"]
+}

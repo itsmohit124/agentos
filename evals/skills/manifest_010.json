@@ -1,0 +1,9 @@
+{
+  "id": "manifest_010",
+  "kind": "manifest",
+  "description": "user_invocable: false does not fall back to model invocation",
+  "fixture": "skills/manifests/not-invocable",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["not_invocable"]
+}

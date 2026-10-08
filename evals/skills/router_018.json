@@ -1,0 +1,11 @@
+{
+  "id": "router_018",
+  "kind": "route",
+  "description": "An explicit intent label routes vague text to code-review",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Take a look at this",
+  "intents": ["review"],
+  "invoker": "model",
+  "expect_top": "code-review"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "router_004",
+  "kind": "route",
+  "description": "Reviewing a pull request routes to code-review",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Review the code in my pull request before merging",
+  "invoker": "model",
+  "expect_top": "code-review"
+}

@@ -1,0 +1,9 @@
+{
+  "id": "manifest_002",
+  "kind": "manifest",
+  "description": "Manifest using every field (incl. optional_recommends, tools, references, all permissions, pre-release version) is valid",
+  "fixture": "skills/manifests/valid-full",
+  "oracle": "skill loads; exact diagnostic code set",
+  "expect_valid": true,
+  "expect_codes": []
+}

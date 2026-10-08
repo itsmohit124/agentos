@@ -1,0 +1,9 @@
+{
+  "id": "manifest_011",
+  "kind": "manifest",
+  "description": "A router must declare routes",
+  "fixture": "skills/manifests/router-without-routes",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["schema"]
+}

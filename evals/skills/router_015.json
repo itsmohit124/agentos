@@ -1,0 +1,10 @@
+{
+  "id": "router_015",
+  "kind": "route",
+  "description": "A human asking to improve the architecture gets improve-codebase-architecture",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Improve the codebase architecture by deepening shallow modules",
+  "invoker": "user",
+  "expect_top": "improve-codebase-architecture"
+}

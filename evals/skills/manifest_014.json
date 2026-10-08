@@ -1,0 +1,9 @@
+{
+  "id": "manifest_014",
+  "kind": "manifest",
+  "description": "Non-built-in skill without eval cases loads with a warning",
+  "fixture": "skills/manifests/no-eval-cases",
+  "oracle": "skill loads; exact diagnostic code set (warning only)",
+  "expect_valid": true,
+  "expect_codes": ["missing_eval_cases"]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "router_006",
+  "kind": "route",
+  "description": "Investigating external behaviour and gathering docs routes to research",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Investigate how the payment provider retries webhooks and gather the docs",
+  "invoker": "model",
+  "expect_top": "research"
+}

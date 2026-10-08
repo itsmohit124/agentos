@@ -1,7 +1,7 @@
 //! `agentos` command-line interface.
 //!
-//! Exit codes: `0` success, `1` runtime error, `2` usage error, `3` `doctor` found a critical
-//! failure.
+//! Exit codes: `0` success, `1` runtime error, `2` usage error, `3` a check failed (`doctor`
+//! critical failure, `skills validate` errors, `evaluate` case failures).
 
 mod app;
 mod cli;
@@ -40,5 +40,7 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
         Command::Init => commands::init::run(&app, format),
         Command::Doctor => commands::doctor::run(&app, format),
         Command::Config => commands::config::run(&app, format),
+        Command::Skills(args) => commands::skills::run(&app, &args, format),
+        Command::Evaluate(args) => commands::evaluate::run(&app, &args, format),
     }
 }

@@ -1,0 +1,20 @@
+{
+  "id": "discovery_004",
+  "kind": "discovery",
+  "description": "All ten built-in skills are discovered without diagnostics",
+  "fixture": "builtin:skills",
+  "oracle": "exact winning level per skill, exact diagnostic code set",
+  "expect_skills": {
+    "architecture-review": "builtin",
+    "code-review": "builtin",
+    "domain-modeling": "builtin",
+    "engineering-router": "builtin",
+    "grilling": "builtin",
+    "implementation": "builtin",
+    "improve-codebase-architecture": "builtin",
+    "interface-design": "builtin",
+    "research": "builtin",
+    "tdd": "builtin"
+  },
+  "expect_codes": []
+}

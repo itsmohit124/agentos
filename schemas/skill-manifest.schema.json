@@ -1,0 +1,176 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AgentOS skill manifest",
+  "description": "YAML front-matter of a portable SKILL.md package. Semantic rules that JSON Schema cannot express (semver syntax, name equals directory, invocation consistency, dependency resolution) are enforced by `agentos skills validate`.",
+  "type": "object",
+  "required": ["name", "description", "version"],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "$ref": "#/$defs/skillName" },
+    "description": {
+      "description": "Concise description used for discovery (the body is loaded only when selected).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "version": {
+      "description": "Semantic version of the skill, e.g. \"0.1.0\". Quote it in YAML.",
+      "type": "string",
+      "minLength": 1
+    },
+    "kind": {
+      "description": "`skill` (default) or `router` (selects among `routes` by their declared triggers).",
+      "enum": ["skill", "router"]
+    },
+    "invocation": {
+      "description": "Explicit invocation mode. Must agree with user_invocable / model_invocable when those are also set.",
+      "enum": ["user", "model", "both"]
+    },
+    "user_invocable": {
+      "description": "The human may explicitly request this skill. Default: true.",
+      "type": "boolean"
+    },
+    "model_invocable": {
+      "description": "The agent may choose this skill autonomously. Default: false (never implicit).",
+      "type": "boolean"
+    },
+    "requires": {
+      "description": "Skills that must run before this one, with optional semver constraints.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/dependency" }
+    },
+    "optional_recommends": {
+      "description": "Skills that are useful alongside this one but not required (not part of the execution order).",
+      "type": "array",
+      "items": { "$ref": "#/$defs/skillName" },
+      "uniqueItems": true
+    },
+    "routes": {
+      "description": "Router skills only: the skills this router selects among.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/skillName" },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "inputs": {
+      "description": "What the skill consumes.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/io" }
+    },
+    "outputs": {
+      "description": "What the skill produces.",
+      "type": "array",
+      "items": { "$ref": "#/$defs/io" }
+    },
+    "tools": {
+      "description": "Abstract tool names the skill uses (e.g. \"test-runner\", \"vcs\").",
+      "type": "array",
+      "items": { "type": "string", "pattern": "^[a-z0-9]+([._-][a-z0-9]+)*$" },
+      "uniqueItems": true
+    },
+    "permissions": {
+      "description": "Capabilities the skill needs. Anything not listed is denied.",
+      "type": "array",
+      "items": { "enum": ["fs.read", "fs.write", "shell", "network", "browser"] },
+      "uniqueItems": true
+    },
+    "references": {
+      "description": "Relative paths (forward slashes, no `..`) of reference files inside the skill directory, loaded only when needed.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "pattern": "^[^/\\\\][^\\\\]*$"
+      },
+      "uniqueItems": true
+    },
+    "triggers": {
+      "description": "Deterministic routing rules.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "phrases": { "$ref": "#/$defs/stringList" },
+        "keywords": {
+          "description": "Single words.",
+          "type": "array",
+          "items": { "type": "string", "pattern": "^[^\\s]+$" },
+          "uniqueItems": true
+        },
+        "intents": { "$ref": "#/$defs/stringList" },
+        "exclude": { "$ref": "#/$defs/stringList" }
+      }
+    },
+    "eval_cases": {
+      "description": "Routing examples that must hold for this skill.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["task"],
+        "additionalProperties": false,
+        "properties": {
+          "task": { "type": "string", "minLength": 1 },
+          "expect": {
+            "description": "`top` (default): the skill ranks first; `ranked`: it is ranked; `not_ranked`: it is not ranked.",
+            "enum": ["top", "ranked", "not_ranked"]
+          },
+          "skill": {
+            "description": "Skill the expectation is about. Defaults to this skill; required for routers.",
+            "$ref": "#/$defs/skillName"
+          },
+          "intents": { "$ref": "#/$defs/stringList" }
+        }
+      }
+    },
+    "license": { "type": "string" },
+    "compatibility": { "type": "string", "maxLength": 500 },
+    "metadata": { "type": "object", "additionalProperties": { "type": "string" } },
+    "allowed-tools": { "type": "string" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "kind": { "const": "router" } }, "required": ["kind"] },
+      "then": { "required": ["routes"] },
+      "else": { "not": { "required": ["routes"] } }
+    }
+  ],
+  "$defs": {
+    "skillName": {
+      "type": "string",
+      "maxLength": 64,
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "dependency": {
+      "oneOf": [
+        { "$ref": "#/$defs/skillName" },
+        {
+          "type": "object",
+          "required": ["name"],
+          "additionalProperties": false,
+          "properties": {
+            "name": { "$ref": "#/$defs/skillName" },
+            "version": {
+              "description": "Semver requirement, e.g. \"^0.1\" or \">=1.2, <2\".",
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "io": {
+      "type": "object",
+      "required": ["name", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z0-9]+([_-][a-z0-9]+)*$" },
+        "description": { "type": "string", "minLength": 1 },
+        "required": { "type": "boolean" }
+      }
+    },
+    "stringList": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "uniqueItems": true
+    }
+  }
+}

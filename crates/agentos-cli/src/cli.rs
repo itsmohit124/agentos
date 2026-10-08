@@ -3,7 +3,7 @@
 use std::path::PathBuf;
 
 use agentos_config::{ConfigOverrides, OutputFormat};
-use clap::{ArgAction, Parser, Subcommand};
+use clap::{ArgAction, Args, Parser, Subcommand, ValueEnum};
 
 /// AgentOS: local-first engineering intelligence layer for coding agents.
 #[derive(Debug, Parser)]
@@ -38,6 +38,95 @@ pub enum Command {
     Doctor,
     /// Show the effective configuration and where each value came from.
     Config,
+    /// Discover, inspect, validate, install and graph skills.
+    Skills(SkillsArgs),
+    /// Run a deterministic evaluation suite.
+    Evaluate(EvaluateArgs),
+}
+
+/// `agentos skills` arguments.
+#[derive(Debug, Args)]
+pub struct SkillsArgs {
+    /// User-level skills directory [default: $HOME/.agentos/skills].
+    #[arg(
+        long,
+        global = true,
+        env = "AGENTOS_USER_SKILLS_DIR",
+        value_name = "DIR"
+    )]
+    pub user_skills_dir: Option<PathBuf>,
+
+    /// Use this directory instead of the built-in skills shipped with agentos.
+    #[arg(
+        long,
+        global = true,
+        env = "AGENTOS_BUILTIN_SKILLS_DIR",
+        value_name = "DIR"
+    )]
+    pub builtin_skills_dir: Option<PathBuf>,
+
+    #[command(subcommand)]
+    pub command: SkillsCommand,
+}
+
+/// `agentos skills` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum SkillsCommand {
+    /// List the skills that won discovery, highest-priority level first per name.
+    List,
+    /// Show a skill's metadata, resolved dependencies, permissions and body.
+    Inspect {
+        /// Skill name.
+        name: String,
+        /// Metadata only; do not read the skill body.
+        #[arg(long)]
+        brief: bool,
+    },
+    /// Validate every skill, including bodies, references and invocation rules.
+    Validate,
+    /// Copy a local skill directory into .agents/skills/ after validating it.
+    Install {
+        /// Local skill directory (git URLs are not supported yet).
+        source: String,
+    },
+    /// Print the skill dependency graph.
+    Graph {
+        /// Output format.
+        #[arg(long, value_enum, default_value_t = GraphFormat::Text)]
+        format: GraphFormat,
+    },
+}
+
+/// `agentos skills graph` formats.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum GraphFormat {
+    /// Human-readable adjacency list.
+    Text,
+    /// Graphviz DOT.
+    Dot,
+}
+
+/// `agentos evaluate` arguments.
+#[derive(Debug, Args)]
+pub struct EvaluateArgs {
+    /// Area to evaluate.
+    #[arg(value_enum)]
+    pub area: EvalArea,
+
+    /// Directory with the case files [default: <root>/evals/<area>].
+    #[arg(long, value_name = "DIR")]
+    pub evals_dir: Option<PathBuf>,
+
+    /// Fixtures directory [default: <root>/fixtures].
+    #[arg(long, value_name = "DIR")]
+    pub fixtures_dir: Option<PathBuf>,
+}
+
+/// Evaluation areas.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum EvalArea {
+    /// The skill system (`evals/skills`).
+    Skills,
 }
 
 impl Cli {

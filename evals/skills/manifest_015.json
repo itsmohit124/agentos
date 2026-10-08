@@ -1,0 +1,9 @@
+{
+  "id": "manifest_015",
+  "kind": "manifest",
+  "description": "Malformed YAML front-matter is reported as a YAML error",
+  "fixture": "skills/manifests/bad-yaml",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["yaml"]
+}

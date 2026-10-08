@@ -1,0 +1,10 @@
+{
+  "id": "router_003",
+  "kind": "route",
+  "description": "A failing regression test for a bug routes to tdd",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Add a failing regression test for the date rounding bug",
+  "invoker": "model",
+  "expect_top": "tdd"
+}

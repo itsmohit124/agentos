@@ -1,0 +1,10 @@
+{
+  "id": "router_011",
+  "kind": "route",
+  "description": "Aggregates and invariants of a bounded context route to domain-modeling",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "What are the aggregates and invariants in the shipping bounded context",
+  "invoker": "model",
+  "expect_top": "domain-modeling"
+}

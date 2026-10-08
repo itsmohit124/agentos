@@ -1,0 +1,11 @@
+{
+  "id": "router_009",
+  "kind": "route",
+  "description": "The model never gets the user-invoked-only grilling skill, even for an exact match",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill (none) and skills that must not be ranked",
+  "task": "Grill me on my database migration plan",
+  "invoker": "model",
+  "expect_top": null,
+  "must_not_rank": ["grilling"]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "resolve_006",
+  "kind": "resolve",
+  "description": "Constraint >=1.0 against installed 0.1.0 fails (version handling)",
+  "fixture": "skills/version-mismatch",
+  "oracle": "error code",
+  "target": "needs-new",
+  "expect_error": "version_mismatch"
+}

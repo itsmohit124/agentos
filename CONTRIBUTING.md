@@ -40,7 +40,12 @@ cargo test --workspace
 - `agentos-testkit` (dev-dependency only) provides `TempProject`, `CliRunner` and the fixture
   loader (`fixture_path`, `copy_fixture`).
 - Fixtures live in `fixtures/<name>/` with ground truth in `expected/` (see `fixtures/README.md`).
-- Evaluation cases live in `evals/<area>/` (see `evals/README.md`).
+- Evaluation cases live in `evals/<area>/` (see `evals/README.md`); run them with
+  `agentos evaluate <area>`.
+- Built-in skills live in `skills/<name>/SKILL.md` and are compiled into the binary. Each needs the
+  body sections `When to use`, `Inputs`, `Procedure` (numbered), `Outputs`, `Must not`, `Validation`
+  and at least one `eval_cases` entry; `agentos skills validate` fails otherwise. When a router case
+  fails, tune the skill's `triggers`, never the expected answer.
 
 ## Database migrations
 

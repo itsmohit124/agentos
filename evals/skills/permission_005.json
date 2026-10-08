@@ -1,0 +1,10 @@
+{
+  "id": "permission_005",
+  "kind": "permission",
+  "description": "architecture-review only reads; fs.write is denied",
+  "fixture": "builtin:skills",
+  "oracle": "check(skill, capability) verdict",
+  "skill": "architecture-review",
+  "capability": "fs.write",
+  "expect": "deny"
+}

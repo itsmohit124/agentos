@@ -1,0 +1,9 @@
+{
+  "id": "discovery_003",
+  "kind": "discovery",
+  "description": "A broken project override makes the name unavailable and warns about the shadowed built-in",
+  "fixture": "skills/broken-override",
+  "oracle": "exact winning level per skill, exact diagnostic code set",
+  "expect_skills": {},
+  "expect_codes": ["schema", "shadowed_by_broken"]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "router_002",
+  "kind": "route",
+  "description": "Explicit TDD request beats the generic \"add\" of implementation",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Use TDD to add pagination to the orders endpoint",
+  "invoker": "model",
+  "expect_top": "tdd"
+}

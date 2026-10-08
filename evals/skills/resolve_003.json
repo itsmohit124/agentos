@@ -1,0 +1,10 @@
+{
+  "id": "resolve_003",
+  "kind": "resolve",
+  "description": "A -> B, B -> A fails with the cycle path starting at A",
+  "fixture": "skills/cycle",
+  "oracle": "error code and exact cycle path",
+  "target": "a",
+  "expect_error": "dependency_cycle",
+  "expect_cycle": ["a", "b", "a"]
+}

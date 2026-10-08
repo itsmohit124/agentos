@@ -1,0 +1,7 @@
+{
+  "id": "skill_eval_001",
+  "kind": "skill_eval",
+  "description": "Every built-in skill declares eval cases and they hold",
+  "fixture": "builtin:skills",
+  "oracle": "router outcome per declared eval case (top / ranked / not_ranked)"
+}

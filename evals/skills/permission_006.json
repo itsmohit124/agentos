@@ -1,0 +1,10 @@
+{
+  "id": "permission_006",
+  "kind": "permission",
+  "description": "No built-in declares browser; code-review is denied browser",
+  "fixture": "builtin:skills",
+  "oracle": "check(skill, capability) verdict",
+  "skill": "code-review",
+  "capability": "browser",
+  "expect": "deny"
+}

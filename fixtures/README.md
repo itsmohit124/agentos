@@ -20,3 +20,4 @@ fixtures/<name>/
 | Name | Phase | Purpose |
 |---|---|---|
 | `placeholder` | 0 | Exercises the fixture loader only. No ground truth beyond its own identity. |
+| `skills/` | 1 | Small skill trees for manifest parsing, discovery priority, duplicates, broken overrides, dependency cycles, missing dependencies, version constraints, implicit model invocation and broken built-ins. Ground truth lives in `evals/skills/*.json`; see `skills/README.md`. |

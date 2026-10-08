@@ -1,0 +1,21 @@
+{
+  "id": "validate_001",
+  "kind": "validate",
+  "description": "All built-in skills pass full validation (bodies, links, invocation, eval cases)",
+  "fixture": "builtin:skills",
+  "oracle": "validation ok; exact diagnostic code set; exact skill list",
+  "expect_ok": true,
+  "expect_codes": [],
+  "expect_skills": [
+    "architecture-review",
+    "code-review",
+    "domain-modeling",
+    "engineering-router",
+    "grilling",
+    "implementation",
+    "improve-codebase-architecture",
+    "interface-design",
+    "research",
+    "tdd"
+  ]
+}

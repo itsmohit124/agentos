@@ -1,0 +1,10 @@
+{
+  "id": "router_005",
+  "kind": "route",
+  "description": "Checking a diff for bugs routes to code-review",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Check this diff for bugs and style problems",
+  "invoker": "model",
+  "expect_top": "code-review"
+}

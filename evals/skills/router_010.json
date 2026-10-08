@@ -1,0 +1,10 @@
+{
+  "id": "router_010",
+  "kind": "route",
+  "description": "Ubiquitous language and glossary work routes to domain-modeling",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Define the ubiquitous language and glossary for the billing domain",
+  "invoker": "model",
+  "expect_top": "domain-modeling"
+}

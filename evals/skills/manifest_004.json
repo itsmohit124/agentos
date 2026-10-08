@@ -1,0 +1,9 @@
+{
+  "id": "manifest_004",
+  "kind": "manifest",
+  "description": "Version \"1.0\" is not a semantic version",
+  "fixture": "skills/manifests/bad-semver",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["invalid_version"]
+}

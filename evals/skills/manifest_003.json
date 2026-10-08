@@ -1,0 +1,9 @@
+{
+  "id": "manifest_003",
+  "kind": "manifest",
+  "description": "Missing required version is a schema error",
+  "fixture": "skills/manifests/missing-version",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["schema"]
+}

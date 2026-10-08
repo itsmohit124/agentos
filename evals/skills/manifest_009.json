@@ -1,0 +1,9 @@
+{
+  "id": "manifest_009",
+  "kind": "manifest",
+  "description": "invocation: user with model_invocable: true is a conflict, not an upgrade",
+  "fixture": "skills/manifests/invocation-conflict",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["invocation_conflict"]
+}

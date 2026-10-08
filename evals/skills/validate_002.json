@@ -1,0 +1,10 @@
+{
+  "id": "validate_002",
+  "kind": "validate",
+  "description": "Broken built-ins (missing quality sections, missing eval cases) fail validation",
+  "fixture": "skills/broken-builtin",
+  "oracle": "validation fails; exact diagnostic code set; exact skill list",
+  "expect_ok": false,
+  "expect_codes": ["missing_eval_cases", "missing_section"],
+  "expect_skills": ["tdd"]
+}

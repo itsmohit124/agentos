@@ -1,0 +1,10 @@
+{
+  "id": "router_017",
+  "kind": "route",
+  "description": "An unrelated task routes to nothing",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill (none)",
+  "task": "Make me a cup of coffee",
+  "invoker": "user",
+  "expect_top": null
+}

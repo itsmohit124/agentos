@@ -1,0 +1,10 @@
+{
+  "id": "permission_004",
+  "kind": "permission",
+  "description": "engineering-router declares nothing, so even fs.read is denied",
+  "fixture": "builtin:skills",
+  "oracle": "check(skill, capability) verdict",
+  "skill": "engineering-router",
+  "capability": "fs.read",
+  "expect": "deny"
+}

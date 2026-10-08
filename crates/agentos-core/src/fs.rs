@@ -5,7 +5,7 @@
 
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs::OpenOptions;
-use std::io::{self, Write};
+use std::io::{self, BufRead, Write};
 use std::path::{Component, Path, PathBuf};
 use std::sync::{Mutex, MutexGuard};
 
@@ -61,6 +61,12 @@ pub trait FileSystem: Send + Sync {
 
     /// Verifies that files can be created in directory `dir`.
     fn check_writable(&self, dir: &Path) -> Result<(), FsError>;
+
+    /// Lists the entries of directory `path` as full paths, sorted.
+    fn read_dir(&self, path: &Path) -> Result<Vec<PathBuf>, FsError>;
+
+    /// Opens a file for buffered streaming reads, so callers can stop before the end of the file.
+    fn open_read(&self, path: &Path) -> Result<Box<dyn BufRead + Send + '_>, FsError>;
 }
 
 /// [`FileSystem`] backed by the real operating-system filesystem.
@@ -114,6 +120,29 @@ impl FileSystem for RealFs {
             .open(&probe)
             .map_err(|e| FsError::new("write probe in", dir, e))?;
         std::fs::remove_file(&probe).map_err(|e| FsError::new("remove write probe", &probe, e))
+    }
+
+    fn read_dir(&self, path: &Path) -> Result<Vec<PathBuf>, FsError> {
+        let mut entries = std::fs::read_dir(path)
+            .and_then(|it| {
+                it.map(|e| e.map(|e| e.path()))
+                    .collect::<io::Result<Vec<_>>>()
+            })
+            .map_err(|e| FsError::new("read directory", path, e))?;
+        entries.sort();
+        Ok(entries)
+    }
+
+    fn open_read(&self, path: &Path) -> Result<Box<dyn BufRead + Send + '_>, FsError> {
+        let file = std::fs::File::open(path).map_err(|e| FsError::new("open", path, e))?;
+        if file.metadata().is_ok_and(|m| m.is_dir()) {
+            return Err(FsError::new(
+                "open",
+                path,
+                io::ErrorKind::IsADirectory.into(),
+            ));
+        }
+        Ok(Box::new(io::BufReader::new(file)))
     }
 }
 
@@ -293,6 +322,48 @@ impl FileSystem for MemFs {
         }
         Ok(())
     }
+
+    fn read_dir(&self, path: &Path) -> Result<Vec<PathBuf>, FsError> {
+        let path = normalize(path);
+        let state = self.lock();
+        match state.nodes.get(&path) {
+            Some(MemNode::Dir) => {}
+            _ if is_fs_root(&path) => {}
+            Some(MemNode::File(_)) => {
+                return Err(FsError::new(
+                    "read directory",
+                    &path,
+                    io::ErrorKind::NotADirectory.into(),
+                ));
+            }
+            None => {
+                return Err(FsError::new(
+                    "read directory",
+                    &path,
+                    io::ErrorKind::NotFound.into(),
+                ));
+            }
+        }
+        Ok(state
+            .nodes
+            .keys()
+            .filter(|p| p.parent() == Some(path.as_path()))
+            .cloned()
+            .collect())
+    }
+
+    fn open_read(&self, path: &Path) -> Result<Box<dyn BufRead + Send + '_>, FsError> {
+        let path = normalize(path);
+        match self.lock().nodes.get(&path) {
+            Some(MemNode::File(bytes)) => Ok(Box::new(io::Cursor::new(bytes.clone()))),
+            Some(MemNode::Dir) => Err(FsError::new(
+                "open",
+                &path,
+                io::ErrorKind::IsADirectory.into(),
+            )),
+            None => Err(FsError::new("open", &path, io::ErrorKind::NotFound.into())),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -326,6 +397,28 @@ mod tests {
 
         fs.check_writable(&dir).unwrap();
         assert!(fs.check_writable(&base.join("nope")).is_err());
+
+        fs.create_dir_all(&dir.join("z")).unwrap();
+        fs.write(&dir.join("c.txt"), b"line1\nline2\n").unwrap();
+        assert_eq!(
+            fs.read_dir(&dir).unwrap(),
+            vec![dir.join("c.txt"), dir.join("f.txt"), dir.join("z")]
+        );
+        assert!(fs.read_dir(&dir.join("z")).unwrap().is_empty());
+        assert_eq!(
+            fs.read_dir(&base.join("nope")).unwrap_err().kind(),
+            io::ErrorKind::NotFound
+        );
+        assert!(fs.read_dir(&file).is_err());
+
+        let mut reader = fs.open_read(&dir.join("c.txt")).unwrap();
+        let mut first = String::new();
+        reader.read_line(&mut first).unwrap();
+        assert_eq!(first, "line1\n");
+        assert_eq!(
+            fs.open_read(&missing).err().unwrap().kind(),
+            io::ErrorKind::NotFound
+        );
     }
 
     #[test]

@@ -1,0 +1,9 @@
+{
+  "id": "discovery_002",
+  "kind": "discovery",
+  "description": "Two project skills claiming the same name are an error and hide the built-in instead of falling back",
+  "fixture": "skills/duplicate",
+  "oracle": "exact winning level per skill, exact diagnostic code set",
+  "expect_skills": {},
+  "expect_codes": ["duplicate_skill", "name_mismatch", "shadowed_by_broken"]
+}

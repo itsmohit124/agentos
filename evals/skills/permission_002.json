@@ -1,0 +1,10 @@
+{
+  "id": "permission_002",
+  "kind": "permission",
+  "description": "tdd declares shell, so shell is allowed",
+  "fixture": "builtin:skills",
+  "oracle": "check(skill, capability) verdict",
+  "skill": "tdd",
+  "capability": "shell",
+  "expect": "allow"
+}

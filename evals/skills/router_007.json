@@ -1,0 +1,10 @@
+{
+  "id": "router_007",
+  "kind": "route",
+  "description": "Finding out which libraries exist routes to research",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Find out which libraries are available for parsing YAML",
+  "invoker": "model",
+  "expect_top": "research"
+}

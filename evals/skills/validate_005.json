@@ -1,0 +1,9 @@
+{
+  "id": "validate_005",
+  "kind": "validate",
+  "description": "A missing dependency fails validation; the non-built-in body without quality sections is only a warning",
+  "fixture": "skills/missing-dep",
+  "oracle": "validation fails; exact diagnostic code set",
+  "expect_ok": false,
+  "expect_codes": ["missing_dependency", "missing_section"]
+}

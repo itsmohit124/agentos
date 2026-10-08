@@ -1,0 +1,9 @@
+{
+  "id": "manifest_006",
+  "kind": "manifest",
+  "description": "Unknown permission capability is rejected (permission parsing)",
+  "fixture": "skills/manifests/unknown-permission",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["schema"]
+}

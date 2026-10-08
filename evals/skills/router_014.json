@@ -1,0 +1,11 @@
+{
+  "id": "router_014",
+  "kind": "route",
+  "description": "Reviewing layering and dependency direction routes to architecture-review, not code-review",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill and skills that must not be ranked",
+  "task": "Review the architecture for layering violations and dependency direction",
+  "invoker": "model",
+  "expect_top": "architecture-review",
+  "must_not_rank": ["code-review"]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "manifest_012",
+  "kind": "manifest",
+  "description": "SKILL.md without front-matter is rejected",
+  "fixture": "skills/manifests/no-front-matter",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["front_matter"]
+}

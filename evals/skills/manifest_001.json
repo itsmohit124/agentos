@@ -1,0 +1,9 @@
+{
+  "id": "manifest_001",
+  "kind": "manifest",
+  "description": "Minimal manifest (name, description, version) is valid",
+  "fixture": "skills/manifests/valid-minimal",
+  "oracle": "skill loads; exact diagnostic code set",
+  "expect_valid": true,
+  "expect_codes": []
+}

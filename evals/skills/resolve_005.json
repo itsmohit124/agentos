@@ -1,0 +1,9 @@
+{
+  "id": "resolve_005",
+  "kind": "resolve",
+  "description": "Missing dependency fails",
+  "fixture": "skills/missing-dep",
+  "oracle": "error code",
+  "target": "a",
+  "expect_error": "missing_dependency"
+}

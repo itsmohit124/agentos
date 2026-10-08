@@ -1,0 +1,9 @@
+{
+  "id": "manifest_005",
+  "kind": "manifest",
+  "description": "Dependency constraint that is not a semver requirement is rejected",
+  "fixture": "skills/manifests/bad-version-req",
+  "oracle": "skill rejected; exact diagnostic code set",
+  "expect_valid": false,
+  "expect_codes": ["invalid_version_req"]
+}

@@ -1,0 +1,10 @@
+{
+  "id": "router_012",
+  "kind": "route",
+  "description": "Designing a public API routes to interface-design",
+  "fixture": "builtin:skills",
+  "oracle": "top-ranked skill",
+  "task": "Design the public API for the cache module",
+  "invoker": "model",
+  "expect_top": "interface-design"
+}

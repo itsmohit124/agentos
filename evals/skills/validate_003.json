@@ -1,0 +1,9 @@
+{
+  "id": "validate_003",
+  "kind": "validate",
+  "description": "A dependency cycle fails validation",
+  "fixture": "skills/cycle",
+  "oracle": "validation fails; exact diagnostic code set",
+  "expect_ok": false,
+  "expect_codes": ["dependency_cycle"]
+}
