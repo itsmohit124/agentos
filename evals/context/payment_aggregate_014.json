@@ -1,0 +1,31 @@
+{
+  "id": "payment_aggregate_014",
+  "kind": "context",
+  "description": "A question about the payment aggregate selects the aggregate and its invariant.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Explain the payment aggregate boundary",
+  "relevant_files": [
+    "app/payments/models.py",
+    "docs/overview.md",
+    "tests/test_payments.py"
+  ],
+  "must_include": [
+    "domain.payments.aggregate.PaymentAggregate",
+    "domain.payments.bounded_context.Payments",
+    "domain.payments.invariant.amount-gt-0",
+    "software.app.payments.models.class.PaymentAggregate"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.users.bounded_context.Users"
+  ],
+  "required_fragments": [
+    "app/payments/models.py"
+  ],
+  "expected_contexts": [
+    "payments"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

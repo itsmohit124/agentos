@@ -1,0 +1,29 @@
+{
+  "id": "notifications_send_010",
+  "kind": "context",
+  "description": "Sending a notification stays in Notifications.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Add a subject line when sending a notification",
+  "relevant_files": [
+    "app/notifications/service.py",
+    "tests/test_users.py"
+  ],
+  "must_include": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.notifications.domain_service.NotificationService",
+    "software.app.notifications.service.class.NotificationService"
+  ],
+  "must_exclude": [
+    "domain.payments.bounded_context.Payments",
+    "domain.users.bounded_context.Users"
+  ],
+  "required_fragments": [
+    "app/notifications/service.py"
+  ],
+  "expected_contexts": [
+    "notifications"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

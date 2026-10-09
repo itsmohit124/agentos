@@ -1,0 +1,36 @@
+{
+  "id": "ambiguous_service_012",
+  "kind": "context",
+  "description": "An unqualified service task matches every service context and records the ambiguity.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Update the service layer",
+  "relevant_files": [
+    "app/notifications/service.py",
+    "app/payments/service.py",
+    "app/users/service.py"
+  ],
+  "must_include": [
+    "domain.notifications.domain_service.NotificationService",
+    "domain.payments.domain_service.PaymentService",
+    "domain.users.domain_service.UserService",
+    "software.app.notifications.service.class.NotificationService",
+    "software.app.payments.service.class.PaymentService",
+    "software.app.users.service.class.UserService"
+  ],
+  "must_exclude": [
+    "software.app.main.function.create_app"
+  ],
+  "required_fragments": [
+    "app/notifications/service.py",
+    "app/payments/service.py",
+    "app/users/service.py"
+  ],
+  "expected_contexts": [
+    "notifications",
+    "payments",
+    "users"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

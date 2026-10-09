@@ -1,0 +1,30 @@
+{
+  "id": "payment_adr_004",
+  "kind": "context",
+  "description": "Reviewing the payment record decision selects the ADR.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Review the decision to record every payment",
+  "relevant_files": [
+    "app/payments/repository.py",
+    "docs/adr/0001-record-payments.md",
+    "docs/overview.md"
+  ],
+  "must_include": [
+    "decision.docs.adr.0001-record-payments",
+    "domain.payments.bounded_context.Payments",
+    "domain.payments.repository.PaymentRepository"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.users.bounded_context.Users"
+  ],
+  "required_fragments": [
+    "docs/adr/0001-record-payments.md"
+  ],
+  "expected_contexts": [
+    "payments"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

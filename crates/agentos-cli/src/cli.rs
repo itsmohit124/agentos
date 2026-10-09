@@ -48,6 +48,8 @@ pub enum Command {
     Knowledge(KnowledgeArgs),
     /// Domain lifecycle: contexts, terminology, proposals, confirmation.
     Domain(DomainArgs),
+    /// Measure naive context costs. Does not build a Context Pack.
+    Benchmark(BenchmarkArgs),
     /// Run a deterministic evaluation suite.
     Evaluate(EvaluateArgs),
 }
@@ -197,6 +199,23 @@ pub enum DomainCommand {
     },
     /// Fail when canonical evidence is missing or a lifecycle rule is broken.
     Validate,
+}
+
+/// `agentos benchmark` arguments.
+#[derive(Debug, Args)]
+pub struct BenchmarkArgs {
+    #[command(subcommand)]
+    pub command: BenchmarkCommand,
+}
+
+/// `agentos benchmark` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum BenchmarkCommand {
+    /// Count full-repository and manually chosen file tokens for each golden task.
+    Baseline {
+        /// Fixture directory, relative to the project root or absolute.
+        fixture: PathBuf,
+    },
 }
 
 /// `agentos evaluate` arguments.

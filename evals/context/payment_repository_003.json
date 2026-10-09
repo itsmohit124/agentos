@@ -1,0 +1,31 @@
+{
+  "id": "payment_repository_003",
+  "kind": "context",
+  "description": "Refactoring payment save stays on the payment repository.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Refactor the payment repository save path",
+  "relevant_files": [
+    "app/payments/repository.py",
+    "app/payments/service.py",
+    "docs/adr/0001-record-payments.md",
+    "tests/test_payments.py"
+  ],
+  "must_include": [
+    "domain.payments.repository.PaymentRepository",
+    "software.app.payments.repository.class.PaymentRepository",
+    "software.app.payments.repository.method.PaymentRepository.save"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.users.bounded_context.Users"
+  ],
+  "required_fragments": [
+    "app/payments/repository.py"
+  ],
+  "expected_contexts": [
+    "payments"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

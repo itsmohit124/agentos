@@ -4,13 +4,15 @@
 //! Every case names its fixture and its oracle; no LLM or network is involved, so the same inputs
 //! always produce the same report.
 //!
-//! Implemented areas: [`skills`], [`knowledge`], [`ddd`].
+//! Implemented areas: [`skills`], [`knowledge`], [`ddd`]. Context cases are measured by
+//! [`baseline`] before the context engine ranks them.
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use serde::Serialize;
 
+pub mod baseline;
 pub mod ddd;
 pub mod knowledge;
 pub mod skills;
@@ -95,4 +97,7 @@ pub enum EvalError {
         /// What is wrong.
         message: String,
     },
+    /// A baseline measurement could not be completed.
+    #[error("{0}")]
+    Failed(String),
 }

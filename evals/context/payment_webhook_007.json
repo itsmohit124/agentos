@@ -1,0 +1,38 @@
+{
+  "id": "payment_webhook_007",
+  "kind": "context",
+  "description": "A payment task must not retrieve the Notifications context.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Add retry support to payment webhook processing",
+  "relevant_files": [
+    "app/payments/controller.py",
+    "app/payments/models.py",
+    "app/payments/repository.py",
+    "app/payments/schema.sql",
+    "app/payments/service.py",
+    "docs/adr/0001-record-payments.md",
+    "docs/overview.md",
+    "tests/test_payments.py"
+  ],
+  "must_include": [
+    "domain.payments.bounded_context.Payments",
+    "domain.payments.entity.Payment",
+    "software.app.payments.service.class.PaymentService"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.notifications.domain_service.NotificationService",
+    "domain.users.bounded_context.Users",
+    "software.app.notifications.service.class.NotificationService"
+  ],
+  "required_fragments": [
+    "app/payments/controller.py",
+    "app/payments/service.py"
+  ],
+  "expected_contexts": [
+    "payments"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

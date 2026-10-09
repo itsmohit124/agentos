@@ -1,0 +1,174 @@
+{
+  "fixture": "python-fastapi",
+  "token_heuristic": "one token per four characters, rounded up",
+  "file_count": 20,
+  "full_repository_tokens": 1117,
+  "cases": [
+    {
+      "id": "ambiguous_service_012",
+      "task": "Update the service layer",
+      "relevant_files": [
+        "app/notifications/service.py",
+        "app/payments/service.py",
+        "app/users/service.py"
+      ],
+      "relevant_file_tokens": 197,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "cross_context_register_011",
+      "task": "When a user registers, send a welcome notification",
+      "relevant_files": [
+        "app/notifications/service.py",
+        "app/users/models.py",
+        "app/users/service.py",
+        "tests/test_users.py"
+      ],
+      "relevant_file_tokens": 265,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "notifications_send_010",
+      "task": "Add a subject line when sending a notification",
+      "relevant_files": [
+        "app/notifications/service.py",
+        "tests/test_users.py"
+      ],
+      "relevant_file_tokens": 155,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "payment_adr_004",
+      "task": "Review the decision to record every payment",
+      "relevant_files": [
+        "app/payments/repository.py",
+        "docs/adr/0001-record-payments.md",
+        "docs/overview.md"
+      ],
+      "relevant_file_tokens": 145,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "payment_aggregate_014",
+      "task": "Explain the payment aggregate boundary",
+      "relevant_files": [
+        "app/payments/models.py",
+        "docs/overview.md",
+        "tests/test_payments.py"
+      ],
+      "relevant_file_tokens": 367,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "payment_charge_001",
+      "task": "Add a refund method to payment charging",
+      "relevant_files": [
+        "app/payments/controller.py",
+        "app/payments/models.py",
+        "app/payments/repository.py",
+        "app/payments/schema.sql",
+        "app/payments/service.py",
+        "docs/adr/0001-record-payments.md",
+        "docs/overview.md",
+        "tests/test_payments.py"
+      ],
+      "relevant_file_tokens": 646,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "payment_controller_013",
+      "task": "Add idempotency to the payment create endpoint",
+      "relevant_files": [
+        "app/payments/controller.py",
+        "app/payments/service.py",
+        "docs/overview.md",
+        "tests/test_payments.py"
+      ],
+      "relevant_file_tokens": 332,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "payment_invariant_002",
+      "task": "Why must a payment amount be positive?",
+      "relevant_files": [
+        "app/payments/models.py",
+        "docs/overview.md",
+        "tests/test_payments.py"
+      ],
+      "relevant_file_tokens": 367,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "payment_money_005",
+      "task": "Add currency conversion for payment money",
+      "relevant_files": [
+        "app/payments/models.py",
+        "docs/overview.md",
+        "tests/test_payments.py"
+      ],
+      "relevant_file_tokens": 367,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "payment_repository_003",
+      "task": "Refactor the payment repository save path",
+      "relevant_files": [
+        "app/payments/repository.py",
+        "app/payments/service.py",
+        "docs/adr/0001-record-payments.md",
+        "tests/test_payments.py"
+      ],
+      "relevant_file_tokens": 369,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "payment_test_006",
+      "task": "Fix the failing test_charge_saves_payment test",
+      "relevant_files": [
+        "app/payments/models.py",
+        "app/payments/repository.py",
+        "app/payments/service.py",
+        "tests/test_payments.py"
+      ],
+      "relevant_file_tokens": 510,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "payment_webhook_007",
+      "task": "Add retry support to payment webhook processing",
+      "relevant_files": [
+        "app/payments/controller.py",
+        "app/payments/models.py",
+        "app/payments/repository.py",
+        "app/payments/schema.sql",
+        "app/payments/service.py",
+        "docs/adr/0001-record-payments.md",
+        "docs/overview.md",
+        "tests/test_payments.py"
+      ],
+      "relevant_file_tokens": 646,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "users_model_009",
+      "task": "What fields does a user account have?",
+      "relevant_files": [
+        "app/users/models.py",
+        "tests/test_users.py"
+      ],
+      "relevant_file_tokens": 138,
+      "full_repository_tokens": 1117
+    },
+    {
+      "id": "users_register_008",
+      "task": "Add email validation when registering a user",
+      "relevant_files": [
+        "app/users/models.py",
+        "app/users/service.py",
+        "tests/test_users.py"
+      ],
+      "relevant_file_tokens": 212,
+      "full_repository_tokens": 1117
+    }
+  ]
+}

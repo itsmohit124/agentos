@@ -1,0 +1,34 @@
+{
+  "id": "cross_context_register_011",
+  "kind": "context",
+  "description": "Registration that sends a notification includes Users and Notifications.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "When a user registers, send a welcome notification",
+  "relevant_files": [
+    "app/notifications/service.py",
+    "app/users/models.py",
+    "app/users/service.py",
+    "tests/test_users.py"
+  ],
+  "must_include": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.users.bounded_context.Users",
+    "domain.users.entity.User",
+    "software.app.notifications.service.class.NotificationService",
+    "software.app.users.service.class.UserService"
+  ],
+  "must_exclude": [
+    "domain.payments.bounded_context.Payments"
+  ],
+  "required_fragments": [
+    "app/notifications/service.py",
+    "app/users/service.py"
+  ],
+  "expected_contexts": [
+    "notifications",
+    "users"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

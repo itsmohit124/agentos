@@ -1,0 +1,30 @@
+{
+  "id": "payment_money_005",
+  "kind": "context",
+  "description": "Currency work on payment money selects the Money value object.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Add currency conversion for payment money",
+  "relevant_files": [
+    "app/payments/models.py",
+    "docs/overview.md",
+    "tests/test_payments.py"
+  ],
+  "must_include": [
+    "domain.payments.terminology.Money",
+    "domain.payments.value_object.Money",
+    "software.app.payments.models.class.Money"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.users.bounded_context.Users"
+  ],
+  "required_fragments": [
+    "app/payments/models.py"
+  ],
+  "expected_contexts": [
+    "payments"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

@@ -1,0 +1,29 @@
+{
+  "id": "users_model_009",
+  "kind": "context",
+  "description": "A question about user fields selects the User entity.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "What fields does a user account have?",
+  "relevant_files": [
+    "app/users/models.py",
+    "tests/test_users.py"
+  ],
+  "must_include": [
+    "domain.users.entity.User",
+    "domain.users.terminology.User",
+    "software.app.users.models.class.User"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.payments.bounded_context.Payments"
+  ],
+  "required_fragments": [
+    "app/users/models.py"
+  ],
+  "expected_contexts": [
+    "users"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

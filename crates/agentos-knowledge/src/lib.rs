@@ -35,6 +35,7 @@ pub use domain::{
 };
 pub use error::KnowledgeError;
 pub use extract::{ExtractorRegistry, LanguageExtractor, RawCall, RawSymbol};
+pub use hashutil::token_estimate;
 pub use model::{
     KnowledgeEdge, KnowledgeFragment, KnowledgeNode, NodeKind, Provenance, ProvenanceKind,
     RelationType,
@@ -46,3 +47,4 @@ pub use profile::{
 };
 pub use scan::{ScanReport, rebuild, rebuild_with, scan, scan_with};
 pub use store::{Inspection, KnowledgeStore, Stats};
+pub use walk::{SourceFile, list_sources};

@@ -1,0 +1,30 @@
+{
+  "id": "payment_invariant_002",
+  "kind": "context",
+  "description": "A question about the payment amount rule selects the invariant.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Why must a payment amount be positive?",
+  "relevant_files": [
+    "app/payments/models.py",
+    "docs/overview.md",
+    "tests/test_payments.py"
+  ],
+  "must_include": [
+    "domain.payments.entity.Payment",
+    "domain.payments.invariant.amount-gt-0",
+    "software.app.payments.models.class.Payment"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.users.bounded_context.Users"
+  ],
+  "required_fragments": [
+    "app/payments/models.py"
+  ],
+  "expected_contexts": [
+    "payments"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

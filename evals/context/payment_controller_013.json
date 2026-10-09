@@ -1,0 +1,32 @@
+{
+  "id": "payment_controller_013",
+  "kind": "context",
+  "description": "Payment create endpoint work stays on the payment controller.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Add idempotency to the payment create endpoint",
+  "relevant_files": [
+    "app/payments/controller.py",
+    "app/payments/service.py",
+    "docs/overview.md",
+    "tests/test_payments.py"
+  ],
+  "must_include": [
+    "domain.payments.bounded_context.Payments",
+    "software.app.payments.controller.class.PaymentController",
+    "software.app.payments.controller.method.PaymentController.create"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.users.bounded_context.Users",
+    "software.app.main.function.create_app"
+  ],
+  "required_fragments": [
+    "app/payments/controller.py"
+  ],
+  "expected_contexts": [
+    "payments"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

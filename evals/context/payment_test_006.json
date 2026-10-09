@@ -1,0 +1,31 @@
+{
+  "id": "payment_test_006",
+  "kind": "context",
+  "description": "A failing payment charge test stays on the payments tests.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Fix the failing test_charge_saves_payment test",
+  "relevant_files": [
+    "app/payments/models.py",
+    "app/payments/repository.py",
+    "app/payments/service.py",
+    "tests/test_payments.py"
+  ],
+  "must_include": [
+    "quality.tests.test_payments.test.test_charge_saves_payment",
+    "software.app.payments.service.class.PaymentService"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.users.bounded_context.Users",
+    "quality.tests.test_users.test.test_register_sends_notification"
+  ],
+  "required_fragments": [
+    "tests/test_payments.py"
+  ],
+  "expected_contexts": [
+    "payments"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}

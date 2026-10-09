@@ -1,0 +1,30 @@
+{
+  "id": "users_register_008",
+  "kind": "context",
+  "description": "Registering a user stays in Users unless the task names another context.",
+  "fixture": "python-fastapi",
+  "oracle": "context-pack",
+  "task": "Add email validation when registering a user",
+  "relevant_files": [
+    "app/users/models.py",
+    "app/users/service.py",
+    "tests/test_users.py"
+  ],
+  "must_include": [
+    "domain.users.bounded_context.Users",
+    "domain.users.entity.User",
+    "software.app.users.service.class.UserService"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.payments.bounded_context.Payments"
+  ],
+  "required_fragments": [
+    "app/users/service.py"
+  ],
+  "expected_contexts": [
+    "users"
+  ],
+  "max_tokens": null,
+  "max_irrelevant_ratio": null
+}
