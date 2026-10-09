@@ -23,6 +23,7 @@ name = "agentos-cli"
 version = "0.1.0"
 dependencies = [
  "agentos-config",
+ "agentos-context",
  "agentos-core",
  "agentos-evaluation",
  "agentos-knowledge",
@@ -52,6 +53,15 @@ dependencies = [
 [[package]]
 name = "agentos-context"
 version = "0.1.0"
+dependencies = [
+ "agentos-knowledge",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "tracing",
+]
 
 [[package]]
 name = "agentos-core"
@@ -67,6 +77,7 @@ dependencies = [
 name = "agentos-evaluation"
 version = "0.1.0"
 dependencies = [
+ "agentos-context",
  "agentos-core",
  "agentos-knowledge",
  "agentos-permissions",

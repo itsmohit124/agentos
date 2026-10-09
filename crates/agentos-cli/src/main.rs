@@ -46,6 +46,7 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
         Command::Knowledge(args) => commands::knowledge::run(&app, &args.command, format),
         Command::Domain(args) => commands::domain::run(&app, &args.command, format),
         Command::Benchmark(args) => commands::benchmark::run(&app, &args.command, format),
+        Command::Context(args) => commands::context::run(&app, &args, format),
         Command::Evaluate(args) => commands::evaluate::run(&app, &args, format),
     }
 }

@@ -1,14 +1,37 @@
 //! AgentOS context engine: budgeted, traceable Context Packs.
 //!
-//! Phase 0 stub. Implemented in Phase 4.
+//! A pack is a projection of the existing project knowledge graph. It stores logical ids and
+//! provenance sources. It does not create a second graph, and it does not upgrade Inferred or
+//! Proposed domain knowledge.
+//!
+//! ```text
+//! build(task) -> ContextPack
+//! ```
+//!
+//! Lexical and graph retrieval work with no embedding model. [`NullSemantic`] is the default.
+
+mod budget;
+mod cache;
+mod engine;
+mod error;
+mod pack;
+mod render;
+mod semantic;
+mod tokens;
+mod view;
+
+pub use engine::{ContextConfig, build, render_json, stats, to_json};
+pub use error::ContextError;
+pub use pack::{
+    Budget, ConstraintLink, ContextPack, ContextStats, Exclusion, Intent, RefItem, RetrievalTrace,
+    ScoreParts, SelectedFragment, SelectedNode, TermHit, TerminologyEntry, TraceEntry,
+};
+pub use render::{explain, to_markdown};
+pub use semantic::{NullSemantic, SemanticHit, SemanticRetriever};
+pub use view::{KnowledgeView, MemoryView, SqliteView, content_fingerprint};
 
 /// Name of this crate.
 pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
 
 #[cfg(test)]
-mod tests {
-    #[test]
-    fn smoke() {
-        assert_eq!(super::CRATE_NAME, "agentos-context");
-    }
-}
+mod tests;

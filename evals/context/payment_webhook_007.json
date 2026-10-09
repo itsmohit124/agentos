@@ -33,6 +33,6 @@
   "expected_contexts": [
     "payments"
   ],
-  "max_tokens": null,
-  "max_irrelevant_ratio": null
+  "max_tokens": 997,
+  "max_irrelevant_ratio": 0.0
 }

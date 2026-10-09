@@ -13,6 +13,7 @@ use std::path::PathBuf;
 use serde::Serialize;
 
 pub mod baseline;
+pub mod context;
 pub mod ddd;
 pub mod knowledge;
 pub mod skills;

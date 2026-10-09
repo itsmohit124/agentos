@@ -12,6 +12,7 @@ path = "src/main.rs"
 
 [dependencies]
 agentos-config.workspace = true
+agentos-context.workspace = true
 agentos-core.workspace = true
 agentos-evaluation.workspace = true
 agentos-knowledge.workspace = true

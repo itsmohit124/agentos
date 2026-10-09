@@ -23,6 +23,8 @@ evals/
 agentos evaluate skills      # exit 0 if every case passes, 3 if any fails
 agentos evaluate knowledge
 agentos evaluate ddd
+agentos evaluate context
+agentos benchmark baseline fixtures/python-fastapi
 ```
 
 The harness lives in `crates/agentos-evaluation`; `cargo test --workspace` also runs the committed
@@ -69,3 +71,15 @@ A domain case passes only when all three sets match. The detail line reports nod
 precision and recall, plus confirmed and canonical counts (both zero on these cases) and whether
 provenance is complete. A markdown case passes when the five generated files match the golden bytes.
 No timestamp is part of either oracle.
+
+## `context/` (Phase 4)
+
+| `kind` | Oracle |
+|---|---|
+| `context` | `must_include`, `must_exclude`, `required_fragments` on a Context Pack built from `fixtures/<fixture>` after scan and domain scan |
+
+`relevant_files` is the manual file list for `agentos benchmark baseline`. The context engine does
+not read it. `max_tokens` and `max_irrelevant_ratio` are the measured pack size and irrelevant-token
+ratio. A bounded-context id in `must_exclude` also rejects every selected node in that package.
+Recall of `must_include` and `required_fragments` must be complete. The detail line reports recall,
+precision, tokens, irrelevant tokens, latency, and reproducibility.

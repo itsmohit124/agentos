@@ -50,6 +50,8 @@ pub enum Command {
     Domain(DomainArgs),
     /// Measure naive context costs. Does not build a Context Pack.
     Benchmark(BenchmarkArgs),
+    /// Build a Context Pack from the project knowledge graph.
+    Context(ContextArgs),
     /// Run a deterministic evaluation suite.
     Evaluate(EvaluateArgs),
 }
@@ -218,6 +220,49 @@ pub enum BenchmarkCommand {
     },
 }
 
+/// `agentos context` arguments.
+#[derive(Debug, Args)]
+pub struct ContextArgs {
+    /// Token budget. Omit it to keep every relevant item without dumping the repository.
+    #[arg(long)]
+    pub budget: Option<u32>,
+
+    #[command(subcommand)]
+    pub command: ContextCommand,
+}
+
+/// `agentos context` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum ContextCommand {
+    /// Explain which contexts and terms a task routes to.
+    Explain {
+        /// Task text.
+        task: String,
+    },
+    /// Build a Context Pack.
+    Build {
+        /// Task text.
+        task: String,
+        /// Pack format.
+        #[arg(long, value_enum, default_value_t = PackFormat::Md)]
+        format: PackFormat,
+    },
+    /// Summarise a Context Pack.
+    Stats {
+        /// Task text.
+        task: String,
+    },
+}
+
+/// `agentos context build` formats.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum PackFormat {
+    /// Pretty JSON.
+    Json,
+    /// Markdown.
+    Md,
+}
+
 /// `agentos evaluate` arguments.
 #[derive(Debug, Args)]
 pub struct EvaluateArgs {
@@ -243,6 +288,8 @@ pub enum EvalArea {
     Knowledge,
     /// Domain lifecycle and DDD fixtures (`evals/ddd`).
     Ddd,
+    /// Context packs (`evals/context`).
+    Context,
 }
 
 impl Cli {

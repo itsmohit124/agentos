@@ -165,8 +165,24 @@ pub fn write(project_root: &Path, fixture_dir: &Path) -> Result<BaselineReport, 
     Ok(report)
 }
 
+/// Loads and checks every context case, in file-name order.
+pub fn all_cases(cases_dir: &Path) -> Result<Vec<ContextCase>, EvalError> {
+    read_cases(cases_dir, None)
+}
+
 /// Loads and checks context cases for one fixture, in file-name order.
 pub fn load_cases(cases_dir: &Path, fixture: &str) -> Result<Vec<ContextCase>, EvalError> {
+    let cases = read_cases(cases_dir, Some(fixture))?;
+    if cases.is_empty() {
+        return Err(EvalError::Failed(format!(
+            "no context cases for fixture {fixture} in {}",
+            cases_dir.display()
+        )));
+    }
+    Ok(cases)
+}
+
+fn read_cases(cases_dir: &Path, fixture: Option<&str>) -> Result<Vec<ContextCase>, EvalError> {
     if !cases_dir.is_dir() {
         return Err(EvalError::NoCases(cases_dir.to_path_buf()));
     }
@@ -216,15 +232,9 @@ pub fn load_cases(cases_dir: &Path, fixture: &str) -> Result<Vec<ContextCase>, E
                 message: "oracle, description, and task must not be empty".to_owned(),
             });
         }
-        if case.fixture == fixture {
+        if fixture.is_none_or(|name| case.fixture == name) {
             cases.push(case);
         }
-    }
-    if cases.is_empty() {
-        return Err(EvalError::Failed(format!(
-            "no context cases for fixture {fixture} in {}",
-            cases_dir.display()
-        )));
     }
     Ok(cases)
 }

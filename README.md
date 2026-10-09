@@ -4,8 +4,9 @@ AgentOS is a local-first, agent-agnostic engineering intelligence layer. It give
 (Cursor, Claude Code, Codex, or any other) the right knowledge, skills, workflow, feedback and
 guardrails for a task — without replacing the agent.
 
-> Status: **early development**. The CLI can initialise a project, manage portable skills, and
-> build a derived knowledge graph. Context, workflow and the other engines are not implemented yet.
+> Status: **early development**. The CLI can initialise a project, manage portable skills, build a
+> derived knowledge graph, and assemble a budgeted Context Pack. Workflow and the other engines
+> are not implemented yet.
 
 ## Build
 
@@ -46,9 +47,15 @@ agentos domain propose            # one lifecycle step toward Proposed
 agentos domain confirm <id>       # Proposed → Confirmed, or Confirmed → Canonical
 agentos domain reject <id>
 agentos domain validate           # exit 3 when canonical evidence has drifted
+agentos benchmark baseline fixtures/python-fastapi
+                              # naive file-token baseline; writes evals/baselines/context-baseline.json
+agentos context explain "Add retry support to payment webhook processing"
+agentos context build "Add retry support to payment webhook processing" --format json
+agentos context stats "Add retry support to payment webhook processing"
 agentos evaluate skills           # run evals/skills; exit 3 if a case fails
 agentos evaluate knowledge        # project profiles and language graph fixtures
 agentos evaluate ddd              # domain lifecycle fixtures
+agentos evaluate context          # context packs against evals/context
 ```
 
 Global flags: `--root <PATH>`, `--json`, `-v` / `-vv`, `--log-level <FILTER>`.

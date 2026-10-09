@@ -37,7 +37,7 @@ pub use error::KnowledgeError;
 pub use extract::{ExtractorRegistry, LanguageExtractor, RawCall, RawSymbol};
 pub use hashutil::token_estimate;
 pub use model::{
-    KnowledgeEdge, KnowledgeFragment, KnowledgeNode, NodeKind, Provenance, ProvenanceKind,
+    Finding, KnowledgeEdge, KnowledgeFragment, KnowledgeNode, NodeKind, Provenance, ProvenanceKind,
     RelationType,
 };
 pub use profile::{

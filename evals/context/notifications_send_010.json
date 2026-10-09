@@ -24,6 +24,6 @@
   "expected_contexts": [
     "notifications"
   ],
-  "max_tokens": null,
-  "max_irrelevant_ratio": null
+  "max_tokens": 97,
+  "max_irrelevant_ratio": 0.0
 }
