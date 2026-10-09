@@ -8,6 +8,7 @@ publish.workspace = true
 
 [dependencies]
 agentos-core.workspace = true
+agentos-knowledge.workspace = true
 agentos-permissions.workspace = true
 agentos-skills.workspace = true
 serde.workspace = true

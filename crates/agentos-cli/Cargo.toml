@@ -14,6 +14,7 @@ path = "src/main.rs"
 agentos-config.workspace = true
 agentos-core.workspace = true
 agentos-evaluation.workspace = true
+agentos-knowledge.workspace = true
 agentos-permissions.workspace = true
 agentos-skills.workspace = true
 anyhow.workspace = true

@@ -1,0 +1,7 @@
+{
+  "id": "profile_greenfield",
+  "kind": "profile",
+  "description": "Requirements plus a manifest and README, with no source, are GREENFIELD and SPECIFIED.",
+  "fixture": "greenfield-specified",
+  "oracle": "expected/profile.json"
+}

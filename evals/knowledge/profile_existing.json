@@ -1,0 +1,7 @@
+{
+  "id": "profile_existing",
+  "kind": "profile",
+  "description": "Source, tests, a manifest and docs, with no spec, are EXISTING and ESTABLISHED.",
+  "fixture": "existing-project",
+  "oracle": "expected/profile.json"
+}

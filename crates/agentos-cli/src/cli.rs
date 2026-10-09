@@ -40,6 +40,12 @@ pub enum Command {
     Config,
     /// Discover, inspect, validate, install and graph skills.
     Skills(SkillsArgs),
+    /// Print the derived project profile.
+    Project(ProjectArgs),
+    /// Index the repository into the knowledge graph.
+    Scan,
+    /// Query or rebuild the knowledge graph.
+    Knowledge(KnowledgeArgs),
     /// Run a deterministic evaluation suite.
     Evaluate(EvaluateArgs),
 }
@@ -106,6 +112,45 @@ pub enum GraphFormat {
     Dot,
 }
 
+/// `agentos project` arguments.
+#[derive(Debug, Args)]
+pub struct ProjectArgs {
+    #[command(subcommand)]
+    pub command: ProjectCommand,
+}
+
+/// `agentos project` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum ProjectCommand {
+    /// Print the persisted project profile.
+    Profile,
+}
+
+/// `agentos knowledge` arguments.
+#[derive(Debug, Args)]
+pub struct KnowledgeArgs {
+    #[command(subcommand)]
+    pub command: KnowledgeCommand,
+}
+
+/// `agentos knowledge` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum KnowledgeCommand {
+    /// Counts of files, nodes, edges, fragments and provenance.
+    Stats,
+    /// List node ids and types.
+    Nodes,
+    /// List edges.
+    Edges,
+    /// Show one node with its edges and fragments.
+    Inspect {
+        /// Logical node id.
+        id: String,
+    },
+    /// Delete the derived graph and scan again.
+    Rebuild,
+}
+
 /// `agentos evaluate` arguments.
 #[derive(Debug, Args)]
 pub struct EvaluateArgs {
@@ -127,6 +172,8 @@ pub struct EvaluateArgs {
 pub enum EvalArea {
     /// The skill system (`evals/skills`).
     Skills,
+    /// Project understanding and the knowledge graph (`evals/knowledge`).
+    Knowledge,
 }
 
 impl Cli {

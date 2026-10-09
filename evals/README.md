@@ -21,6 +21,7 @@ evals/
 
 ```bash
 agentos evaluate skills      # exit 0 if every case passes, 3 if any fails
+agentos evaluate knowledge
 ```
 
 The harness lives in `crates/agentos-evaluation`; `cargo test --workspace` also runs the committed
@@ -41,3 +42,14 @@ suite. A case file with an unknown field, an `id` that differs from its file nam
 
 `fixture` is a directory under `fixtures/` (with optional `project/`, `user/`, `builtin/`
 subdirectories, or a bare directory of skills), or `builtin:skills` for the shipped skills.
+
+## `knowledge/` (Phase 2)
+
+| `kind` | Oracle |
+|---|---|
+| `profile` | `fixtures/<fixture>/expected/profile.json` (classification, maturity, confidence, every signal) |
+| `graph` | `fixtures/<fixture>/expected/graph.json` (node id, type, provenance kind; edge endpoints, relation, provenance kind) |
+
+A graph case passes only when both sets match (recall and precision are `n/n`), every node and edge
+has complete provenance, a second scan writes zero rows, and deleting `agentos.db` then scanning
+reproduces the same node fingerprints. The case copies the fixture before scanning it.

@@ -87,6 +87,7 @@ fn init_creates_project_state_in_git_repo() {
             (".agentos/config.toml", "created"),
             (".agentos/.gitignore", "created"),
             (".agentos/agentos.db", "created"),
+            (".agentos/project-profile.json", "created"),
         ]
         .map(|(a, b)| (a.to_owned(), b.to_owned()))
     );

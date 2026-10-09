@@ -1,0 +1,70 @@
+{
+  "classification": "GREENFIELD",
+  "maturity": "SPECIFIED",
+  "confidence_millis": 750,
+  "uncertain": false,
+  "provenance_kind": "generated",
+  "signals": [
+    {
+      "name": "git",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "git_history",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "source_files",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "manifests",
+      "present": true,
+      "evidence": [
+        "pyproject.toml"
+      ]
+    },
+    {
+      "name": "tests",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "docs",
+      "present": true,
+      "evidence": [
+        "README.md"
+      ]
+    },
+    {
+      "name": "specs",
+      "present": true,
+      "evidence": [
+        "docs/spec/requirements.md"
+      ]
+    },
+    {
+      "name": "database",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "api",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "ci",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "container",
+      "present": false,
+      "evidence": []
+    }
+  ]
+}

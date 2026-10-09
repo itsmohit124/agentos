@@ -1,0 +1,90 @@
+{
+  "classification": "EXISTING",
+  "maturity": "MATURE",
+  "confidence_millis": 1000,
+  "uncertain": false,
+  "provenance_kind": "generated",
+  "signals": [
+    {
+      "name": "git",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "git_history",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "source_files",
+      "present": true,
+      "evidence": [
+        "app/main.py",
+        "app/notifications/service.py",
+        "app/payments/controller.py",
+        "app/payments/models.py",
+        "app/payments/repository.py",
+        "app/payments/service.py",
+        "app/users/models.py",
+        "app/users/service.py"
+      ]
+    },
+    {
+      "name": "manifests",
+      "present": true,
+      "evidence": [
+        "pyproject.toml"
+      ]
+    },
+    {
+      "name": "tests",
+      "present": true,
+      "evidence": [
+        "tests/test_payments.py",
+        "tests/test_users.py"
+      ]
+    },
+    {
+      "name": "docs",
+      "present": true,
+      "evidence": [
+        "README.md",
+        "docs/adr/0001-record-payments.md",
+        "docs/overview.md"
+      ]
+    },
+    {
+      "name": "specs",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "database",
+      "present": true,
+      "evidence": [
+        "app/payments/schema.sql"
+      ]
+    },
+    {
+      "name": "api",
+      "present": true,
+      "evidence": [
+        "openapi.yaml"
+      ]
+    },
+    {
+      "name": "ci",
+      "present": true,
+      "evidence": [
+        ".github/workflows/ci.yml"
+      ]
+    },
+    {
+      "name": "container",
+      "present": true,
+      "evidence": [
+        "Dockerfile"
+      ]
+    }
+  ]
+}

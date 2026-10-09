@@ -4,8 +4,8 @@ AgentOS is a local-first, agent-agnostic engineering intelligence layer. It give
 (Cursor, Claude Code, Codex, or any other) the right knowledge, skills, workflow, feedback and
 guardrails for a task — without replacing the agent.
 
-> Status: **early development**. The CLI can initialise and check a project and manage portable
-> skills; the knowledge, context, workflow and other engines are not implemented yet.
+> Status: **early development**. The CLI can initialise a project, manage portable skills, and
+> build a derived knowledge graph. Context, workflow and the other engines are not implemented yet.
 
 ## Build
 
@@ -19,10 +19,18 @@ cargo build --release
 ## Usage
 
 ```bash
-agentos init              # create .agentos/ (config, derived SQLite index); safe to re-run
+agentos init              # create .agentos/ (config, profile, derived SQLite index); safe to re-run
 agentos doctor            # check root, git, .agentos, config, database, writability
 agentos doctor --json     # same, machine-readable
 agentos config            # effective configuration and the source of every value
+
+agentos project profile          # classification, maturity, signals (written by init and scan)
+agentos scan                     # index the repository; a second run reports 0 changed
+agentos knowledge stats          # node, edge and provenance counts
+agentos knowledge nodes          # logical ids
+agentos knowledge edges
+agentos knowledge inspect <id>
+agentos knowledge rebuild        # delete the derived graph and scan again
 
 agentos skills list               # skills that won discovery, with level and invocation
 agentos skills inspect tdd        # metadata, resolved dependencies, permissions, body
@@ -31,6 +39,7 @@ agentos skills validate           # everything, including bodies; exit 3 on erro
 agentos skills install ./my-skill # copy a local skill into .agents/skills/ (git URLs: not yet)
 agentos skills graph [--format dot]
 agentos evaluate skills           # run evals/skills; exit 3 if a case fails
+agentos evaluate knowledge        # project profiles and the python-fastapi graph
 ```
 
 Global flags: `--root <PATH>`, `--json`, `-v` / `-vv`, `--log-level <FILTER>`.
@@ -88,9 +97,10 @@ Logs are written to stderr; command results to stdout.
 
 ```text
 .agentos/
-├── config.toml   # project configuration (yours to edit; never overwritten)
-├── .gitignore    # keeps derived state out of Git
-└── agentos.db    # SQLite index: derived state, safe to delete and rebuild
+├── config.toml          # project configuration (yours to edit; never overwritten)
+├── .gitignore           # keeps derived state out of Git
+├── project-profile.json # derived classification and signals; rewritten by init and scan
+└── agentos.db           # SQLite knowledge index: derived state, safe to delete and rebuild
 ```
 
 ## Development

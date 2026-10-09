@@ -1,0 +1,64 @@
+{
+  "classification": "GREENFIELD",
+  "maturity": "EMPTY",
+  "confidence_millis": 500,
+  "uncertain": true,
+  "provenance_kind": "generated",
+  "signals": [
+    {
+      "name": "git",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "git_history",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "source_files",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "manifests",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "tests",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "docs",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "specs",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "database",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "api",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "ci",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "container",
+      "present": false,
+      "evidence": []
+    }
+  ]
+}

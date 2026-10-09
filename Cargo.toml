@@ -30,6 +30,7 @@ publish = false
 agentos-core = { path = "crates/agentos-core" }
 agentos-config = { path = "crates/agentos-config" }
 agentos-evaluation = { path = "crates/agentos-evaluation" }
+agentos-knowledge = { path = "crates/agentos-knowledge" }
 agentos-permissions = { path = "crates/agentos-permissions" }
 agentos-skills = { path = "crates/agentos-skills" }
 agentos-testkit = { path = "crates/agentos-testkit" }

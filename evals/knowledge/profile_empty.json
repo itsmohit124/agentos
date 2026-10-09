@@ -1,0 +1,7 @@
+{
+  "id": "profile_empty",
+  "kind": "profile",
+  "description": "A note file and an ignored README stay GREENFIELD, EMPTY, and explicitly uncertain.",
+  "fixture": "empty-project",
+  "oracle": "expected/profile.json"
+}

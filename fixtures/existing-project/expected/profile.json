@@ -1,0 +1,72 @@
+{
+  "classification": "EXISTING",
+  "maturity": "ESTABLISHED",
+  "confidence_millis": 800,
+  "uncertain": false,
+  "provenance_kind": "generated",
+  "signals": [
+    {
+      "name": "git",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "git_history",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "source_files",
+      "present": true,
+      "evidence": [
+        "app/orders/service.py"
+      ]
+    },
+    {
+      "name": "manifests",
+      "present": true,
+      "evidence": [
+        "pyproject.toml"
+      ]
+    },
+    {
+      "name": "tests",
+      "present": true,
+      "evidence": [
+        "tests/test_orders.py"
+      ]
+    },
+    {
+      "name": "docs",
+      "present": true,
+      "evidence": [
+        "README.md"
+      ]
+    },
+    {
+      "name": "specs",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "database",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "api",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "ci",
+      "present": false,
+      "evidence": []
+    },
+    {
+      "name": "container",
+      "present": false,
+      "evidence": []
+    }
+  ]
+}

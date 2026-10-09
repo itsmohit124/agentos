@@ -1,0 +1,7 @@
+{
+  "id": "profile_hybrid",
+  "kind": "profile",
+  "description": "Source and a specification together are HYBRID and ESTABLISHED.",
+  "fixture": "hybrid-project",
+  "oracle": "expected/profile.json"
+}

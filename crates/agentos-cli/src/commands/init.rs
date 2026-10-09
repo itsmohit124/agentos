@@ -53,6 +53,16 @@ pub fn run(app: &App, format: OutputFormat) -> anyhow::Result<ExitCode> {
         status: db_status,
     });
 
+    let (_profile, profile_status) = agentos_knowledge::write_profile(&app.root.path)
+        .with_context(|| format!("cannot write project profile in {}", layout.dir().display()))?;
+    entries.push(Entry {
+        path: layout
+            .relative(&agentos_knowledge::profile_path(&app.root.path))
+            .display()
+            .to_string(),
+        status: profile_status.as_str(),
+    });
+
     if let Err(err) = &app.config {
         output::warn(&format!("{err} (run `agentos doctor` for details)"));
     }

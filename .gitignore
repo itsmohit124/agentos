@@ -11,3 +11,6 @@
 /docs/phases/
 /docs/templates/
 /docs/phase-reports/
+
+# Derived state created when verification commands run inside a fixture.
+fixtures/**/.agentos/

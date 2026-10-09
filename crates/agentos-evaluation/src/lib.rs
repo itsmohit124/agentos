@@ -4,13 +4,14 @@
 //! Every case names its fixture and its oracle; no LLM or network is involved, so the same inputs
 //! always produce the same report.
 //!
-//! Implemented areas: [`skills`].
+//! Implemented areas: [`skills`], [`knowledge`].
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use serde::Serialize;
 
+pub mod knowledge;
 pub mod skills;
 
 /// Outcome of one evaluation case.

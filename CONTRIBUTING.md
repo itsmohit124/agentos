@@ -49,5 +49,7 @@ cargo test --workspace
 
 ## Database migrations
 
-Migrations are listed in `crates/agentos-core/src/db.rs` (`MIGRATIONS`). Append new migrations
-with the next version number; never edit or reorder a released migration.
+Migrations for the core `meta` table are listed in `crates/agentos-core/src/db.rs` (`MIGRATIONS`).
+Append new core migrations with the next version number; never edit or reorder a released migration.
+The knowledge graph uses its own migration table inside the same `agentos.db` (`agentos-knowledge`),
+because `agentos-core` cannot depend on that crate.

@@ -41,6 +41,9 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
         Command::Doctor => commands::doctor::run(&app, format),
         Command::Config => commands::config::run(&app, format),
         Command::Skills(args) => commands::skills::run(&app, &args, format),
+        Command::Project(args) => commands::project::run(&app, &args.command, format),
+        Command::Scan => commands::scan::run(&app, format),
+        Command::Knowledge(args) => commands::knowledge::run(&app, &args.command, format),
         Command::Evaluate(args) => commands::evaluate::run(&app, &args, format),
     }
 }

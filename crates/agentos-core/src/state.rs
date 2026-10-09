@@ -21,6 +21,7 @@ agentos.db
 agentos.db-journal
 agentos.db-wal
 agentos.db-shm
+project-profile.json
 ";
 
 /// Error returned by [`StateLayout::ensure`].

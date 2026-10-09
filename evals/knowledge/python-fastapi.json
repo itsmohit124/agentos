@@ -1,0 +1,7 @@
+{
+  "id": "python-fastapi",
+  "kind": "graph",
+  "description": "Payments, users and notifications: calls, tests, extends, imports, and inferred document mentions.",
+  "fixture": "python-fastapi",
+  "oracle": "expected/graph.json"
+}

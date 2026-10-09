@@ -3,14 +3,18 @@
 The locked V1 architecture is specified in [spec/ARCHITECTURE.md](spec/ARCHITECTURE.md), with
 product principles in [spec/VISION.md](spec/VISION.md) and per-subsystem contracts in `spec/`.
 
-## What exists after Phase 1
+## What exists after Phase 2
 
 ```text
-agentos-cli ─┬─► agentos-config ──────────────► agentos-core
-             ├─► agentos-evaluation ─┬─► agentos-skills ─┬─► agentos-core
-             │                       │                   └─► agentos-permissions
-             ├─► agentos-skills      └─► agentos-permissions
-             └─► agentos-permissions
+agentos-cli ─┬─► agentos-config ───► agentos-core
+             ├─► agentos-knowledge ─► agentos-core
+             ├─► agentos-skills ─┬─► agentos-core
+             │                   └─► agentos-permissions
+             ├─► agentos-permissions
+             └─► agentos-evaluation ─┬─► agentos-core
+                                     ├─► agentos-knowledge
+                                     ├─► agentos-skills
+                                     └─► agentos-permissions
 ```
 
 | Crate | Contents |
@@ -19,8 +23,9 @@ agentos-cli ─┬─► agentos-config ─────────────�
 | `agentos-config` | Layered config resolution (defaults → file → env → CLI) with per-key sources |
 | `agentos-permissions` | `Capability`, `PermissionSet`, `PermissionSubject`, `check(subject, capability) -> Decision` (default-deny, with reason) |
 | `agentos-skills` | `SKILL.md` front-matter parsing (schema `schemas/skill-manifest.schema.json` + semantic checks), `SkillLoader` (prioritized discovery, front-matter only), `SkillRegistry` (lazy body/reference loading), dependency resolver (topological order, cycle path, semver), rule-based `SkillRouter`, full `validate`, `SkillGraph` (text/DOT), local `install`, built-in skills embedded from `skills/` |
-| `agentos-evaluation` | Deterministic case runner; area `skills` (`evals/skills/*.json`) |
-| `agentos-cli` | The `agentos` binary: `init`, `doctor`, `config`, `skills {list, inspect, validate, install, graph}`, `evaluate skills`, logging, exit codes |
+| `agentos-knowledge` | Automatic project profile, ignore-aware scanner, `LanguageExtractor` (Python, TypeScript, JavaScript), knowledge graph in SQLite (nodes, edges, fragments, FTS5), provenance |
+| `agentos-evaluation` | Deterministic case runner; areas `skills` (`evals/skills/*.json`) and `knowledge` (`evals/knowledge/*.json`) |
+| `agentos-cli` | The `agentos` binary: `init`, `doctor`, `config`, `project profile`, `scan`, `knowledge {stats, nodes, edges, inspect, rebuild}`, `skills {list, inspect, validate, install, graph}`, `evaluate {skills, knowledge}`, logging, exit codes |
 | `agentos-testkit` | Dev-only: `TempProject`, `CliRunner`, fixture loader |
 | all other crates | Compiling stubs, implemented by later phases |
 
