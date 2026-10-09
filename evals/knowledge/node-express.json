@@ -1,0 +1,7 @@
+{
+  "id": "node-express",
+  "kind": "graph",
+  "description": "Express payments service: relative imports, JSDoc calls, class extends, and inferred document mentions.",
+  "fixture": "node-express",
+  "oracle": "expected/graph.json"
+}

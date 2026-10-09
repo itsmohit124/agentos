@@ -1,0 +1,4 @@
+CREATE TABLE payment (
+  id TEXT PRIMARY KEY,
+  amount INTEGER NOT NULL
+);

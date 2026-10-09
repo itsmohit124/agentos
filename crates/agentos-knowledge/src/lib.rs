@@ -3,7 +3,7 @@
 //! ```text
 //! detect(root)                         -> ProjectProfile
 //! scan(root)                           -> nodes, edges, fragments in SQLite
-//! LanguageExtractor::extract(source)   -> symbols (Python, TypeScript, JavaScript, …)
+//! LanguageExtractor::extract(source)   -> symbols (Python, TypeScript, JavaScript, Go, Java, Ruby)
 //! ```
 //!
 //! The repository stays the source of truth. `agentos.db` and `project-profile.json` are

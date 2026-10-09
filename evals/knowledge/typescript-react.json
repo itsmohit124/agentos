@@ -1,0 +1,7 @@
+{
+  "id": "typescript-react",
+  "kind": "graph",
+  "description": "TypeScript payments service with a React card: typed calls, implements, JSX, and inferred document mentions.",
+  "fixture": "typescript-react",
+  "oracle": "expected/graph.json"
+}

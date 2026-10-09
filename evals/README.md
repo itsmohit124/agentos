@@ -43,7 +43,10 @@ suite. A case file with an unknown field, an `id` that differs from its file nam
 `fixture` is a directory under `fixtures/` (with optional `project/`, `user/`, `builtin/`
 subdirectories, or a bare directory of skills), or `builtin:skills` for the shipped skills.
 
-## `knowledge/` (Phase 2)
+## `knowledge/` (Phase 2 and 2b)
+
+Phase 2: four profile cases and the `python-fastapi` graph. Phase 2b adds graph cases
+`node-express`, `typescript-react`, `go`, `java`, and `ruby-rails`. A case `id` is the file stem.
 
 | `kind` | Oracle |
 |---|---|

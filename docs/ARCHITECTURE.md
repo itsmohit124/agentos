@@ -23,7 +23,7 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
 | `agentos-config` | Layered config resolution (defaults → file → env → CLI) with per-key sources |
 | `agentos-permissions` | `Capability`, `PermissionSet`, `PermissionSubject`, `check(subject, capability) -> Decision` (default-deny, with reason) |
 | `agentos-skills` | `SKILL.md` front-matter parsing (schema `schemas/skill-manifest.schema.json` + semantic checks), `SkillLoader` (prioritized discovery, front-matter only), `SkillRegistry` (lazy body/reference loading), dependency resolver (topological order, cycle path, semver), rule-based `SkillRouter`, full `validate`, `SkillGraph` (text/DOT), local `install`, built-in skills embedded from `skills/` |
-| `agentos-knowledge` | Automatic project profile, ignore-aware scanner, `LanguageExtractor` (Python, TypeScript, JavaScript), knowledge graph in SQLite (nodes, edges, fragments, FTS5), provenance |
+| `agentos-knowledge` | Automatic project profile, ignore-aware scanner, `LanguageExtractor` (Python, TypeScript, JavaScript, Go, Java, Ruby), knowledge graph in SQLite (nodes, edges, fragments, FTS5), provenance |
 | `agentos-evaluation` | Deterministic case runner; areas `skills` (`evals/skills/*.json`) and `knowledge` (`evals/knowledge/*.json`) |
 | `agentos-cli` | The `agentos` binary: `init`, `doctor`, `config`, `project profile`, `scan`, `knowledge {stats, nodes, edges, inspect, rebuild}`, `skills {list, inspect, validate, install, graph}`, `evaluate {skills, knowledge}`, logging, exit codes |
 | `agentos-testkit` | Dev-only: `TempProject`, `CliRunner`, fixture loader |

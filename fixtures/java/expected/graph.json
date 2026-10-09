@@ -1,0 +1,721 @@
+{
+  "edges": [
+    {
+      "from": "decision.docs.adr.0001-record-payments",
+      "provenance_kind": "inferred",
+      "relation": "REFERENCES",
+      "to": "software.app.payments.PaymentRepository.class.PaymentRepository"
+    },
+    {
+      "from": "document.docs.overview",
+      "provenance_kind": "inferred",
+      "relation": "REFERENCES",
+      "to": "software.app.payments.Payment.class.Payment"
+    },
+    {
+      "from": "document.docs.overview",
+      "provenance_kind": "inferred",
+      "relation": "REFERENCES",
+      "to": "software.app.payments.PaymentService.class.PaymentService"
+    },
+    {
+      "from": "quality.tests.test_payments.class.PaymentTests",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_payments.test.PaymentTests.test_charge_saves_payment"
+    },
+    {
+      "from": "quality.tests.test_payments.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_payments.module"
+    },
+    {
+      "from": "quality.tests.test_payments.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_payments.class.PaymentTests"
+    },
+    {
+      "from": "quality.tests.test_payments.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_payments.import.app.payments.Payment"
+    },
+    {
+      "from": "quality.tests.test_payments.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_payments.import.app.payments.PaymentRepository"
+    },
+    {
+      "from": "quality.tests.test_payments.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_payments.import.app.payments.PaymentService"
+    },
+    {
+      "from": "quality.tests.test_payments.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_payments.test.PaymentTests.test_charge_saves_payment"
+    },
+    {
+      "from": "quality.tests.test_payments.module",
+      "provenance_kind": "observed",
+      "relation": "IMPORTS",
+      "to": "software.app.payments.Payment.module"
+    },
+    {
+      "from": "quality.tests.test_payments.module",
+      "provenance_kind": "observed",
+      "relation": "IMPORTS",
+      "to": "software.app.payments.PaymentRepository.module"
+    },
+    {
+      "from": "quality.tests.test_payments.module",
+      "provenance_kind": "observed",
+      "relation": "IMPORTS",
+      "to": "software.app.payments.PaymentService.module"
+    },
+    {
+      "from": "quality.tests.test_payments.test.PaymentTests.test_charge_saves_payment",
+      "provenance_kind": "observed",
+      "relation": "TESTS",
+      "to": "software.app.payments.Payment.class.Payment"
+    },
+    {
+      "from": "quality.tests.test_payments.test.PaymentTests.test_charge_saves_payment",
+      "provenance_kind": "observed",
+      "relation": "TESTS",
+      "to": "software.app.payments.PaymentRepository.class.PaymentRepository"
+    },
+    {
+      "from": "quality.tests.test_payments.test.PaymentTests.test_charge_saves_payment",
+      "provenance_kind": "observed",
+      "relation": "TESTS",
+      "to": "software.app.payments.PaymentService.class.PaymentService"
+    },
+    {
+      "from": "quality.tests.test_users.class.UserTests",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_users.test.UserTests.test_register_sends_notification"
+    },
+    {
+      "from": "quality.tests.test_users.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_users.module"
+    },
+    {
+      "from": "quality.tests.test_users.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_users.class.UserTests"
+    },
+    {
+      "from": "quality.tests.test_users.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_users.import.app.notifications.NotificationService"
+    },
+    {
+      "from": "quality.tests.test_users.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_users.import.app.users.User"
+    },
+    {
+      "from": "quality.tests.test_users.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_users.import.app.users.UserService"
+    },
+    {
+      "from": "quality.tests.test_users.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "quality.tests.test_users.test.UserTests.test_register_sends_notification"
+    },
+    {
+      "from": "quality.tests.test_users.module",
+      "provenance_kind": "observed",
+      "relation": "IMPORTS",
+      "to": "software.app.notifications.NotificationService.module"
+    },
+    {
+      "from": "quality.tests.test_users.module",
+      "provenance_kind": "observed",
+      "relation": "IMPORTS",
+      "to": "software.app.users.User.module"
+    },
+    {
+      "from": "quality.tests.test_users.module",
+      "provenance_kind": "observed",
+      "relation": "IMPORTS",
+      "to": "software.app.users.UserService.module"
+    },
+    {
+      "from": "quality.tests.test_users.test.UserTests.test_register_sends_notification",
+      "provenance_kind": "observed",
+      "relation": "TESTS",
+      "to": "software.app.notifications.NotificationService.class.NotificationService"
+    },
+    {
+      "from": "quality.tests.test_users.test.UserTests.test_register_sends_notification",
+      "provenance_kind": "observed",
+      "relation": "TESTS",
+      "to": "software.app.users.User.class.User"
+    },
+    {
+      "from": "quality.tests.test_users.test.UserTests.test_register_sends_notification",
+      "provenance_kind": "observed",
+      "relation": "TESTS",
+      "to": "software.app.users.UserService.class.UserService"
+    },
+    {
+      "from": "software.app.Main.class.Main",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.Main.method.Main.createApp"
+    },
+    {
+      "from": "software.app.Main.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.Main.module"
+    },
+    {
+      "from": "software.app.Main.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.Main.class.Main"
+    },
+    {
+      "from": "software.app.Main.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.Main.method.Main.createApp"
+    },
+    {
+      "from": "software.app.notifications.NotificationService.class.NotificationService",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.notifications.NotificationService.method.NotificationService.send"
+    },
+    {
+      "from": "software.app.notifications.NotificationService.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.notifications.NotificationService.module"
+    },
+    {
+      "from": "software.app.notifications.NotificationService.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.notifications.NotificationService.class.NotificationService"
+    },
+    {
+      "from": "software.app.notifications.NotificationService.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.notifications.NotificationService.method.NotificationService.send"
+    },
+    {
+      "from": "software.app.payments.Payment.class.Payment",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.Payment.method.Payment.Payment"
+    },
+    {
+      "from": "software.app.payments.Payment.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.Payment.module"
+    },
+    {
+      "from": "software.app.payments.Payment.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.Payment.class.Payment"
+    },
+    {
+      "from": "software.app.payments.Payment.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.Payment.method.Payment.Payment"
+    },
+    {
+      "from": "software.app.payments.PaymentController.class.PaymentController",
+      "provenance_kind": "observed",
+      "relation": "CALLS",
+      "to": "software.app.payments.PaymentService.class.PaymentService"
+    },
+    {
+      "from": "software.app.payments.PaymentController.class.PaymentController",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentController.method.PaymentController.create"
+    },
+    {
+      "from": "software.app.payments.PaymentController.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentController.module"
+    },
+    {
+      "from": "software.app.payments.PaymentController.method.PaymentController.create",
+      "provenance_kind": "observed",
+      "relation": "CALLS",
+      "to": "software.app.payments.PaymentService.method.PaymentService.charge"
+    },
+    {
+      "from": "software.app.payments.PaymentController.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentController.class.PaymentController"
+    },
+    {
+      "from": "software.app.payments.PaymentController.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentController.method.PaymentController.create"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.class.BaseRepository",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.method.BaseRepository.save"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.class.BaseRepository",
+      "provenance_kind": "observed",
+      "relation": "IMPLEMENTS",
+      "to": "software.app.payments.PaymentRepository.interface.PaymentStore"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.class.PaymentRepository",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.method.PaymentRepository.save"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.class.PaymentRepository",
+      "provenance_kind": "observed",
+      "relation": "EXTENDS",
+      "to": "software.app.payments.PaymentRepository.class.BaseRepository"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.module"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.interface.PaymentStore",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.method.PaymentStore.save"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.class.BaseRepository"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.class.PaymentRepository"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.interface.PaymentStore"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.method.BaseRepository.save"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.method.PaymentRepository.save"
+    },
+    {
+      "from": "software.app.payments.PaymentRepository.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentRepository.method.PaymentStore.save"
+    },
+    {
+      "from": "software.app.payments.PaymentService.class.PaymentService",
+      "provenance_kind": "observed",
+      "relation": "CALLS",
+      "to": "software.app.payments.PaymentRepository.class.PaymentRepository"
+    },
+    {
+      "from": "software.app.payments.PaymentService.class.PaymentService",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentService.method.PaymentService.charge"
+    },
+    {
+      "from": "software.app.payments.PaymentService.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentService.module"
+    },
+    {
+      "from": "software.app.payments.PaymentService.method.PaymentService.charge",
+      "provenance_kind": "observed",
+      "relation": "CALLS",
+      "to": "software.app.payments.PaymentRepository.method.PaymentRepository.save"
+    },
+    {
+      "from": "software.app.payments.PaymentService.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentService.class.PaymentService"
+    },
+    {
+      "from": "software.app.payments.PaymentService.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.PaymentService.method.PaymentService.charge"
+    },
+    {
+      "from": "software.app.users.User.class.User",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.users.User.method.User.User"
+    },
+    {
+      "from": "software.app.users.User.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.users.User.module"
+    },
+    {
+      "from": "software.app.users.User.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.users.User.class.User"
+    },
+    {
+      "from": "software.app.users.User.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.users.User.method.User.User"
+    },
+    {
+      "from": "software.app.users.UserService.class.UserService",
+      "provenance_kind": "observed",
+      "relation": "CALLS",
+      "to": "software.app.notifications.NotificationService.class.NotificationService"
+    },
+    {
+      "from": "software.app.users.UserService.class.UserService",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.users.UserService.method.UserService.register"
+    },
+    {
+      "from": "software.app.users.UserService.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.users.UserService.module"
+    },
+    {
+      "from": "software.app.users.UserService.method.UserService.register",
+      "provenance_kind": "observed",
+      "relation": "CALLS",
+      "to": "software.app.notifications.NotificationService.method.NotificationService.send"
+    },
+    {
+      "from": "software.app.users.UserService.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.users.UserService.class.UserService"
+    },
+    {
+      "from": "software.app.users.UserService.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.users.UserService.method.UserService.register"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "decision.docs.adr.0001-record-payments",
+      "node_type": "decision",
+      "provenance_kind": "declared"
+    },
+    {
+      "id": "document.README",
+      "node_type": "document",
+      "provenance_kind": "declared"
+    },
+    {
+      "id": "document.docs.overview",
+      "node_type": "document",
+      "provenance_kind": "declared"
+    },
+    {
+      "id": "quality.tests.test_payments.class.PaymentTests",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_payments.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_payments.import.app.payments.Payment",
+      "node_type": "import",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_payments.import.app.payments.PaymentRepository",
+      "node_type": "import",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_payments.import.app.payments.PaymentService",
+      "node_type": "import",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_payments.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_payments.test.PaymentTests.test_charge_saves_payment",
+      "node_type": "test",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_users.class.UserTests",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_users.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_users.import.app.notifications.NotificationService",
+      "node_type": "import",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_users.import.app.users.User",
+      "node_type": "import",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_users.import.app.users.UserService",
+      "node_type": "import",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_users.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "quality.tests.test_users.test.UserTests.test_register_sends_notification",
+      "node_type": "test",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.Main.class.Main",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.Main.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.Main.method.Main.createApp",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.Main.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.notifications.NotificationService.class.NotificationService",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.notifications.NotificationService.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.notifications.NotificationService.method.NotificationService.send",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.notifications.NotificationService.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.Payment.class.Payment",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.Payment.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.Payment.method.Payment.Payment",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.Payment.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentController.class.PaymentController",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentController.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentController.method.PaymentController.create",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentController.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentRepository.class.BaseRepository",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentRepository.class.PaymentRepository",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentRepository.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentRepository.interface.PaymentStore",
+      "node_type": "interface",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentRepository.method.BaseRepository.save",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentRepository.method.PaymentRepository.save",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentRepository.method.PaymentStore.save",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentRepository.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentService.class.PaymentService",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentService.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentService.method.PaymentService.charge",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.PaymentService.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.users.User.class.User",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.users.User.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.users.User.method.User.User",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.users.User.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.users.UserService.class.UserService",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.users.UserService.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.users.UserService.method.UserService.register",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.users.UserService.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    }
+  ]
+}

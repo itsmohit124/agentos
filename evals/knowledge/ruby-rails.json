@@ -1,0 +1,7 @@
+{
+  "id": "ruby-rails",
+  "kind": "graph",
+  "description": "Ruby payments service: inheritance, YARD calls, require_relative, and inferred document mentions.",
+  "fixture": "ruby-rails",
+  "oracle": "expected/graph.json"
+}

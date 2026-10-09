@@ -1,7 +1,8 @@
 //! Language extractors.
 //!
-//! The trait is the extension point. Python and TypeScript/JavaScript ship in this crate
-//! behind it; another language registers an implementation and does not change node types.
+//! The trait is the extension point. Python, TypeScript/JavaScript, Go, Java, and Ruby
+//! ship in this crate behind it; another language registers an implementation and does
+//! not change node types.
 
 use std::path::Path;
 
@@ -72,12 +73,15 @@ impl ExtractorRegistry {
         Self::default()
     }
 
-    /// Python, TypeScript, and JavaScript.
+    /// Python, TypeScript, JavaScript, Go, Java, and Ruby.
     pub fn builtin() -> Self {
         let mut registry = Self::new();
         registry.register(Box::new(crate::languages::PythonExtractor));
         registry.register(Box::new(crate::languages::TypeScriptExtractor));
         registry.register(Box::new(crate::languages::JavaScriptExtractor));
+        registry.register(Box::new(crate::languages::GoExtractor));
+        registry.register(Box::new(crate::languages::JavaExtractor));
+        registry.register(Box::new(crate::languages::RubyExtractor));
         registry
     }
 

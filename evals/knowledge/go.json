@@ -1,0 +1,7 @@
+{
+  "id": "go",
+  "kind": "graph",
+  "description": "Go payments service: embedding, typed calls, composite-literal tests, and inferred document mentions.",
+  "fixture": "go",
+  "oracle": "expected/graph.json"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "java",
+  "kind": "graph",
+  "description": "Java payments service: extends, implements, constructors, and inferred document mentions.",
+  "fixture": "java",
+  "oracle": "expected/graph.json"
+}

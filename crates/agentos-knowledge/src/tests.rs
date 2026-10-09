@@ -4,7 +4,10 @@ use std::fs;
 use std::path::Path;
 
 use crate::extract::{ExtractorRegistry, LanguageExtractor};
-use crate::languages::{PythonExtractor, TypeScriptExtractor};
+use crate::languages::{
+    GoExtractor, JavaExtractor, JavaScriptExtractor, PythonExtractor, RubyExtractor,
+    TypeScriptExtractor,
+};
 use crate::model::{NodeKind, ProvenanceKind, RelationType};
 use crate::scan::{rebuild, scan, scan_with};
 
@@ -61,6 +64,353 @@ class PaymentService implements PaymentStore {
     assert_eq!(
         charge.calls[0].receiver_type.as_deref(),
         Some("PaymentStore")
+    );
+}
+
+#[test]
+fn javascript_resolves_relative_imports_new_jsdoc_and_require() {
+    let source = r#"
+const { PaymentRepository } = require("./repository");
+import { PaymentService } from "../app/payments/service.js";
+
+class PaymentService {
+  /**
+   * @param {PaymentRepository} repository
+   * @param {Payment} payment
+   */
+  charge(repository, payment) {
+    return repository.save(payment);
+  }
+}
+
+function test_charge_saves_payment() {
+  const repository = new PaymentRepository();
+  const service = new PaymentService();
+  return service.charge(repository, null);
+}
+"#;
+    let symbols = JavaScriptExtractor
+        .extract("tests/test_payments.js", source)
+        .unwrap();
+    let require_import = symbols
+        .iter()
+        .find(|s| s.kind == NodeKind::Import && s.name == "tests.repository")
+        .unwrap();
+    assert_eq!(
+        require_import.import_target.as_deref(),
+        Some("tests.repository")
+    );
+    let esm = symbols
+        .iter()
+        .find(|s| s.import_target.as_deref() == Some("app.payments.service"))
+        .unwrap();
+    assert_eq!(esm.kind, NodeKind::Import);
+    let charge = symbols.iter().find(|s| s.name == "charge").unwrap();
+    assert_eq!(charge.calls[0].callee, "save");
+    assert_eq!(
+        charge.calls[0].receiver_type.as_deref(),
+        Some("PaymentRepository")
+    );
+    let test = symbols
+        .iter()
+        .find(|s| s.name == "test_charge_saves_payment")
+        .unwrap();
+    assert!(
+        test.calls
+            .iter()
+            .any(|call| call.callee == "PaymentRepository" && call.receiver.is_none())
+    );
+    assert!(
+        test.calls
+            .iter()
+            .any(|call| call.callee == "PaymentService" && call.receiver.is_none())
+    );
+}
+
+#[test]
+fn javascript_class_extends_records_the_superclass() {
+    let source = r#"
+class BaseRepository {
+  save(payment) { return payment; }
+}
+class PaymentRepository extends BaseRepository {
+  save(payment) { return payment; }
+}
+"#;
+    let symbols = JavaScriptExtractor
+        .extract("app/payments/repository.js", source)
+        .unwrap();
+    let repo = symbols
+        .iter()
+        .find(|s| s.name == "PaymentRepository")
+        .unwrap();
+    assert_eq!(repo.bases, vec!["BaseRepository".to_owned()]);
+}
+
+#[test]
+fn typescript_arrow_jsx_interface_extends_and_field_method() {
+    let source = r#"
+export interface PaymentReader {
+  read(id: string): string;
+}
+export interface PaymentStore extends PaymentReader {
+  save(id: string): void;
+}
+export default class PaymentService {
+  charge = (repository: PaymentRepository) => repository.save(repository);
+}
+export const PaymentBadge = (payment: Payment) => paymentLabel(payment);
+export function PaymentCard(payment: Payment): string {
+  return <PaymentBadge payment={payment} />;
+}
+"#;
+    let symbols = TypeScriptExtractor
+        .extract("app/payments/card.tsx", source)
+        .unwrap();
+    let store = symbols.iter().find(|s| s.name == "PaymentStore").unwrap();
+    assert_eq!(store.kind, NodeKind::Interface);
+    assert_eq!(store.bases, vec!["PaymentReader".to_owned()]);
+    assert!(
+        symbols
+            .iter()
+            .any(|s| s.kind == NodeKind::Class && s.name == "PaymentService")
+    );
+    let charge = symbols.iter().find(|s| s.name == "charge").unwrap();
+    assert_eq!(charge.kind, NodeKind::Method);
+    assert_eq!(charge.parent.as_deref(), Some("PaymentService"));
+    assert_eq!(charge.calls[0].callee, "save");
+    assert_eq!(
+        charge.calls[0].receiver_type.as_deref(),
+        Some("PaymentRepository")
+    );
+    let badge = symbols.iter().find(|s| s.name == "PaymentBadge").unwrap();
+    assert_eq!(badge.kind, NodeKind::Function);
+    assert_eq!(badge.calls[0].callee, "paymentLabel");
+    assert!(badge.calls[0].receiver.is_none());
+    let card = symbols.iter().find(|s| s.name == "PaymentCard").unwrap();
+    assert!(
+        card.calls
+            .iter()
+            .any(|call| call.callee == "PaymentBadge" && call.receiver.is_none())
+    );
+}
+
+#[test]
+fn go_extractor_embeds_structs_and_records_typed_calls() {
+    let source = r#"
+package payments
+
+import "app/payments/models"
+
+type PaymentStore interface {
+	Save(payment Payment) Payment
+}
+
+type BaseRepository struct{}
+
+func (r *BaseRepository) Save(payment Payment) Payment {
+	return payment
+}
+
+type PaymentRepository struct {
+	BaseRepository
+}
+
+func (r *PaymentRepository) Save(payment Payment) Payment {
+	return payment
+}
+
+func (s *PaymentService) Charge(repository PaymentRepository, payment Payment) Payment {
+	return repository.Save(payment)
+}
+
+func test_charge_saves_payment() {
+	repository := PaymentRepository{}
+	service := PaymentService{}
+	service.Charge(repository, payment)
+}
+"#;
+    let symbols = GoExtractor
+        .extract("app/payments/repository.go", source)
+        .unwrap();
+    let imported = symbols.iter().find(|s| s.kind == NodeKind::Import).unwrap();
+    assert_eq!(
+        imported.import_target.as_deref(),
+        Some("app.payments.models")
+    );
+    let repo = symbols
+        .iter()
+        .find(|s| s.name == "PaymentRepository")
+        .unwrap();
+    assert_eq!(repo.kind, NodeKind::Class);
+    assert_eq!(repo.bases, vec!["BaseRepository".to_owned()]);
+    assert!(
+        symbols
+            .iter()
+            .any(|s| s.kind == NodeKind::Interface && s.name == "PaymentStore")
+    );
+    let charge = symbols.iter().find(|s| s.name == "Charge").unwrap();
+    assert_eq!(charge.parent.as_deref(), Some("PaymentService"));
+    assert_eq!(charge.calls[0].callee, "Save");
+    assert_eq!(
+        charge.calls[0].receiver_type.as_deref(),
+        Some("PaymentRepository")
+    );
+    let test = symbols
+        .iter()
+        .find(|s| s.name == "test_charge_saves_payment")
+        .unwrap();
+    assert!(
+        test.calls
+            .iter()
+            .any(|call| call.callee == "PaymentRepository" && call.receiver.is_none())
+    );
+}
+
+#[test]
+fn java_extractor_extends_implements_and_constructs() {
+    let source = r#"
+package app.payments;
+
+import app.payments.Payment;
+
+interface PaymentStore {
+    Payment save(Payment payment);
+}
+
+class BaseRepository implements PaymentStore {
+    public Payment save(Payment payment) {
+        return payment;
+    }
+}
+
+public class PaymentRepository extends BaseRepository {
+    public Payment save(Payment payment) {
+        return payment;
+    }
+}
+
+class PaymentService {
+    public Payment charge(PaymentRepository repository, Payment payment) {
+        return repository.save(payment);
+    }
+}
+
+class PaymentTests {
+    void test_charge_saves_payment() {
+        PaymentRepository repository = new PaymentRepository();
+        PaymentService service = new PaymentService();
+        service.charge(repository, payment);
+    }
+}
+"#;
+    let symbols = JavaExtractor
+        .extract("app/payments/PaymentRepository.java", source)
+        .unwrap();
+    let imported = symbols.iter().find(|s| s.kind == NodeKind::Import).unwrap();
+    assert_eq!(
+        imported.import_target.as_deref(),
+        Some("app.payments.Payment")
+    );
+    let base = symbols.iter().find(|s| s.name == "BaseRepository").unwrap();
+    assert_eq!(base.implements, vec!["PaymentStore".to_owned()]);
+    let repo = symbols
+        .iter()
+        .find(|s| s.name == "PaymentRepository")
+        .unwrap();
+    assert_eq!(repo.bases, vec!["BaseRepository".to_owned()]);
+    let charge = symbols.iter().find(|s| s.name == "charge").unwrap();
+    assert_eq!(charge.calls[0].callee, "save");
+    assert_eq!(
+        charge.calls[0].receiver_type.as_deref(),
+        Some("PaymentRepository")
+    );
+    let test = symbols
+        .iter()
+        .find(|s| s.name == "test_charge_saves_payment")
+        .unwrap();
+    assert_eq!(test.parent.as_deref(), Some("PaymentTests"));
+    assert!(
+        test.calls
+            .iter()
+            .any(|call| call.callee == "PaymentService" && call.receiver.is_none())
+    );
+}
+
+#[test]
+fn ruby_extractor_uses_yard_inheritance_and_new() {
+    let source = r#"
+require_relative "service"
+PAYMENT_STATUS = "captured"
+
+module Payments
+end
+
+class BaseRepository
+  def save(payment)
+    payment
+  end
+end
+
+class PaymentRepository < BaseRepository
+  def save(payment)
+    payment
+  end
+end
+
+class PaymentService
+  # @param repository [PaymentRepository]
+  # @param payment [Payment]
+  def charge(repository, payment)
+    repository.save(payment)
+  end
+end
+
+class PaymentTests
+  def test_charge_saves_payment
+    repository = PaymentRepository.new
+    service = PaymentService.new
+    service.charge(repository, payment)
+  end
+end
+"#;
+    let symbols = RubyExtractor
+        .extract("app/payments/service.rb", source)
+        .unwrap();
+    let imported = symbols.iter().find(|s| s.kind == NodeKind::Import).unwrap();
+    assert_eq!(
+        imported.import_target.as_deref(),
+        Some("app.payments.service")
+    );
+    assert!(
+        symbols
+            .iter()
+            .any(|s| s.kind == NodeKind::Symbol && s.name == "PAYMENT_STATUS")
+    );
+    assert!(
+        symbols
+            .iter()
+            .any(|s| s.kind == NodeKind::Class && s.name == "Payments")
+    );
+    let repo = symbols
+        .iter()
+        .find(|s| s.name == "PaymentRepository")
+        .unwrap();
+    assert_eq!(repo.bases, vec!["BaseRepository".to_owned()]);
+    let charge = symbols.iter().find(|s| s.name == "charge").unwrap();
+    assert_eq!(charge.calls[0].callee, "save");
+    assert_eq!(
+        charge.calls[0].receiver_type.as_deref(),
+        Some("PaymentRepository")
+    );
+    let test = symbols
+        .iter()
+        .find(|s| s.name == "test_charge_saves_payment")
+        .unwrap();
+    assert!(
+        test.calls
+            .iter()
+            .any(|call| call.callee == "PaymentRepository" && call.receiver.is_none())
     );
 }
 

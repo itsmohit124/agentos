@@ -39,7 +39,7 @@ agentos skills validate           # everything, including bodies; exit 3 on erro
 agentos skills install ./my-skill # copy a local skill into .agents/skills/ (git URLs: not yet)
 agentos skills graph [--format dot]
 agentos evaluate skills           # run evals/skills; exit 3 if a case fails
-agentos evaluate knowledge        # project profiles and the python-fastapi graph
+agentos evaluate knowledge        # project profiles and language graph fixtures
 ```
 
 Global flags: `--root <PATH>`, `--json`, `-v` / `-vv`, `--log-level <FILTER>`.

@@ -16,9 +16,10 @@ fn knowledge_suite_passes_and_is_deterministic() {
     let second = knowledge::run(&cases, &fixtures).unwrap();
     assert!(first.is_ok(), "{first:?}");
     assert_eq!(first, second);
-    assert_eq!(first.passed(), 5);
+    // Phase 2: 4 profiles + python-fastapi. Phase 2b: five language graphs.
+    assert_eq!(first.passed(), 10);
     assert_eq!(first.by_kind()["profile"].passed, 4);
-    assert_eq!(first.by_kind()["graph"].passed, 1);
+    assert_eq!(first.by_kind()["graph"].passed, 6);
 }
 
 #[test]
