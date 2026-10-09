@@ -1,0 +1,7 @@
+{
+  "id": "greenfield_domain",
+  "kind": "domain",
+  "description": "Requirements seed Proposed domain nodes. A glossary term stays Observed. Nothing is Confirmed.",
+  "fixture": "greenfield-domain",
+  "oracle": "expected/domain.json"
+}

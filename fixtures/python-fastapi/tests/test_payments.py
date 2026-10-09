@@ -12,3 +12,13 @@ def test_charge_saves_payment() -> None:
     service = PaymentService()
     saved = service.charge(repository, payment)
     assert saved == payment
+
+
+def test_amount_must_be_positive() -> None:
+    """Invariant: amount > 0."""
+    try:
+        Payment("pay-0", 0)
+    except ValueError as error:
+        assert str(error) == "amount > 0"
+        return
+    raise AssertionError("amount > 0")

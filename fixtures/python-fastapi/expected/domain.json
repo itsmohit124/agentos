@@ -1,0 +1,307 @@
+{
+  "edges": [
+    {
+      "from": "domain.notifications.domain_service.NotificationService",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.notifications.bounded_context.Notifications"
+    },
+    {
+      "from": "domain.notifications.domain_service.NotificationService",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.notifications.service.class.NotificationService"
+    },
+    {
+      "from": "domain.payments.aggregate.PaymentAggregate",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.payments.bounded_context.Payments"
+    },
+    {
+      "from": "domain.payments.aggregate.PaymentAggregate",
+      "provenance_kind": "inferred",
+      "relation": "CONSTRAINED_BY",
+      "to": "domain.payments.invariant.amount-gt-0"
+    },
+    {
+      "from": "domain.payments.aggregate.PaymentAggregate",
+      "provenance_kind": "inferred",
+      "relation": "CONTAINS",
+      "to": "domain.payments.entity.Payment"
+    },
+    {
+      "from": "domain.payments.aggregate.PaymentAggregate",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.payments.models.class.PaymentAggregate"
+    },
+    {
+      "from": "domain.payments.bounded_context.Payments",
+      "provenance_kind": "inferred",
+      "relation": "HAS_AGGREGATE",
+      "to": "domain.payments.aggregate.PaymentAggregate"
+    },
+    {
+      "from": "domain.payments.bounded_context.Payments",
+      "provenance_kind": "inferred",
+      "relation": "HAS_ENTITY",
+      "to": "domain.payments.entity.Payment"
+    },
+    {
+      "from": "domain.payments.bounded_context.Payments",
+      "provenance_kind": "inferred",
+      "relation": "HAS_VALUE_OBJECT",
+      "to": "domain.payments.value_object.Money"
+    },
+    {
+      "from": "domain.payments.domain_service.PaymentService",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.payments.bounded_context.Payments"
+    },
+    {
+      "from": "domain.payments.domain_service.PaymentService",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.payments.service.class.PaymentService"
+    },
+    {
+      "from": "domain.payments.entity.Payment",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.payments.bounded_context.Payments"
+    },
+    {
+      "from": "domain.payments.entity.Payment",
+      "provenance_kind": "inferred",
+      "relation": "CONSTRAINED_BY",
+      "to": "domain.payments.invariant.amount-gt-0"
+    },
+    {
+      "from": "domain.payments.entity.Payment",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.payments.models.class.Payment"
+    },
+    {
+      "from": "domain.payments.entity.Payment",
+      "provenance_kind": "inferred",
+      "relation": "HAS_VALUE_OBJECT",
+      "to": "domain.payments.value_object.Money"
+    },
+    {
+      "from": "domain.payments.invariant.amount-gt-0",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.payments.bounded_context.Payments"
+    },
+    {
+      "from": "domain.payments.repository.PaymentRepository",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.payments.bounded_context.Payments"
+    },
+    {
+      "from": "domain.payments.repository.PaymentRepository",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.payments.repository.class.PaymentRepository"
+    },
+    {
+      "from": "domain.payments.terminology.Money",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.payments.bounded_context.Payments"
+    },
+    {
+      "from": "domain.payments.terminology.Money",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.payments.value_object.Money"
+    },
+    {
+      "from": "domain.payments.terminology.PaymentAggregate",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.payments.bounded_context.Payments"
+    },
+    {
+      "from": "domain.payments.terminology.PaymentAggregate",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.payments.aggregate.PaymentAggregate"
+    },
+    {
+      "from": "domain.payments.terminology.Payment",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.payments.bounded_context.Payments"
+    },
+    {
+      "from": "domain.payments.terminology.Payment",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.payments.entity.Payment"
+    },
+    {
+      "from": "domain.payments.value_object.Money",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.payments.bounded_context.Payments"
+    },
+    {
+      "from": "domain.payments.value_object.Money",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.payments.models.class.Money"
+    },
+    {
+      "from": "domain.users.bounded_context.Users",
+      "provenance_kind": "inferred",
+      "relation": "CROSS_CONTEXT_TO",
+      "to": "domain.notifications.bounded_context.Notifications"
+    },
+    {
+      "from": "domain.users.bounded_context.Users",
+      "provenance_kind": "inferred",
+      "relation": "HAS_ENTITY",
+      "to": "domain.users.entity.User"
+    },
+    {
+      "from": "domain.users.domain_service.UserService",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.users.bounded_context.Users"
+    },
+    {
+      "from": "domain.users.domain_service.UserService",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.users.service.class.UserService"
+    },
+    {
+      "from": "domain.users.entity.User",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.users.bounded_context.Users"
+    },
+    {
+      "from": "domain.users.entity.User",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.users.models.class.User"
+    },
+    {
+      "from": "domain.users.terminology.User",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.users.bounded_context.Users"
+    },
+    {
+      "from": "domain.users.terminology.User",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.users.entity.User"
+    }
+  ],
+  "findings": [],
+  "nodes": [
+    {
+      "id": "domain.notifications.bounded_context.Notifications",
+      "node_type": "bounded_context",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.notifications.domain_service.NotificationService",
+      "node_type": "domain_service",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.aggregate.PaymentAggregate",
+      "node_type": "aggregate",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.bounded_context.Payments",
+      "node_type": "bounded_context",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.domain_service.PaymentService",
+      "node_type": "domain_service",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.entity.Payment",
+      "node_type": "entity",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.invariant.amount-gt-0",
+      "node_type": "invariant",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.repository.PaymentRepository",
+      "node_type": "repository",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.terminology.Money",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.terminology.Payment",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.terminology.PaymentAggregate",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.payments.value_object.Money",
+      "node_type": "value_object",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.users.bounded_context.Users",
+      "node_type": "bounded_context",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.users.domain_service.UserService",
+      "node_type": "domain_service",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.users.entity.User",
+      "node_type": "entity",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.users.terminology.User",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    }
+  ]
+}

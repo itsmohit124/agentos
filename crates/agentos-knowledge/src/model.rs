@@ -35,6 +35,28 @@ pub enum NodeKind {
     Document,
     /// An architecture decision record.
     Decision,
+    /// A bounded context (Phase 3). Stored in `domain_nodes`.
+    BoundedContext,
+    /// A ubiquitous-language term.
+    Terminology,
+    /// A domain entity.
+    Entity,
+    /// A value object.
+    ValueObject,
+    /// An aggregate or aggregate root.
+    Aggregate,
+    /// A business invariant.
+    Invariant,
+    /// A domain service.
+    DomainService,
+    /// A domain repository. Software classes stay `class`.
+    Repository,
+    /// A domain policy, including a corrective policy.
+    Policy,
+    /// A domain event.
+    DomainEvent,
+    /// An anti-corruption layer.
+    AntiCorruptionLayer,
 }
 
 impl NodeKind {
@@ -52,6 +74,17 @@ impl NodeKind {
             Self::Symbol => "symbol",
             Self::Document => "document",
             Self::Decision => "decision",
+            Self::BoundedContext => "bounded_context",
+            Self::Terminology => "terminology",
+            Self::Entity => "entity",
+            Self::ValueObject => "value_object",
+            Self::Aggregate => "aggregate",
+            Self::Invariant => "invariant",
+            Self::DomainService => "domain_service",
+            Self::Repository => "repository",
+            Self::Policy => "policy",
+            Self::DomainEvent => "domain_event",
+            Self::AntiCorruptionLayer => "anti_corruption_layer",
         }
     }
 
@@ -69,8 +102,37 @@ impl NodeKind {
             "symbol" => Self::Symbol,
             "document" => Self::Document,
             "decision" => Self::Decision,
+            "bounded_context" => Self::BoundedContext,
+            "terminology" => Self::Terminology,
+            "entity" => Self::Entity,
+            "value_object" => Self::ValueObject,
+            "aggregate" => Self::Aggregate,
+            "invariant" => Self::Invariant,
+            "domain_service" => Self::DomainService,
+            "repository" => Self::Repository,
+            "policy" => Self::Policy,
+            "domain_event" => Self::DomainEvent,
+            "anti_corruption_layer" => Self::AntiCorruptionLayer,
             _ => return None,
         })
+    }
+
+    /// True for Phase 3 domain concepts. Software nodes stay false.
+    pub fn is_domain(self) -> bool {
+        matches!(
+            self,
+            Self::BoundedContext
+                | Self::Terminology
+                | Self::Entity
+                | Self::ValueObject
+                | Self::Aggregate
+                | Self::Invariant
+                | Self::DomainService
+                | Self::Repository
+                | Self::Policy
+                | Self::DomainEvent
+                | Self::AntiCorruptionLayer
+        )
     }
 }
 
@@ -92,6 +154,26 @@ pub enum RelationType {
     Implements,
     /// The source mentions the target. Inferred mentions stay inferred.
     References,
+    /// The source domain concept belongs to the target context.
+    BelongsTo,
+    /// The context has the entity.
+    HasEntity,
+    /// The source has the value object.
+    HasValueObject,
+    /// The context has the aggregate.
+    HasAggregate,
+    /// The source is constrained by the target invariant.
+    ConstrainedBy,
+    /// The source policy governs the target.
+    Governs,
+    /// The source context calls into the target context.
+    CrossContextTo,
+    /// The source anti-corruption layer protects the target context.
+    AntiCorrupts,
+    /// The source concept was read from the target node.
+    DerivedFrom,
+    /// The source term conflicts with the target term. Not a merge.
+    ConflictsWith,
 }
 
 impl RelationType {
@@ -105,6 +187,16 @@ impl RelationType {
             Self::Extends => "EXTENDS",
             Self::Implements => "IMPLEMENTS",
             Self::References => "REFERENCES",
+            Self::BelongsTo => "BELONGS_TO",
+            Self::HasEntity => "HAS_ENTITY",
+            Self::HasValueObject => "HAS_VALUE_OBJECT",
+            Self::HasAggregate => "HAS_AGGREGATE",
+            Self::ConstrainedBy => "CONSTRAINED_BY",
+            Self::Governs => "GOVERNS",
+            Self::CrossContextTo => "CROSS_CONTEXT_TO",
+            Self::AntiCorrupts => "ANTI_CORRUPTS",
+            Self::DerivedFrom => "DERIVED_FROM",
+            Self::ConflictsWith => "CONFLICTS_WITH",
         }
     }
 
@@ -118,6 +210,16 @@ impl RelationType {
             "EXTENDS" => Self::Extends,
             "IMPLEMENTS" => Self::Implements,
             "REFERENCES" => Self::References,
+            "BELONGS_TO" => Self::BelongsTo,
+            "HAS_ENTITY" => Self::HasEntity,
+            "HAS_VALUE_OBJECT" => Self::HasValueObject,
+            "HAS_AGGREGATE" => Self::HasAggregate,
+            "CONSTRAINED_BY" => Self::ConstrainedBy,
+            "GOVERNS" => Self::Governs,
+            "CROSS_CONTEXT_TO" => Self::CrossContextTo,
+            "ANTI_CORRUPTS" => Self::AntiCorrupts,
+            "DERIVED_FROM" => Self::DerivedFrom,
+            "CONFLICTS_WITH" => Self::ConflictsWith,
             _ => return None,
         })
     }
@@ -326,4 +428,42 @@ pub fn line_span(start: u32, end: u32) -> String {
 /// Edge id. The separator cannot appear in a relation name.
 pub fn edge_id(from: &str, relation: RelationType, to: &str) -> String {
     format!("{from}|{}|{to}", relation.as_str())
+}
+
+/// A domain finding. Ambiguity and leaks are findings, not merges and not canonical facts.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct Finding {
+    /// Stable id.
+    pub id: String,
+    /// `terminology_ambiguity`, `hexagonal_leak`, `aggregate_boundary`, or `drift`.
+    pub kind: String,
+    /// One sentence.
+    pub summary: String,
+    /// Why the finding is believed.
+    pub provenance: Provenance,
+    /// Confidence in thousandths.
+    pub confidence_millis: u16,
+    /// Sorted evidence paths or quotes.
+    pub evidence: String,
+    /// Related node ids, sorted.
+    pub subjects: Vec<String>,
+}
+
+/// One recorded lifecycle change. `occurred_at` is audit data and is not written to golden files.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TransitionRecord {
+    /// `{node_id}|{from}|{to}|{index}`.
+    pub id: String,
+    /// Domain node id.
+    pub node_id: String,
+    /// Previous status, or `none` when the node is created.
+    pub from_status: String,
+    /// Status after the change.
+    pub to_status: String,
+    /// Who asked for the change (`agentos`, `operator`, a proposer name).
+    pub actor: String,
+    /// Why the change was made. Never empty.
+    pub reason: String,
+    /// Clock value. Omitted from generated markdown.
+    pub occurred_at: String,
 }

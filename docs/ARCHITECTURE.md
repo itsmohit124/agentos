@@ -3,6 +3,13 @@
 The locked V1 architecture is specified in [spec/ARCHITECTURE.md](spec/ARCHITECTURE.md), with
 product principles in [spec/VISION.md](spec/VISION.md) and per-subsystem contracts in `spec/`.
 
+## What exists after Phase 3
+
+Phase 3 adds a domain module in `agentos-knowledge`. It writes bounded contexts, tactical concepts,
+findings, and lifecycle transitions into the same SQLite index (`domain_nodes`, `domain_edges`,
+`domain_transitions`, `domain_findings`). Software nodes stay in the Phase 2 tables. `agentos domain`
+confirms or rejects them. Generated markdown is under `.agentos/knowledge/domain/`.
+
 ## What exists after Phase 2
 
 ```text

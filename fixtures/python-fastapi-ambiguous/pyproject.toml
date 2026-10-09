@@ -1,0 +1,5 @@
+[project]
+name = "billing-ambiguous"
+version = "0.1.0"
+description = "Billing records payment, charge, and transaction as competing names."
+requires-python = ">=3.11"

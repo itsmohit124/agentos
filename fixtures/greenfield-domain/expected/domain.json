@@ -1,0 +1,139 @@
+{
+  "edges": [
+    {
+      "from": "domain.billing.aggregate.InvoiceAggregate",
+      "provenance_kind": "declared",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.aggregate.InvoiceAggregate",
+      "provenance_kind": "declared",
+      "relation": "CONSTRAINED_BY",
+      "to": "domain.billing.invariant.amount-gt-0"
+    },
+    {
+      "from": "domain.billing.bounded_context.Billing",
+      "provenance_kind": "declared",
+      "relation": "HAS_AGGREGATE",
+      "to": "domain.billing.aggregate.InvoiceAggregate"
+    },
+    {
+      "from": "domain.billing.bounded_context.Billing",
+      "provenance_kind": "declared",
+      "relation": "HAS_ENTITY",
+      "to": "domain.billing.entity.Invoice"
+    },
+    {
+      "from": "domain.billing.bounded_context.Billing",
+      "provenance_kind": "declared",
+      "relation": "HAS_VALUE_OBJECT",
+      "to": "domain.billing.value_object.Money"
+    },
+    {
+      "from": "domain.billing.entity.Invoice",
+      "provenance_kind": "declared",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.entity.Invoice",
+      "provenance_kind": "declared",
+      "relation": "CONSTRAINED_BY",
+      "to": "domain.billing.invariant.amount-gt-0"
+    },
+    {
+      "from": "domain.billing.entity.Invoice",
+      "provenance_kind": "declared",
+      "relation": "HAS_VALUE_OBJECT",
+      "to": "domain.billing.value_object.Money"
+    },
+    {
+      "from": "domain.billing.invariant.amount-gt-0",
+      "provenance_kind": "declared",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.terminology.InvoiceAggregate",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.terminology.InvoiceAggregate",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.billing.aggregate.InvoiceAggregate"
+    },
+    {
+      "from": "domain.billing.terminology.Invoice",
+      "provenance_kind": "declared",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.terminology.Money",
+      "provenance_kind": "declared",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.value_object.Money",
+      "provenance_kind": "declared",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    }
+  ],
+  "findings": [],
+  "nodes": [
+    {
+      "id": "domain.billing.aggregate.InvoiceAggregate",
+      "node_type": "aggregate",
+      "provenance_kind": "declared",
+      "status": "proposed"
+    },
+    {
+      "id": "domain.billing.bounded_context.Billing",
+      "node_type": "bounded_context",
+      "provenance_kind": "declared",
+      "status": "proposed"
+    },
+    {
+      "id": "domain.billing.entity.Invoice",
+      "node_type": "entity",
+      "provenance_kind": "declared",
+      "status": "proposed"
+    },
+    {
+      "id": "domain.billing.invariant.amount-gt-0",
+      "node_type": "invariant",
+      "provenance_kind": "declared",
+      "status": "proposed"
+    },
+    {
+      "id": "domain.billing.terminology.Invoice",
+      "node_type": "terminology",
+      "provenance_kind": "declared",
+      "status": "observed"
+    },
+    {
+      "id": "domain.billing.terminology.InvoiceAggregate",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.billing.terminology.Money",
+      "node_type": "terminology",
+      "provenance_kind": "declared",
+      "status": "observed"
+    },
+    {
+      "id": "domain.billing.value_object.Money",
+      "node_type": "value_object",
+      "provenance_kind": "declared",
+      "status": "proposed"
+    }
+  ]
+}

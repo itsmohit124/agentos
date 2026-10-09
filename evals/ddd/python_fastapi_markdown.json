@@ -1,0 +1,8 @@
+{
+  "id": "python_fastapi_markdown",
+  "kind": "markdown",
+  "description": "Generated domain markdown is deterministic and has no timestamps.",
+  "fixture": "python-fastapi",
+  "oracle": "expected/domain-markdown",
+  "confirm": "domain.payments.entity.Payment"
+}

@@ -1,0 +1,5 @@
+[project]
+name = "billing-greenfield"
+version = "0.1.0"
+description = "Billing requirements with no implementation yet."
+requires-python = ">=3.11"

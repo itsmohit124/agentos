@@ -46,6 +46,8 @@ pub enum Command {
     Scan,
     /// Query or rebuild the knowledge graph.
     Knowledge(KnowledgeArgs),
+    /// Domain lifecycle: contexts, terminology, proposals, confirmation.
+    Domain(DomainArgs),
     /// Run a deterministic evaluation suite.
     Evaluate(EvaluateArgs),
 }
@@ -151,6 +153,52 @@ pub enum KnowledgeCommand {
     Rebuild,
 }
 
+/// `agentos domain` arguments.
+#[derive(Debug, Args)]
+pub struct DomainArgs {
+    #[command(subcommand)]
+    pub command: DomainCommand,
+}
+
+/// `agentos domain` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum DomainCommand {
+    /// Infer domain nodes from the scanned graph. Does not confirm anything.
+    Scan,
+    /// List bounded contexts.
+    Contexts,
+    /// List ubiquitous-language terms and ambiguity findings.
+    Terminology,
+    /// List context-map edges.
+    Map,
+    /// Move inferred nodes one step toward Proposed.
+    Propose,
+    /// Confirm a Proposed node, or promote a Confirmed node to Canonical.
+    Confirm {
+        /// Logical domain node id.
+        id: String,
+        /// Who is confirming. Default: operator.
+        #[arg(long)]
+        by: Option<String>,
+        /// Why this confirmation is being recorded.
+        #[arg(long)]
+        reason: Option<String>,
+    },
+    /// Reject a domain node. Canonical nodes cannot be rejected.
+    Reject {
+        /// Logical domain node id.
+        id: String,
+        /// Who is rejecting. Default: operator.
+        #[arg(long)]
+        by: Option<String>,
+        /// Why this rejection is being recorded.
+        #[arg(long)]
+        reason: Option<String>,
+    },
+    /// Fail when canonical evidence is missing or a lifecycle rule is broken.
+    Validate,
+}
+
 /// `agentos evaluate` arguments.
 #[derive(Debug, Args)]
 pub struct EvaluateArgs {
@@ -174,6 +222,8 @@ pub enum EvalArea {
     Skills,
     /// Project understanding and the knowledge graph (`evals/knowledge`).
     Knowledge,
+    /// Domain lifecycle and DDD fixtures (`evals/ddd`).
+    Ddd,
 }
 
 impl Cli {

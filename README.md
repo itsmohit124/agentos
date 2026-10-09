@@ -38,8 +38,17 @@ agentos skills inspect tdd --brief  # metadata only; the body is not read
 agentos skills validate           # everything, including bodies; exit 3 on errors
 agentos skills install ./my-skill # copy a local skill into .agents/skills/ (git URLs: not yet)
 agentos skills graph [--format dot]
+agentos domain scan               # infer domain nodes; never confirms them
+agentos domain contexts
+agentos domain terminology
+agentos domain map
+agentos domain propose            # one lifecycle step toward Proposed
+agentos domain confirm <id>       # Proposed → Confirmed, or Confirmed → Canonical
+agentos domain reject <id>
+agentos domain validate           # exit 3 when canonical evidence has drifted
 agentos evaluate skills           # run evals/skills; exit 3 if a case fails
 agentos evaluate knowledge        # project profiles and language graph fixtures
+agentos evaluate ddd              # domain lifecycle fixtures
 ```
 
 Global flags: `--root <PATH>`, `--json`, `-v` / `-vv`, `--log-level <FILTER>`.

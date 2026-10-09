@@ -1,0 +1,192 @@
+{
+  "edges": [
+    {
+      "from": "domain.orders.aggregate.OrderAggregate",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.orders.bounded_context.Orders"
+    },
+    {
+      "from": "domain.orders.aggregate.OrderAggregate",
+      "provenance_kind": "inferred",
+      "relation": "CONSTRAINED_BY",
+      "to": "domain.orders.invariant.amount-gt-0"
+    },
+    {
+      "from": "domain.orders.aggregate.OrderAggregate",
+      "provenance_kind": "inferred",
+      "relation": "CONTAINS",
+      "to": "domain.orders.entity.Order"
+    },
+    {
+      "from": "domain.orders.aggregate.OrderAggregate",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.orders.domain.model.class.OrderAggregate"
+    },
+    {
+      "from": "domain.orders.bounded_context.Orders",
+      "provenance_kind": "inferred",
+      "relation": "HAS_AGGREGATE",
+      "to": "domain.orders.aggregate.OrderAggregate"
+    },
+    {
+      "from": "domain.orders.bounded_context.Orders",
+      "provenance_kind": "inferred",
+      "relation": "HAS_ENTITY",
+      "to": "domain.orders.entity.Order"
+    },
+    {
+      "from": "domain.orders.domain_service.OrderService",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.orders.bounded_context.Orders"
+    },
+    {
+      "from": "domain.orders.domain_service.OrderService",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.orders.service.class.OrderService"
+    },
+    {
+      "from": "domain.orders.entity.Order",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.orders.bounded_context.Orders"
+    },
+    {
+      "from": "domain.orders.entity.Order",
+      "provenance_kind": "inferred",
+      "relation": "CONSTRAINED_BY",
+      "to": "domain.orders.invariant.amount-gt-0"
+    },
+    {
+      "from": "domain.orders.entity.Order",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.orders.domain.model.class.Order"
+    },
+    {
+      "from": "domain.orders.invariant.amount-gt-0",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.orders.bounded_context.Orders"
+    },
+    {
+      "from": "domain.orders.policy.ReconciliationPolicy",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.orders.bounded_context.Orders"
+    },
+    {
+      "from": "domain.orders.policy.ReconciliationPolicy",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.orders.domain.policy.class.ReconciliationPolicy"
+    },
+    {
+      "from": "domain.orders.policy.ReconciliationPolicy",
+      "provenance_kind": "inferred",
+      "relation": "GOVERNS",
+      "to": "domain.orders.bounded_context.Orders"
+    },
+    {
+      "from": "domain.orders.repository.OrderRepository",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.orders.bounded_context.Orders"
+    },
+    {
+      "from": "domain.orders.repository.OrderRepository",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.orders.repository.class.OrderRepository"
+    },
+    {
+      "from": "domain.orders.terminology.OrderAggregate",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.orders.bounded_context.Orders"
+    },
+    {
+      "from": "domain.orders.terminology.OrderAggregate",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.orders.aggregate.OrderAggregate"
+    },
+    {
+      "from": "domain.orders.terminology.Order",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.orders.bounded_context.Orders"
+    },
+    {
+      "from": "domain.orders.terminology.Order",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.orders.entity.Order"
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding.hexagonal_leak.app-orders-domain-model-py.sqlalchemy",
+      "kind": "hexagonal_leak"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "domain.orders.aggregate.OrderAggregate",
+      "node_type": "aggregate",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.orders.bounded_context.Orders",
+      "node_type": "bounded_context",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.orders.domain_service.OrderService",
+      "node_type": "domain_service",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.orders.entity.Order",
+      "node_type": "entity",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.orders.invariant.amount-gt-0",
+      "node_type": "invariant",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.orders.policy.ReconciliationPolicy",
+      "node_type": "policy",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.orders.repository.OrderRepository",
+      "node_type": "repository",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.orders.terminology.Order",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.orders.terminology.OrderAggregate",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    }
+  ]
+}

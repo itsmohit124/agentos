@@ -12,6 +12,7 @@
 
 mod assemble;
 mod docs;
+mod domain;
 mod error;
 mod extract;
 mod hashutil;
@@ -26,6 +27,12 @@ mod walk;
 #[cfg(test)]
 mod tests;
 
+pub use domain::{
+    Clock, DomainProposal, DomainProposer, DomainReport, FixedClock, Lifecycle, NullProposer,
+    ProposeReport, StatusChange, SystemClock, TerminologyView, ValidationReport, confirm,
+    confirm_with, context_map, contexts, propose, propose_with, reject, reject_with,
+    scan as domain_scan, scan_with as domain_scan_with, terminology, validate,
+};
 pub use error::KnowledgeError;
 pub use extract::{ExtractorRegistry, LanguageExtractor, RawCall, RawSymbol};
 pub use model::{

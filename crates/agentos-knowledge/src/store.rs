@@ -15,8 +15,8 @@ use serde::Serialize;
 use crate::assemble::{Draft, StoredSymbol};
 use crate::error::KnowledgeError;
 use crate::model::{
-    KnowledgeEdge, KnowledgeFragment, KnowledgeNode, NodeKind, Provenance, ProvenanceKind,
-    RelationType,
+    Finding, KnowledgeEdge, KnowledgeFragment, KnowledgeNode, NodeKind, Provenance, ProvenanceKind,
+    RelationType, TransitionRecord,
 };
 
 const MIGRATION_SQL: &str = "\
@@ -89,6 +89,74 @@ CREATE VIRTUAL TABLE fragments_fts USING fts5(
     content,
     tokenize = 'unicode61'
 );
+";
+
+/// Phase 3 tables. Additive: version 1 tables are not rewritten.
+const MIGRATION_V2_SQL: &str = "\
+CREATE TABLE domain_nodes (
+    id TEXT PRIMARY KEY NOT NULL,
+    node_type TEXT NOT NULL,
+    name TEXT NOT NULL,
+    scope TEXT NOT NULL,
+    summary TEXT NOT NULL,
+    status TEXT NOT NULL,
+    provenance_kind TEXT NOT NULL,
+    provenance_source TEXT NOT NULL,
+    provenance_location TEXT NOT NULL,
+    extractor TEXT NOT NULL,
+    extractor_version TEXT NOT NULL,
+    method TEXT NOT NULL,
+    confidence_millis INTEGER NOT NULL,
+    version INTEGER NOT NULL,
+    fingerprint TEXT NOT NULL,
+    source_refs TEXT NOT NULL,
+    retrieval_metadata TEXT NOT NULL,
+    payload TEXT NOT NULL,
+    source_id TEXT NOT NULL,
+    parent TEXT
+) STRICT;
+CREATE TABLE domain_edges (
+    id TEXT PRIMARY KEY NOT NULL,
+    from_id TEXT NOT NULL,
+    relation_type TEXT NOT NULL,
+    to_id TEXT NOT NULL,
+    confidence_millis INTEGER NOT NULL,
+    provenance_kind TEXT NOT NULL,
+    provenance_source TEXT NOT NULL,
+    provenance_location TEXT NOT NULL,
+    extractor TEXT NOT NULL,
+    extractor_version TEXT NOT NULL,
+    method TEXT NOT NULL,
+    metadata TEXT NOT NULL,
+    source_id TEXT NOT NULL
+) STRICT;
+CREATE TABLE domain_transitions (
+    id TEXT PRIMARY KEY NOT NULL,
+    node_id TEXT NOT NULL,
+    from_status TEXT NOT NULL,
+    to_status TEXT NOT NULL,
+    actor TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    occurred_at TEXT NOT NULL
+) STRICT;
+CREATE TABLE domain_findings (
+    id TEXT PRIMARY KEY NOT NULL,
+    kind TEXT NOT NULL,
+    summary TEXT NOT NULL,
+    provenance_kind TEXT NOT NULL,
+    provenance_source TEXT NOT NULL,
+    provenance_location TEXT NOT NULL,
+    extractor TEXT NOT NULL,
+    extractor_version TEXT NOT NULL,
+    method TEXT NOT NULL,
+    confidence_millis INTEGER NOT NULL,
+    evidence TEXT NOT NULL,
+    subjects TEXT NOT NULL
+) STRICT;
+CREATE INDEX idx_domain_nodes_type ON domain_nodes(node_type);
+CREATE INDEX idx_domain_edges_from ON domain_edges(from_id);
+CREATE INDEX idx_domain_edges_to ON domain_edges(to_id);
+CREATE INDEX idx_domain_transitions_node ON domain_transitions(node_id);
 ";
 
 /// Open derived store for one project root.
@@ -250,10 +318,21 @@ impl KnowledgeStore {
         Ok(self.total_changes() - before)
     }
 
-    /// Deletes every derived row. The schema stays.
+    /// Deletes every derived row, including domain rows. The schema stays.
+    ///
+    /// Transition history is derived with the rest of the index. Deleting `agentos.db`
+    /// also drops confirmations.
     pub fn clear(&self) -> Result<(), KnowledgeError> {
         self.conn().execute_batch(
-            "DELETE FROM fragments_fts; DELETE FROM fragments; DELETE FROM edges; DELETE FROM nodes; DELETE FROM sources;",
+            "DELETE FROM domain_findings;
+             DELETE FROM domain_transitions;
+             DELETE FROM domain_edges;
+             DELETE FROM domain_nodes;
+             DELETE FROM fragments_fts;
+             DELETE FROM fragments;
+             DELETE FROM edges;
+             DELETE FROM nodes;
+             DELETE FROM sources;",
         )?;
         Ok(())
     }
@@ -281,55 +360,170 @@ impl KnowledgeStore {
             .map_err(KnowledgeError::from)
     }
 
-    /// All nodes, sorted by id.
+    /// Software nodes only, sorted by id. Domain rows live in [`Self::domain_nodes`].
+    pub(crate) fn software_nodes(&self) -> Result<Vec<KnowledgeNode>, KnowledgeError> {
+        table_nodes(self.conn(), "nodes")
+    }
+
+    /// Domain nodes only, sorted by id.
+    pub fn domain_nodes(&self) -> Result<Vec<KnowledgeNode>, KnowledgeError> {
+        table_nodes(self.conn(), "domain_nodes")
+    }
+
+    /// Software and domain nodes, sorted by id.
     pub fn nodes(&self) -> Result<Vec<KnowledgeNode>, KnowledgeError> {
-        let mut stmt = self.conn().prepare("SELECT * FROM nodes ORDER BY id")?;
-        let rows = stmt.query_map([], node_from_row)?;
+        let mut all = self.software_nodes()?;
+        all.extend(self.domain_nodes()?);
+        all.sort_by(|a, b| a.id.cmp(&b.id));
+        Ok(all)
+    }
+
+    /// Software edges only, sorted by id.
+    pub(crate) fn software_edges(&self) -> Result<Vec<KnowledgeEdge>, KnowledgeError> {
+        table_edges(self.conn(), "edges")
+    }
+
+    /// Domain edges only, sorted by id.
+    pub fn domain_edges(&self) -> Result<Vec<KnowledgeEdge>, KnowledgeError> {
+        table_edges(self.conn(), "domain_edges")
+    }
+
+    /// Software and domain edges, sorted by id.
+    pub fn edges(&self) -> Result<Vec<KnowledgeEdge>, KnowledgeError> {
+        let mut all = self.software_edges()?;
+        all.extend(self.domain_edges()?);
+        all.sort_by(|a, b| a.id.cmp(&b.id));
+        Ok(all)
+    }
+
+    /// Stored findings, sorted by id.
+    pub fn domain_findings(&self) -> Result<Vec<Finding>, KnowledgeError> {
+        let mut stmt = self
+            .conn()
+            .prepare("SELECT * FROM domain_findings ORDER BY id")?;
+        let rows = stmt.query_map([], finding_from_row)?;
         rows.collect::<Result<Vec<_>, _>>()
             .map_err(KnowledgeError::from)
     }
 
-    /// All edges, sorted by id.
-    pub fn edges(&self) -> Result<Vec<KnowledgeEdge>, KnowledgeError> {
-        self.edges_where("1 = 1")
+    /// Transitions for one node, in insertion order.
+    pub(crate) fn transitions_for(
+        &self,
+        node_id: &str,
+    ) -> Result<Vec<TransitionRecord>, KnowledgeError> {
+        let mut stmt = self
+            .conn()
+            .prepare("SELECT * FROM domain_transitions WHERE node_id = ?1 ORDER BY id")?;
+        let rows = stmt.query_map(params![node_id], transition_from_row)?;
+        rows.collect::<Result<Vec<_>, _>>()
+            .map_err(KnowledgeError::from)
     }
 
-    /// Aggregated counts.
+    /// Replaces domain rows only when the new set differs. Appends transitions.
+    /// Returns SQLite rows written.
+    pub(crate) fn sync_domain(
+        &self,
+        nodes: &[KnowledgeNode],
+        edges: &[KnowledgeEdge],
+        findings: &[Finding],
+        transitions: &[TransitionRecord],
+    ) -> Result<u64, KnowledgeError> {
+        let before = self.total_changes();
+        let tx = self.conn().unchecked_transaction()?;
+        let existing_nodes = table_nodes(&tx, "domain_nodes")?;
+        if existing_nodes != nodes {
+            tx.execute("DELETE FROM domain_nodes", [])?;
+            for node in nodes {
+                insert_node_into(&tx, "domain_nodes", node)?;
+            }
+        }
+        let existing_edges = table_edges(&tx, "domain_edges")?;
+        if existing_edges != edges {
+            tx.execute("DELETE FROM domain_edges", [])?;
+            for edge in edges {
+                insert_edge_into(&tx, "domain_edges", edge)?;
+            }
+        }
+        let existing_findings = {
+            let mut stmt = tx.prepare("SELECT * FROM domain_findings ORDER BY id")?;
+            let rows = stmt.query_map([], finding_from_row)?;
+            rows.collect::<Result<Vec<_>, _>>()?
+        };
+        if existing_findings != findings {
+            tx.execute("DELETE FROM domain_findings", [])?;
+            for finding in findings {
+                insert_finding(&tx, finding)?;
+            }
+        }
+        for transition in transitions {
+            insert_transition(&tx, transition)?;
+        }
+        tx.commit()?;
+        Ok(self.total_changes() - before)
+    }
+
+    /// Aggregated counts, including domain rows.
     pub fn stats(&self) -> Result<Stats, KnowledgeError> {
         let files = count(self.conn(), "SELECT COUNT(*) FROM sources")?;
-        let nodes = count(self.conn(), "SELECT COUNT(*) FROM nodes")?;
-        let edges = count(self.conn(), "SELECT COUNT(*) FROM edges")?;
+        let nodes = count(self.conn(), "SELECT COUNT(*) FROM nodes")?
+            + count(self.conn(), "SELECT COUNT(*) FROM domain_nodes")?;
+        let edges = count(self.conn(), "SELECT COUNT(*) FROM edges")?
+            + count(self.conn(), "SELECT COUNT(*) FROM domain_edges")?;
         let fragments = count(self.conn(), "SELECT COUNT(*) FROM fragments")?;
         Ok(Stats {
             files,
             nodes,
             edges,
             fragments,
-            nodes_by_type: grouped(
+            nodes_by_type: grouped_merge(
                 self.conn(),
                 "SELECT node_type, COUNT(*) FROM nodes GROUP BY node_type",
+                "SELECT node_type, COUNT(*) FROM domain_nodes GROUP BY node_type",
             )?,
-            edges_by_type: grouped(
+            edges_by_type: grouped_merge(
                 self.conn(),
                 "SELECT relation_type, COUNT(*) FROM edges GROUP BY relation_type",
+                "SELECT relation_type, COUNT(*) FROM domain_edges GROUP BY relation_type",
             )?,
             provenance: provenance_counts(self.conn())?,
             schema_version: self.schema_version()?,
         })
     }
 
-    /// One node, its edges, and its fragments.
+    /// One software or domain node, with edges from both tables and software fragments.
     pub fn inspect(&self, id: &str) -> Result<Inspection, KnowledgeError> {
-        let node = self
+        let node = if let Some(node) = self
             .conn()
-            .query_row("SELECT * FROM nodes WHERE id = ?1", params![id], |row| {
-                node_from_row(row)
-            })
+            .query_row(
+                "SELECT * FROM nodes WHERE id = ?1",
+                params![id],
+                node_from_row,
+            )
             .optional()?
-            .ok_or_else(|| KnowledgeError::NotFound(id.to_owned()))?;
+        {
+            node
+        } else if let Some(node) = self
+            .conn()
+            .query_row(
+                "SELECT * FROM domain_nodes WHERE id = ?1",
+                params![id],
+                node_from_row,
+            )
+            .optional()?
+        {
+            node
+        } else {
+            return Err(KnowledgeError::NotFound(id.to_owned()));
+        };
+        let mut outgoing = self.edges_where_param("edges", "from_id = ?1", id)?;
+        outgoing.extend(self.edges_where_param("domain_edges", "from_id = ?1", id)?);
+        outgoing.sort_by(|a, b| a.id.cmp(&b.id));
+        let mut incoming = self.edges_where_param("edges", "to_id = ?1", id)?;
+        incoming.extend(self.edges_where_param("domain_edges", "to_id = ?1", id)?);
+        incoming.sort_by(|a, b| a.id.cmp(&b.id));
         Ok(Inspection {
-            outgoing: self.edges_where_param("from_id = ?1", id)?,
-            incoming: self.edges_where_param("to_id = ?1", id)?,
+            outgoing,
+            incoming,
             fragments: self.fragments_of(id)?,
             node,
         })
@@ -358,10 +552,11 @@ impl KnowledgeStore {
 
     fn edges_where_param(
         &self,
+        table: &str,
         clause: &str,
         id: &str,
     ) -> Result<Vec<KnowledgeEdge>, KnowledgeError> {
-        let sql = format!("SELECT * FROM edges WHERE {clause} ORDER BY id");
+        let sql = format!("SELECT * FROM {table} WHERE {clause} ORDER BY id");
         let mut stmt = self.conn().prepare(&sql)?;
         let rows = stmt.query_map(params![id], edge_from_row)?;
         rows.collect::<Result<Vec<_>, _>>()
@@ -420,13 +615,24 @@ fn insert_draft_sql(conn: &Connection, draft: &Draft) -> Result<(), KnowledgeErr
 }
 
 fn insert_node_sql(conn: &Connection, node: &KnowledgeNode) -> Result<(), KnowledgeError> {
-    conn.execute(
-        "INSERT INTO nodes (
+    insert_node_into(conn, "nodes", node)
+}
+
+fn insert_node_into(
+    conn: &Connection,
+    table: &str,
+    node: &KnowledgeNode,
+) -> Result<(), KnowledgeError> {
+    let sql = format!(
+        "INSERT INTO {table} (
             id, node_type, name, scope, summary, status,
             provenance_kind, provenance_source, provenance_location,
             extractor, extractor_version, method, confidence_millis, version,
             fingerprint, source_refs, retrieval_metadata, payload, source_id, parent
-         ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20)",
+         ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20)"
+    );
+    conn.execute(
+        &sql,
         params![
             node.id,
             node.node_type.as_str(),
@@ -454,12 +660,23 @@ fn insert_node_sql(conn: &Connection, node: &KnowledgeNode) -> Result<(), Knowle
 }
 
 fn insert_edge_sql(conn: &Connection, edge: &KnowledgeEdge) -> Result<(), KnowledgeError> {
-    conn.execute(
-        "INSERT INTO edges (
+    insert_edge_into(conn, "edges", edge)
+}
+
+fn insert_edge_into(
+    conn: &Connection,
+    table: &str,
+    edge: &KnowledgeEdge,
+) -> Result<(), KnowledgeError> {
+    let sql = format!(
+        "INSERT INTO {table} (
             id, from_id, relation_type, to_id, confidence_millis,
             provenance_kind, provenance_source, provenance_location,
             extractor, extractor_version, method, metadata, source_id
-         ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+         ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)"
+    );
+    conn.execute(
+        &sql,
         params![
             edge.id,
             edge.from_id,
@@ -510,16 +727,29 @@ fn migrate(conn: &Connection) -> Result<(), KnowledgeError> {
         [],
         |row| row.get(0),
     )?;
-    if current >= 1 {
-        return Ok(());
+    if current < 1 {
+        let tx = conn.unchecked_transaction()?;
+        tx.execute_batch(MIGRATION_SQL)?;
+        tx.execute(
+            "INSERT INTO knowledge_migrations (version, name) VALUES (1, 'knowledge')",
+            [],
+        )?;
+        tx.commit()?;
     }
-    let tx = conn.unchecked_transaction()?;
-    tx.execute_batch(MIGRATION_SQL)?;
-    tx.execute(
-        "INSERT INTO knowledge_migrations (version, name) VALUES (1, 'knowledge')",
+    let current: u32 = conn.query_row(
+        "SELECT COALESCE(MAX(version), 0) FROM knowledge_migrations",
         [],
+        |row| row.get(0),
     )?;
-    tx.commit()?;
+    if current < 2 {
+        let tx = conn.unchecked_transaction()?;
+        tx.execute_batch(MIGRATION_V2_SQL)?;
+        tx.execute(
+            "INSERT INTO knowledge_migrations (version, name) VALUES (2, 'domain')",
+            [],
+        )?;
+        tx.commit()?;
+    }
     Ok(())
 }
 
@@ -542,16 +772,30 @@ fn grouped(conn: &Connection, sql: &str) -> Result<BTreeMap<String, usize>, Know
 }
 
 fn provenance_counts(conn: &Connection) -> Result<BTreeMap<String, usize>, KnowledgeError> {
-    let mut out = grouped(
+    let mut out = grouped_merge(
         conn,
         "SELECT provenance_kind, COUNT(*) FROM nodes GROUP BY provenance_kind",
+        "SELECT provenance_kind, COUNT(*) FROM domain_nodes GROUP BY provenance_kind",
     )?;
-    let edges = grouped(
+    let edges = grouped_merge(
         conn,
         "SELECT provenance_kind, COUNT(*) FROM edges GROUP BY provenance_kind",
+        "SELECT provenance_kind, COUNT(*) FROM domain_edges GROUP BY provenance_kind",
     )?;
     for (kind, n) in edges {
         *out.entry(kind).or_default() += n;
+    }
+    Ok(out)
+}
+
+fn grouped_merge(
+    conn: &Connection,
+    left: &str,
+    right: &str,
+) -> Result<BTreeMap<String, usize>, KnowledgeError> {
+    let mut out = grouped(conn, left)?;
+    for (key, n) in grouped(conn, right)? {
+        *out.entry(key).or_default() += n;
     }
     Ok(out)
 }
@@ -607,6 +851,99 @@ fn edge_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<KnowledgeEdge> {
         metadata: serde_json::from_str(&row.get::<_, String>("metadata")?).unwrap_or_default(),
         source_id: row.get("source_id")?,
     })
+}
+
+fn table_nodes(conn: &Connection, table: &str) -> Result<Vec<KnowledgeNode>, KnowledgeError> {
+    let sql = format!("SELECT * FROM {table} ORDER BY id");
+    let mut stmt = conn.prepare(&sql)?;
+    let rows = stmt.query_map([], node_from_row)?;
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(KnowledgeError::from)
+}
+
+fn table_edges(conn: &Connection, table: &str) -> Result<Vec<KnowledgeEdge>, KnowledgeError> {
+    let sql = format!("SELECT * FROM {table} ORDER BY id");
+    let mut stmt = conn.prepare(&sql)?;
+    let rows = stmt.query_map([], edge_from_row)?;
+    rows.collect::<Result<Vec<_>, _>>()
+        .map_err(KnowledgeError::from)
+}
+
+fn finding_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<Finding> {
+    let prov: String = row.get("provenance_kind")?;
+    Ok(Finding {
+        id: row.get("id")?,
+        kind: row.get("kind")?,
+        summary: row.get("summary")?,
+        provenance: Provenance {
+            kind: ProvenanceKind::parse(&prov).unwrap_or(ProvenanceKind::Inferred),
+            source: row.get("provenance_source")?,
+            location: row.get("provenance_location")?,
+            extractor: row.get("extractor")?,
+            extractor_version: row.get("extractor_version")?,
+            method: row.get("method")?,
+        },
+        confidence_millis: row.get("confidence_millis")?,
+        evidence: row.get("evidence")?,
+        subjects: serde_json::from_str(&row.get::<_, String>("subjects")?).unwrap_or_default(),
+    })
+}
+
+fn transition_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<TransitionRecord> {
+    Ok(TransitionRecord {
+        id: row.get("id")?,
+        node_id: row.get("node_id")?,
+        from_status: row.get("from_status")?,
+        to_status: row.get("to_status")?,
+        actor: row.get("actor")?,
+        reason: row.get("reason")?,
+        occurred_at: row.get("occurred_at")?,
+    })
+}
+
+fn insert_finding(conn: &Connection, finding: &Finding) -> Result<(), KnowledgeError> {
+    conn.execute(
+        "INSERT INTO domain_findings (
+            id, kind, summary, provenance_kind, provenance_source, provenance_location,
+            extractor, extractor_version, method, confidence_millis, evidence, subjects
+         ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12)",
+        params![
+            finding.id,
+            finding.kind,
+            finding.summary,
+            finding.provenance.kind.as_str(),
+            finding.provenance.source,
+            finding.provenance.location,
+            finding.provenance.extractor,
+            finding.provenance.extractor_version,
+            finding.provenance.method,
+            finding.confidence_millis,
+            finding.evidence,
+            serde_json::to_string(&finding.subjects).unwrap_or_else(|_| "[]".into()),
+        ],
+    )?;
+    Ok(())
+}
+
+fn insert_transition(
+    conn: &Connection,
+    transition: &TransitionRecord,
+) -> Result<(), KnowledgeError> {
+    conn.execute(
+        "INSERT INTO domain_transitions (
+            id, node_id, from_status, to_status, actor, reason, occurred_at
+         ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
+        params![
+            transition.id,
+            transition.node_id,
+            transition.from_status,
+            transition.to_status,
+            transition.actor,
+            transition.reason,
+            transition.occurred_at,
+        ],
+    )?;
+    Ok(())
 }
 
 fn fragment_from_row(row: &rusqlite::Row<'_>) -> rusqlite::Result<KnowledgeFragment> {

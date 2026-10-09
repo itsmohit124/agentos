@@ -1,0 +1,5 @@
+[project]
+name = "orders-leak"
+version = "0.1.0"
+description = "Orders domain imports SQLAlchemy directly."
+requires-python = ">=3.11"

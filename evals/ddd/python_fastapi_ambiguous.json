@@ -1,0 +1,7 @@
+{
+  "id": "python_fastapi_ambiguous",
+  "kind": "domain",
+  "description": "Payment, Charge, and Transaction are flagged as ambiguous and are not merged or canonicalized.",
+  "fixture": "python-fastapi-ambiguous",
+  "oracle": "expected/domain.json"
+}

@@ -1,0 +1,7 @@
+{
+  "id": "python_fastapi_domain",
+  "kind": "domain",
+  "description": "Payments, Users, and Notifications contexts; Payment has Money; amount > 0 stays inferred.",
+  "fixture": "python-fastapi",
+  "oracle": "expected/domain.json"
+}

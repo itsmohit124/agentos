@@ -1,0 +1,180 @@
+{
+  "edges": [
+    {
+      "from": "domain.billing.bounded_context.Billing",
+      "provenance_kind": "inferred",
+      "relation": "HAS_ENTITY",
+      "to": "domain.billing.entity.Charge"
+    },
+    {
+      "from": "domain.billing.bounded_context.Billing",
+      "provenance_kind": "inferred",
+      "relation": "HAS_ENTITY",
+      "to": "domain.billing.entity.Payment"
+    },
+    {
+      "from": "domain.billing.bounded_context.Billing",
+      "provenance_kind": "inferred",
+      "relation": "HAS_ENTITY",
+      "to": "domain.billing.entity.Transaction"
+    },
+    {
+      "from": "domain.billing.domain_service.BillingService",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.domain_service.BillingService",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.billing.service.class.BillingService"
+    },
+    {
+      "from": "domain.billing.entity.Charge",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.entity.Charge",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.billing.models.class.Charge"
+    },
+    {
+      "from": "domain.billing.entity.Payment",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.entity.Payment",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.billing.models.class.Payment"
+    },
+    {
+      "from": "domain.billing.entity.Transaction",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.entity.Transaction",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "software.app.billing.models.class.Transaction"
+    },
+    {
+      "from": "domain.billing.terminology.Charge",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.terminology.Charge",
+      "provenance_kind": "inferred",
+      "relation": "CONFLICTS_WITH",
+      "to": "domain.billing.terminology.Payment"
+    },
+    {
+      "from": "domain.billing.terminology.Charge",
+      "provenance_kind": "inferred",
+      "relation": "CONFLICTS_WITH",
+      "to": "domain.billing.terminology.Transaction"
+    },
+    {
+      "from": "domain.billing.terminology.Charge",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.billing.entity.Charge"
+    },
+    {
+      "from": "domain.billing.terminology.Payment",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.terminology.Payment",
+      "provenance_kind": "inferred",
+      "relation": "CONFLICTS_WITH",
+      "to": "domain.billing.terminology.Transaction"
+    },
+    {
+      "from": "domain.billing.terminology.Payment",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.billing.entity.Payment"
+    },
+    {
+      "from": "domain.billing.terminology.Transaction",
+      "provenance_kind": "inferred",
+      "relation": "BELONGS_TO",
+      "to": "domain.billing.bounded_context.Billing"
+    },
+    {
+      "from": "domain.billing.terminology.Transaction",
+      "provenance_kind": "inferred",
+      "relation": "DERIVED_FROM",
+      "to": "domain.billing.entity.Transaction"
+    }
+  ],
+  "findings": [
+    {
+      "id": "finding.terminology_ambiguity.charge-payment-transaction",
+      "kind": "terminology_ambiguity"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "domain.billing.bounded_context.Billing",
+      "node_type": "bounded_context",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.billing.domain_service.BillingService",
+      "node_type": "domain_service",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.billing.entity.Charge",
+      "node_type": "entity",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.billing.entity.Payment",
+      "node_type": "entity",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.billing.entity.Transaction",
+      "node_type": "entity",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.billing.terminology.Charge",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.billing.terminology.Payment",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    },
+    {
+      "id": "domain.billing.terminology.Transaction",
+      "node_type": "terminology",
+      "provenance_kind": "inferred",
+      "status": "inferred"
+    }
+  ]
+}

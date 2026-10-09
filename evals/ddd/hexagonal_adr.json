@@ -1,0 +1,7 @@
+{
+  "id": "hexagonal_adr",
+  "kind": "domain",
+  "description": "The same infrastructure import is not a finding when an ADR records an allowed exception.",
+  "fixture": "hexagonal-adr",
+  "oracle": "expected/domain.json"
+}

@@ -372,7 +372,13 @@ fn copy_tree(from: &Path, to: &Path) -> std::io::Result<()> {
     let mut entries: Vec<_> = fs::read_dir(from)?.collect::<Result<Vec<_>, _>>()?;
     entries.sort_by_key(|entry| entry.file_name());
     for entry in entries {
-        let target = to.join(entry.file_name());
+        let name = entry.file_name();
+        // Derived index. A domain scan leaves rows that software `scan` preserves, so copying
+        // them would make the graph case compare domain nodes against the software oracle.
+        if name == ".agentos" {
+            continue;
+        }
+        let target = to.join(&name);
         let file_type = entry.file_type()?;
         if file_type.is_dir() {
             copy_tree(&entry.path(), &target)?;
@@ -381,4 +387,42 @@ fn copy_tree(from: &Path, to: &Path) -> std::io::Result<()> {
         }
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::{Path, PathBuf};
+
+    use super::run;
+
+    struct RemoveDir<'a>(&'a Path);
+
+    impl Drop for RemoveDir<'_> {
+        fn drop(&mut self) {
+            let _ = std::fs::remove_dir_all(self.0);
+        }
+    }
+
+    #[test]
+    fn derived_domain_index_is_excluded_from_the_graph_oracle() {
+        let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
+        let fixture = root.join("fixtures/python-fastapi");
+        let state = fixture.join(".agentos");
+        let _cleanup = RemoveDir(&state);
+        let _ = std::fs::remove_dir_all(&state);
+        agentos_knowledge::domain_scan(&fixture).expect("domain scan");
+        let report = run(&root.join("evals/knowledge"), &root.join("fixtures")).expect("eval");
+        assert!(report.is_ok(), "{report:?}");
+        let case = report
+            .cases
+            .iter()
+            .find(|case| case.id == "python-fastapi")
+            .expect("python-fastapi case");
+        assert!(case.passed, "{}", case.detail);
+        assert!(
+            case.detail.contains("nodes recall 54/54 precision 54/54"),
+            "{}",
+            case.detail
+        );
+    }
 }

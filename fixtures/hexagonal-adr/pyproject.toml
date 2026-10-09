@@ -1,0 +1,5 @@
+[project]
+name = "orders-adr"
+version = "0.1.0"
+description = "Orders domain imports SQLAlchemy under an accepted exception."
+requires-python = ">=3.11"

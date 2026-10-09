@@ -46,6 +46,12 @@
       "from": "quality.tests.test_payments.module",
       "provenance_kind": "observed",
       "relation": "CONTAINS",
+      "to": "quality.tests.test_payments.test.test_amount_must_be_positive"
+    },
+    {
+      "from": "quality.tests.test_payments.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
       "to": "quality.tests.test_payments.test.test_charge_saves_payment"
     },
     {
@@ -65,6 +71,12 @@
       "provenance_kind": "observed",
       "relation": "IMPORTS",
       "to": "software.app.payments.service.module"
+    },
+    {
+      "from": "quality.tests.test_payments.test.test_amount_must_be_positive",
+      "provenance_kind": "observed",
+      "relation": "TESTS",
+      "to": "software.app.payments.models.class.Payment"
     },
     {
       "from": "quality.tests.test_payments.test.test_charge_saves_payment",
@@ -223,16 +235,40 @@
       "to": "software.app.payments.controller.method.PaymentController.create"
     },
     {
+      "from": "software.app.payments.models.class.Money",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.models.method.Money.__init__"
+    },
+    {
       "from": "software.app.payments.models.class.Payment",
       "provenance_kind": "observed",
       "relation": "CONTAINS",
       "to": "software.app.payments.models.method.Payment.__init__"
     },
     {
+      "from": "software.app.payments.models.class.PaymentAggregate",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.models.method.PaymentAggregate.__init__"
+    },
+    {
       "from": "software.app.payments.models.file",
       "provenance_kind": "observed",
       "relation": "CONTAINS",
       "to": "software.app.payments.models.module"
+    },
+    {
+      "from": "software.app.payments.models.method.Payment.__init__",
+      "provenance_kind": "observed",
+      "relation": "CALLS",
+      "to": "software.app.payments.models.class.Money"
+    },
+    {
+      "from": "software.app.payments.models.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.models.class.Money"
     },
     {
       "from": "software.app.payments.models.module",
@@ -244,7 +280,25 @@
       "from": "software.app.payments.models.module",
       "provenance_kind": "observed",
       "relation": "CONTAINS",
+      "to": "software.app.payments.models.class.PaymentAggregate"
+    },
+    {
+      "from": "software.app.payments.models.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.models.method.Money.__init__"
+    },
+    {
+      "from": "software.app.payments.models.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
       "to": "software.app.payments.models.method.Payment.__init__"
+    },
+    {
+      "from": "software.app.payments.models.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.models.method.PaymentAggregate.__init__"
     },
     {
       "from": "software.app.payments.models.module",
@@ -439,6 +493,11 @@
       "provenance_kind": "observed"
     },
     {
+      "id": "quality.tests.test_payments.test.test_amount_must_be_positive",
+      "node_type": "test",
+      "provenance_kind": "observed"
+    },
+    {
       "id": "quality.tests.test_payments.test.test_charge_saves_payment",
       "node_type": "test",
       "provenance_kind": "observed"
@@ -529,7 +588,17 @@
       "provenance_kind": "observed"
     },
     {
+      "id": "software.app.payments.models.class.Money",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
       "id": "software.app.payments.models.class.Payment",
+      "node_type": "class",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.models.class.PaymentAggregate",
       "node_type": "class",
       "provenance_kind": "observed"
     },
@@ -539,7 +608,17 @@
       "provenance_kind": "observed"
     },
     {
+      "id": "software.app.payments.models.method.Money.__init__",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
       "id": "software.app.payments.models.method.Payment.__init__",
+      "node_type": "method",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.models.method.PaymentAggregate.__init__",
       "node_type": "method",
       "provenance_kind": "observed"
     },

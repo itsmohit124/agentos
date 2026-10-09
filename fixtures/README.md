@@ -26,9 +26,13 @@ fixtures/<name>/
 | `greenfield-specified` | 2 | Specs, docs and a manifest, no source. Expected: `GREENFIELD` / `SPECIFIED`. |
 | `existing-project` | 2 | Source, tests, docs and a manifest, no spec. Expected: `EXISTING` / `ESTABLISHED`. |
 | `hybrid-project` | 2 | Source and a specification. Expected: `HYBRID` / `ESTABLISHED`. |
-| `python-fastapi` | 2 | Payments, users, notifications, tests, ADR, API, database, CI, container. Graph ground truth in `expected/graph.json`. |
+| `python-fastapi` | 2, 3 | Payments, users, notifications, tests, ADR, API, database, CI, container. Graph ground truth in `expected/graph.json`. Domain ground truth in `expected/domain.json` (Payment, Money, PaymentAggregate, `amount > 0`). |
 | `node-express` | 2b | Same payments shape in JavaScript (ESM, JSDoc, `extends`). Graph ground truth in `expected/graph.json`. |
 | `typescript-react` | 2b | Same payments shape in TypeScript, plus a React card (`implements`, JSX). Graph ground truth in `expected/graph.json`. |
 | `go` | 2b | Same payments shape in Go (struct embedding, interface, composite literals). Graph ground truth in `expected/graph.json`. |
 | `java` | 2b | Same payments shape in Java (`extends`, `implements`, constructors). Graph ground truth in `expected/graph.json`. |
 | `ruby-rails` | 2b | Same payments shape in Ruby (inheritance, YARD, `require_relative`). Graph ground truth in `expected/graph.json`. |
+| `python-fastapi-ambiguous` | 3 | Payment, Charge, and Transaction are separate types. Domain eval expects an ambiguity finding and no merge. |
+| `hexagonal-leak` | 3 | Order domain imports SQLAlchemy with no accepted exception. |
+| `hexagonal-adr` | 3 | The same import, allowed by an ADR. |
+| `greenfield-domain` | 3 | Billing requirements and a glossary, no source. Domain nodes are Proposed or Observed, never Confirmed. |

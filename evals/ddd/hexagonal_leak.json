@@ -1,0 +1,7 @@
+{
+  "id": "hexagonal_leak",
+  "kind": "domain",
+  "description": "An infrastructure import inside the order domain is a hexagonal leak finding.",
+  "fixture": "hexagonal-leak",
+  "oracle": "expected/domain.json"
+}

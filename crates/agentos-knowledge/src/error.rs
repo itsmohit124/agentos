@@ -43,4 +43,28 @@ pub enum KnowledgeError {
         /// What is wrong.
         message: String,
     },
+    /// A domain lifecycle change is not one of the allowed steps.
+    #[error("illegal domain transition from {from} to {to}")]
+    IllegalTransition {
+        /// Status before the change.
+        from: String,
+        /// Status that was refused.
+        to: String,
+    },
+    /// A proposer tried to write Confirmed or Canonical knowledge.
+    #[error("domain proposer {proposer} tried to write {status}")]
+    ProposerForbidden {
+        /// [`crate::domain::DomainProposer::name`].
+        proposer: String,
+        /// The status that was refused.
+        status: String,
+    },
+    /// `confirm` or `reject` refused the requested change.
+    #[error("cannot update domain node {id}: {reason}")]
+    DomainUpdate {
+        /// Logical id.
+        id: String,
+        /// Why the command stopped.
+        reason: String,
+    },
 }
