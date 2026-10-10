@@ -28,6 +28,7 @@ pub use pack::{
 };
 pub use render::{explain, to_markdown};
 pub use semantic::{NullSemantic, SemanticHit, SemanticRetriever};
+pub use tokens::intent_kind;
 pub use view::{KnowledgeView, MemoryView, SqliteView, content_fingerprint};
 
 /// Name of this crate.

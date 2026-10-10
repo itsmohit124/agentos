@@ -13,3 +13,4 @@ pub mod project;
 pub mod scan;
 pub mod skills;
 pub mod validate;
+pub mod workflow;

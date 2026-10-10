@@ -32,6 +32,7 @@ dependencies = [
  "agentos-skills",
  "agentos-testkit",
  "agentos-tools",
+ "agentos-workflow",
  "anyhow",
  "assert_cmd",
  "clap",
@@ -86,6 +87,7 @@ dependencies = [
  "agentos-permissions",
  "agentos-skills",
  "agentos-tools",
+ "agentos-workflow",
  "serde",
  "serde_json",
  "tempfile",
@@ -178,6 +180,22 @@ dependencies = [
 [[package]]
 name = "agentos-workflow"
 version = "0.1.0"
+dependencies = [
+ "agentos-context",
+ "agentos-core",
+ "agentos-feedback",
+ "agentos-knowledge",
+ "agentos-permissions",
+ "agentos-skills",
+ "agentos-tools",
+ "serde",
+ "serde_json",
+ "serde_norway",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "tracing",
+]
 
 [[package]]
 name = "ahash"

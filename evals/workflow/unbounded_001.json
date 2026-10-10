@@ -1,0 +1,10 @@
+{
+  "id": "unbounded_001",
+  "kind": "error",
+  "description": "Concurrency of zero is rejected so a run cannot use unbounded parallelism.",
+  "concurrency": 0,
+  "steps": [
+    {"id": "a"}
+  ],
+  "expect_error": "concurrency must be at least 1"
+}

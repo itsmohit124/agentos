@@ -1,0 +1,14 @@
+{
+  "id": "workflow_feature_001",
+  "kind": "workflow",
+  "description": "The feature workflow skips integration validation and completes under MockRunner.",
+  "workflow": "feature",
+  "task": "Add retry support to payment webhook processing",
+  "expect_skipped": [
+    {
+      "id": "integration_test",
+      "reason": "workflow does not require integration validation for this task type"
+    }
+  ],
+  "expect_state": "completed"
+}

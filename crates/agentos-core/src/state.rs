@@ -24,6 +24,7 @@ agentos.db-shm
 project-profile.json
 context-cache/
 feedback/
+runs/
 ";
 
 /// Error returned by [`StateLayout::ensure`].

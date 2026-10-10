@@ -1,0 +1,11 @@
+{
+  "id": "permission_001",
+  "kind": "permission",
+  "description": "A unit-test step without shell permission is blocked and the runner is not called.",
+  "steps": [
+    {"id": "gate", "validation": "unit_test"},
+    {"id": "after", "depends_on": ["gate"]}
+  ],
+  "expect_state": "blocked",
+  "expect_error": "does not declare shell"
+}

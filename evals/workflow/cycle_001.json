@@ -1,0 +1,10 @@
+{
+  "id": "cycle_001",
+  "kind": "error",
+  "description": "A task-graph cycle fails planning with the cycle path.",
+  "steps": [
+    {"id": "a", "depends_on": ["b"]},
+    {"id": "b", "depends_on": ["a"]}
+  ],
+  "expect_error": "workflow cycle: a -> b -> a"
+}

@@ -1,0 +1,57 @@
+id: bugfix
+task_type: bugfix
+description: Reproduce a bug, add a regression test, and fix it.
+concurrency: 1
+max_fix_iterations: 3
+steps:
+  - id: research
+    summary: Reproduce the failure described by the task.
+    skill: research
+    outputs: [findings]
+  - id: domain_design
+    summary: Model the domain.
+    skill: domain-modeling
+    skip_reason: workflow does not require domain design for this task type
+  - id: interface
+    summary: Design a new interface.
+    skill: interface-design
+    skip_reason: workflow does not require interface design for this task type
+  - id: tdd
+    summary: Add a failing regression test for the bug.
+    skill: tdd
+    depends_on: [research]
+    consumes: [findings]
+    outputs: [tests]
+  - id: implementation
+    summary: Make the regression test pass.
+    skill: implementation
+    depends_on: [tdd]
+    consumes: [tests]
+    outputs: [change]
+  - id: unit_test
+    summary: Run unit tests and fix product code when they fail.
+    validation: unit_test
+    depends_on: [implementation]
+    consumes: [tests, change]
+    permissions: [shell]
+    fix_loop: true
+  - id: integration_test
+    summary: Run integration tests.
+    validation: integration_test
+    depends_on: [unit_test]
+    permissions: [shell]
+    skip_reason: workflow does not require integration validation for this task type
+  - id: architecture_review
+    summary: Review the architecture.
+    skill: architecture-review
+    skip_reason: workflow does not require architecture review for this task type
+  - id: code_review
+    summary: Review the fix.
+    skill: code-review
+    depends_on: [unit_test]
+    consumes: [change]
+    outputs: [review]
+  - id: done
+    summary: Record the bugfix as complete.
+    depends_on: [code_review]
+    consumes: [review]

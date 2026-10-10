@@ -1,0 +1,15 @@
+{
+  "id": "join_001",
+  "kind": "graph",
+  "description": "D stays out of the frontier until both B and C have passed.",
+  "concurrency": 4,
+  "steps": [
+    {"id": "a"},
+    {"id": "b", "depends_on": ["a"]},
+    {"id": "c", "depends_on": ["a"]},
+    {"id": "d", "depends_on": ["b", "c"]}
+  ],
+  "expect_waves": [["a"], ["b", "c"], ["d"]],
+  "expect_frontier": ["d"],
+  "expect_state": "completed"
+}

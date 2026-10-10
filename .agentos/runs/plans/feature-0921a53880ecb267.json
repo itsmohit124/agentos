@@ -1,0 +1,389 @@
+{
+  "id": "feature-0921a53880ecb267",
+  "task": "Add retry support to payment webhook processing",
+  "workflow": "feature",
+  "task_type": "feature",
+  "selection": {
+    "source": "explicit",
+    "rule": "flag:feature"
+  },
+  "steps": [
+    {
+      "id": "research",
+      "summary": "Gather primary sources for the task.",
+      "skill": "research",
+      "depends_on": [],
+      "consumes": [],
+      "outputs": [
+        "findings"
+      ],
+      "validation": null,
+      "fix_loop": false,
+      "granted": [
+        "fs.read",
+        "network"
+      ],
+      "required": [
+        "fs.read",
+        "network"
+      ],
+      "ready_with": [
+        "research"
+      ]
+    },
+    {
+      "id": "domain_design",
+      "summary": "Record the domain terms and invariants the task depends on.",
+      "skill": "domain-modeling",
+      "depends_on": [
+        "research"
+      ],
+      "consumes": [
+        "findings"
+      ],
+      "outputs": [
+        "decisions",
+        "glossary"
+      ],
+      "validation": null,
+      "fix_loop": false,
+      "granted": [
+        "fs.read",
+        "fs.write"
+      ],
+      "required": [
+        "fs.read",
+        "fs.write"
+      ],
+      "ready_with": [
+        "domain_design"
+      ]
+    },
+    {
+      "id": "interface",
+      "summary": "Design the public interface and its contract tests.",
+      "skill": "interface-design",
+      "depends_on": [
+        "domain_design"
+      ],
+      "consumes": [
+        "decisions",
+        "glossary"
+      ],
+      "outputs": [
+        "contract_tests",
+        "interface"
+      ],
+      "validation": null,
+      "fix_loop": false,
+      "granted": [
+        "fs.read",
+        "fs.write"
+      ],
+      "required": [
+        "fs.read",
+        "fs.write"
+      ],
+      "ready_with": [
+        "interface"
+      ]
+    },
+    {
+      "id": "implementation",
+      "summary": "Implement the feature against the interface.",
+      "skill": "implementation",
+      "depends_on": [
+        "interface"
+      ],
+      "consumes": [
+        "interface"
+      ],
+      "outputs": [
+        "change",
+        "summary"
+      ],
+      "validation": null,
+      "fix_loop": false,
+      "granted": [
+        "fs.read",
+        "fs.write",
+        "shell"
+      ],
+      "required": [
+        "fs.read",
+        "fs.write",
+        "shell"
+      ],
+      "ready_with": [
+        "implementation",
+        "tdd"
+      ]
+    },
+    {
+      "id": "tdd",
+      "summary": "Write the failing tests for the feature.",
+      "skill": "tdd",
+      "depends_on": [
+        "interface"
+      ],
+      "consumes": [
+        "contract_tests",
+        "interface"
+      ],
+      "outputs": [
+        "tests"
+      ],
+      "validation": null,
+      "fix_loop": false,
+      "granted": [
+        "fs.read",
+        "fs.write",
+        "shell"
+      ],
+      "required": [
+        "fs.read",
+        "fs.write",
+        "shell"
+      ],
+      "ready_with": [
+        "implementation",
+        "tdd"
+      ]
+    },
+    {
+      "id": "unit_test",
+      "summary": "Run unit tests and fix product code when they fail.",
+      "skill": null,
+      "depends_on": [
+        "implementation",
+        "tdd"
+      ],
+      "consumes": [
+        "change",
+        "tests"
+      ],
+      "outputs": [],
+      "validation": "unit_test",
+      "fix_loop": true,
+      "granted": [
+        "shell"
+      ],
+      "required": [
+        "shell"
+      ],
+      "ready_with": [
+        "unit_test"
+      ]
+    },
+    {
+      "id": "architecture_review",
+      "summary": "Review dependency direction after the change.",
+      "skill": "architecture-review",
+      "depends_on": [
+        "unit_test"
+      ],
+      "consumes": [
+        "change"
+      ],
+      "outputs": [
+        "report"
+      ],
+      "validation": "architecture",
+      "fix_loop": false,
+      "granted": [
+        "fs.read"
+      ],
+      "required": [
+        "fs.read"
+      ],
+      "ready_with": [
+        "architecture_review"
+      ]
+    },
+    {
+      "id": "done",
+      "summary": "Record the feature as complete.",
+      "skill": null,
+      "depends_on": [
+        "architecture_review"
+      ],
+      "consumes": [
+        "report"
+      ],
+      "outputs": [],
+      "validation": null,
+      "fix_loop": false,
+      "granted": [],
+      "required": [],
+      "ready_with": [
+        "done"
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "from": "architecture_review",
+      "to": "done",
+      "active": true
+    },
+    {
+      "from": "domain_design",
+      "to": "interface",
+      "active": true
+    },
+    {
+      "from": "implementation",
+      "to": "unit_test",
+      "active": true
+    },
+    {
+      "from": "interface",
+      "to": "implementation",
+      "active": true
+    },
+    {
+      "from": "interface",
+      "to": "tdd",
+      "active": true
+    },
+    {
+      "from": "research",
+      "to": "domain_design",
+      "active": true
+    },
+    {
+      "from": "tdd",
+      "to": "unit_test",
+      "active": true
+    },
+    {
+      "from": "unit_test",
+      "to": "architecture_review",
+      "active": true
+    },
+    {
+      "from": "unit_test",
+      "to": "integration_test",
+      "active": false
+    }
+  ],
+  "skill_edges": [
+    {
+      "from": "tdd",
+      "to": "interface-design",
+      "step_id": "tdd"
+    }
+  ],
+  "skills": [
+    {
+      "name": "architecture-review",
+      "version": "0.1.0",
+      "step_id": "architecture_review",
+      "position": 0,
+      "reason": "selected by step architecture_review",
+      "permissions": [
+        "fs.read"
+      ]
+    },
+    {
+      "name": "domain-modeling",
+      "version": "0.1.0",
+      "step_id": "domain_design",
+      "position": 0,
+      "reason": "selected by step domain_design",
+      "permissions": [
+        "fs.read",
+        "fs.write"
+      ]
+    },
+    {
+      "name": "implementation",
+      "version": "0.1.0",
+      "step_id": "implementation",
+      "position": 0,
+      "reason": "selected by step implementation",
+      "permissions": [
+        "fs.read",
+        "fs.write",
+        "shell"
+      ]
+    },
+    {
+      "name": "interface-design",
+      "version": "0.1.0",
+      "step_id": "interface",
+      "position": 0,
+      "reason": "selected by step interface",
+      "permissions": [
+        "fs.read",
+        "fs.write"
+      ]
+    },
+    {
+      "name": "research",
+      "version": "0.1.0",
+      "step_id": "research",
+      "position": 0,
+      "reason": "selected by step research",
+      "permissions": [
+        "fs.read",
+        "network"
+      ]
+    },
+    {
+      "name": "interface-design",
+      "version": "0.1.0",
+      "step_id": "tdd",
+      "position": 0,
+      "reason": "required by step tdd because tdd requires interface-design",
+      "permissions": [
+        "fs.read",
+        "fs.write"
+      ]
+    },
+    {
+      "name": "tdd",
+      "version": "0.1.0",
+      "step_id": "tdd",
+      "position": 1,
+      "reason": "selected by step tdd",
+      "permissions": [
+        "fs.read",
+        "fs.write",
+        "shell"
+      ]
+    }
+  ],
+  "skipped": [
+    {
+      "id": "integration_test",
+      "reason": "workflow does not require integration validation for this task type"
+    }
+  ],
+  "permissions": [
+    "fs.read",
+    "fs.write",
+    "network",
+    "shell"
+  ],
+  "validation": [
+    {
+      "step_id": "architecture_review",
+      "kind": "architecture",
+      "fix_loop": false,
+      "max_iterations": 3
+    },
+    {
+      "step_id": "unit_test",
+      "kind": "unit_test",
+      "fix_loop": true,
+      "max_iterations": 3
+    }
+  ],
+  "execution": {
+    "planner": "deterministic-v1",
+    "ordering": "topological-by-step-id",
+    "concurrency": 2,
+    "max_fix_iterations": 3
+  }
+}

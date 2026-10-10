@@ -1,0 +1,11 @@
+{
+  "id": "weaken_remove_001",
+  "kind": "weaken",
+  "description": "Removing a test during the fix loop fails the run.",
+  "weaken": "remove",
+  "steps": [
+    {"id": "check", "validation": "unit_test", "fix_loop": true, "permissions": ["shell"]}
+  ],
+  "expect_state": "failed",
+  "expect_error": "removed test"
+}

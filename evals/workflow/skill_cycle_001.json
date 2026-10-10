@@ -1,0 +1,7 @@
+{
+  "id": "skill_cycle_001",
+  "kind": "skill_cycle",
+  "description": "A cycle in skill dependencies fails planning through the Phase 1 resolver.",
+  "task": "task",
+  "expect_error": "dependency cycle"
+}

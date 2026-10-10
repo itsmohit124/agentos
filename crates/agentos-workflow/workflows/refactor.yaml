@@ -1,0 +1,60 @@
+id: refactor
+task_type: refactor
+description: Review structure, adjust the interface, and keep the tests green.
+concurrency: 2
+max_fix_iterations: 3
+steps:
+  - id: research
+    summary: Research an external behavior.
+    skill: research
+    skip_reason: workflow does not require research for this task type
+  - id: domain_design
+    summary: Model the domain.
+    skill: domain-modeling
+    skip_reason: workflow does not require domain design for this task type
+  - id: architecture_review
+    summary: Assess the current structure before changing it.
+    skill: architecture-review
+    validation: architecture
+    outputs: [report]
+  - id: interface
+    summary: Adjust the public interface the refactor will preserve.
+    skill: interface-design
+    depends_on: [architecture_review]
+    consumes: [report]
+    outputs: [interface]
+  - id: tdd
+    summary: Keep characterization tests in place for the refactor.
+    skill: tdd
+    depends_on: [interface]
+    consumes: [interface]
+    outputs: [tests]
+  - id: implementation
+    summary: Apply the refactor without expanding the task.
+    skill: implementation
+    depends_on: [interface]
+    consumes: [interface]
+    outputs: [change]
+  - id: unit_test
+    summary: Run unit tests and fix product code when they fail.
+    validation: unit_test
+    depends_on: [tdd, implementation]
+    consumes: [tests, change]
+    permissions: [shell]
+    fix_loop: true
+  - id: integration_test
+    summary: Run integration tests.
+    validation: integration_test
+    depends_on: [unit_test]
+    permissions: [shell]
+    skip_reason: workflow does not require integration validation for this task type
+  - id: code_review
+    summary: Review the refactor.
+    skill: code-review
+    depends_on: [unit_test]
+    consumes: [change]
+    outputs: [review]
+  - id: done
+    summary: Record the refactor as complete.
+    depends_on: [code_review]
+    consumes: [review]

@@ -1,0 +1,15 @@
+{
+  "id": "concurrency_001",
+  "kind": "graph",
+  "description": "A concurrency of 2 admits a prefix of the ready frontier and still records the full frontier.",
+  "concurrency": 2,
+  "steps": [
+    {"id": "a"},
+    {"id": "b", "depends_on": ["a"]},
+    {"id": "c", "depends_on": ["a"]},
+    {"id": "d", "depends_on": ["a"]}
+  ],
+  "expect_waves": [["a"], ["b", "c"], ["d"]],
+  "expect_frontier": ["b", "c", "d"],
+  "expect_state": "completed"
+}

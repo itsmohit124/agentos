@@ -1,0 +1,58 @@
+id: feature
+task_type: feature
+description: Research, design, implement, and validate a feature.
+concurrency: 2
+max_fix_iterations: 3
+steps:
+  - id: research
+    summary: Gather primary sources for the task.
+    skill: research
+    outputs: [findings]
+  - id: domain_design
+    summary: Record the domain terms and invariants the task depends on.
+    skill: domain-modeling
+    depends_on: [research]
+    consumes: [findings]
+    outputs: [glossary, decisions]
+  - id: interface
+    summary: Design the public interface and its contract tests.
+    skill: interface-design
+    depends_on: [domain_design]
+    consumes: [glossary, decisions]
+    outputs: [interface, contract_tests]
+  - id: tdd
+    summary: Write the failing tests for the feature.
+    skill: tdd
+    depends_on: [interface]
+    consumes: [interface, contract_tests]
+    outputs: [tests]
+  - id: implementation
+    summary: Implement the feature against the interface.
+    skill: implementation
+    depends_on: [interface]
+    consumes: [interface]
+    outputs: [change, summary]
+  - id: unit_test
+    summary: Run unit tests and fix product code when they fail.
+    validation: unit_test
+    depends_on: [tdd, implementation]
+    consumes: [tests, change]
+    permissions: [shell]
+    fix_loop: true
+  - id: integration_test
+    summary: Run integration tests.
+    validation: integration_test
+    depends_on: [unit_test]
+    permissions: [shell]
+    skip_reason: workflow does not require integration validation for this task type
+  - id: architecture_review
+    summary: Review dependency direction after the change.
+    skill: architecture-review
+    validation: architecture
+    depends_on: [unit_test]
+    consumes: [change]
+    outputs: [report]
+  - id: done
+    summary: Record the feature as complete.
+    depends_on: [architecture_review]
+    consumes: [report]

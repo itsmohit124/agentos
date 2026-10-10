@@ -1,0 +1,29 @@
+{
+  "id": "transition_001",
+  "kind": "transition",
+  "description": "The legal run and step transition tables match the engine, and every other edge is rejected.",
+  "legal_run": [
+    ["planned", "ready"],
+    ["planned", "aborted"],
+    ["ready", "running"],
+    ["ready", "blocked"],
+    ["ready", "aborted"],
+    ["running", "ready"],
+    ["running", "passed"],
+    ["running", "failed"],
+    ["running", "blocked"],
+    ["running", "aborted"],
+    ["passed", "completed"]
+  ],
+  "legal_step": [
+    ["planned", "ready"],
+    ["planned", "aborted"],
+    ["ready", "running"],
+    ["ready", "blocked"],
+    ["ready", "aborted"],
+    ["running", "passed"],
+    ["running", "failed"],
+    ["running", "aborted"],
+    ["running", "ready"]
+  ]
+}

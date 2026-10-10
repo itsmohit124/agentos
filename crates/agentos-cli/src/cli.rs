@@ -56,6 +56,10 @@ pub enum Command {
     Validate(ValidateArgs),
     /// Analyze the knowledge graph for architecture smells.
     Architecture(ArchitectureArgs),
+    /// Plan a task into a deterministic workflow.
+    Plan(PlanArgs),
+    /// Execute, resume, abort, or inspect a run.
+    Run(RunArgs),
     /// Run a deterministic evaluation suite.
     Evaluate(EvaluateArgs),
 }
@@ -335,6 +339,71 @@ pub enum ArchitectureCommand {
     },
 }
 
+/// `agentos plan` arguments.
+#[derive(Debug, Args)]
+pub struct PlanArgs {
+    /// Task text. It is stored unchanged.
+    pub task: String,
+    /// Workflow to run. Omit it to select feature, bugfix, or refactor from task-type words.
+    #[arg(long, value_name = "NAME")]
+    pub workflow: Option<String>,
+}
+
+/// `agentos run` arguments.
+#[derive(Debug, Args)]
+#[command(args_conflicts_with_subcommands = true)]
+pub struct RunArgs {
+    /// Status, resume, or abort. Omit this to execute a plan.
+    #[command(subcommand)]
+    pub command: Option<RunCommand>,
+
+    /// Plan id to execute.
+    pub plan_id: Option<String>,
+
+    /// `mock` succeeds deterministically. `manual` prints the step and records `--result`.
+    #[arg(long, value_enum, default_value_t = RunnerChoice::Manual)]
+    pub runner: RunnerChoice,
+
+    /// JSON runner result for the manual runner.
+    #[arg(long, value_name = "PATH")]
+    pub result: Option<PathBuf>,
+}
+
+/// `agentos run` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum RunCommand {
+    /// Show a run.
+    Status {
+        /// Run id.
+        run_id: String,
+    },
+    /// Continue a run from its saved state.
+    Resume {
+        /// Run id.
+        run_id: String,
+        /// Runner to use for the remaining steps.
+        #[arg(long, value_enum, default_value_t = RunnerChoice::Manual)]
+        runner: RunnerChoice,
+        /// JSON runner result for the manual runner.
+        #[arg(long, value_name = "PATH")]
+        result: Option<PathBuf>,
+    },
+    /// Abort a run that is not already finished.
+    Abort {
+        /// Run id.
+        run_id: String,
+    },
+}
+
+/// How `agentos run` executes a step.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum RunnerChoice {
+    /// Scripted success. Validation passes without spawning a tool.
+    Mock,
+    /// Print the step instructions and Context Pack, then record `--result`.
+    Manual,
+}
+
 /// `agentos evaluate` arguments.
 #[derive(Debug, Args)]
 pub struct EvaluateArgs {
@@ -366,6 +435,8 @@ pub enum EvalArea {
     Feedback,
     /// Architecture detectors (`evals/architecture`).
     Architecture,
+    /// Workflow plans and runs (`evals/workflow`).
+    Workflow,
 }
 
 impl Cli {
@@ -416,5 +487,27 @@ mod tests {
         assert_eq!(cli.overrides().output_format, Some(OutputFormat::Json));
         let cli = Cli::parse_from(["agentos", "config"]);
         assert_eq!(cli.overrides().output_format, None);
+    }
+
+    #[test]
+    fn run_accepts_a_plan_id_or_a_subcommand() {
+        let start =
+            Cli::try_parse_from(["agentos", "run", "feature-abc-1", "--runner", "mock"]).unwrap();
+        match start.command {
+            Command::Run(args) => {
+                assert_eq!(args.plan_id.as_deref(), Some("feature-abc-1"));
+                assert!(args.command.is_none());
+                assert_eq!(args.runner, RunnerChoice::Mock);
+            }
+            other => panic!("unexpected {other:?}"),
+        }
+        let status = Cli::try_parse_from(["agentos", "run", "status", "run-1"]).unwrap();
+        match status.command {
+            Command::Run(args) => match args.command {
+                Some(RunCommand::Status { run_id }) => assert_eq!(run_id, "run-1"),
+                other => panic!("unexpected {other:?}"),
+            },
+            other => panic!("unexpected {other:?}"),
+        }
     }
 }

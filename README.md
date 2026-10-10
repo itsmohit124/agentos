@@ -64,6 +64,12 @@ agentos validate record-regression <id>
 agentos architecture analyze     # detectors over the knowledge graph; exit 3 if any finding
 agentos evaluate feedback         # detection, parsing, permission, regressions
 agentos evaluate architecture     # bad and good architecture fixtures
+agentos plan "Add retry support to payment webhook processing" --workflow feature
+agentos run <plan-id> --runner mock
+agentos run status <run-id>
+agentos run resume <run-id>
+agentos run abort <run-id>
+agentos evaluate workflow         # plans, scheduler, resume, fix loop
 ```
 
 Global flags: `--root <PATH>`, `--json`, `-v` / `-vv`, `--log-level <FILTER>`.
@@ -115,7 +121,7 @@ Logs are written to stderr; command results to stdout.
 | 0 | success |
 | 1 | runtime error |
 | 2 | usage error |
-| 3 | a check failed: `doctor` critical failure, `skills validate` errors, `evaluate` case failures |
+| 3 | a check failed: `doctor` critical failure, `skills validate` errors, `evaluate` case failures, a workflow run that is `failed` or `blocked` |
 
 ### Project state
 
@@ -124,7 +130,10 @@ Logs are written to stderr; command results to stdout.
 ├── config.toml          # project configuration (yours to edit; never overwritten)
 ├── .gitignore           # keeps derived state out of Git
 ├── project-profile.json # derived classification and signals; rewritten by init and scan
-└── agentos.db           # SQLite knowledge index: derived state, safe to delete and rebuild
+├── agentos.db           # SQLite knowledge index: derived state, safe to delete and rebuild
+├── context-cache/       # derived Context Pack cache
+├── feedback/            # derived validation results
+└── runs/                # derived plans and resumable runs
 ```
 
 ## Development

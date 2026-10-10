@@ -1,0 +1,6 @@
+{
+  "id": "deterministic_001",
+  "kind": "deterministic",
+  "description": "The same task produces the same plan, and an explicit workflow flag wins without rewriting the task.",
+  "task": "Fix the failing webhook"
+}

@@ -20,6 +20,7 @@ agentos-knowledge.workspace = true
 agentos-permissions.workspace = true
 agentos-skills.workspace = true
 agentos-tools.workspace = true
+agentos-workflow.workspace = true
 anyhow.workspace = true
 clap.workspace = true
 serde.workspace = true

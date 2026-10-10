@@ -1,0 +1,9 @@
+{
+  "id": "missing_skill_001",
+  "kind": "error",
+  "description": "A step that names an unknown skill fails planning.",
+  "steps": [
+    {"id": "work", "skill": "missing-skill"}
+  ],
+  "expect_error": "unknown skill"
+}

@@ -1,0 +1,13 @@
+{
+  "id": "fix_exhaust_001",
+  "kind": "fix",
+  "description": "Repeated validation failure stops at the iteration cap and fails the run.",
+  "max_fix_iterations": 2,
+  "steps": [
+    {"id": "check", "validation": "unit_test", "fix_loop": true, "permissions": ["shell"]}
+  ],
+  "validations": [false, false, true],
+  "expect_calls": ["check:fix"],
+  "expect_state": "failed",
+  "expect_error": "after 2 attempts"
+}

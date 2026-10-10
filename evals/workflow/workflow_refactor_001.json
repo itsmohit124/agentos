@@ -1,0 +1,22 @@
+{
+  "id": "workflow_refactor_001",
+  "kind": "workflow",
+  "description": "The refactor workflow skips research, domain design, and integration validation, and completes under MockRunner.",
+  "workflow": "refactor",
+  "task": "Refactor payment webhook processing",
+  "expect_skipped": [
+    {
+      "id": "research",
+      "reason": "workflow does not require research for this task type"
+    },
+    {
+      "id": "domain_design",
+      "reason": "workflow does not require domain design for this task type"
+    },
+    {
+      "id": "integration_test",
+      "reason": "workflow does not require integration validation for this task type"
+    }
+  ],
+  "expect_state": "completed"
+}

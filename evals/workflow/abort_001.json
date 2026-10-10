@@ -1,0 +1,12 @@
+{
+  "id": "abort_001",
+  "kind": "abort",
+  "description": "Abort stops a running plan, and a second abort is an illegal transition.",
+  "steps": [
+    {"id": "a"},
+    {"id": "b", "depends_on": ["a"]}
+  ],
+  "suspend_after": "a",
+  "expect_state": "aborted",
+  "expect_error": "illegal transition"
+}

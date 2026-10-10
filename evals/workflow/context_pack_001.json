@@ -1,0 +1,12 @@
+{
+  "id": "context_pack_001",
+  "kind": "context",
+  "description": "Each step gets its own pack, declared dependency outputs are passed, and unrelated fragments stay out.",
+  "task": "Add retry support to payment webhook processing",
+  "steps": [
+    {"id": "research", "outputs": ["findings"]},
+    {"id": "implement", "depends_on": ["research"], "consumes": ["findings"]}
+  ],
+  "include_fragment": "Webhook",
+  "exclude_fragment": "Recipe"
+}

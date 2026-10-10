@@ -14,12 +14,13 @@ agentos-knowledge.workspace = true
 agentos-permissions.workspace = true
 agentos-skills.workspace = true
 agentos-tools.workspace = true
+agentos-workflow.workspace = true
+tempfile.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true
 
 [dev-dependencies]
-tempfile.workspace = true
 
 [lints]
 workspace = true

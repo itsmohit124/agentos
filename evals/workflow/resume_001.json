@@ -1,0 +1,13 @@
+{
+  "id": "resume_001",
+  "kind": "resume",
+  "description": "After A and B complete, resume executes only C.",
+  "steps": [
+    {"id": "a"},
+    {"id": "b", "depends_on": ["a"]},
+    {"id": "c", "depends_on": ["b"]}
+  ],
+  "suspend_after": "b",
+  "expect_calls": ["a:execute", "b:execute", "c:execute"],
+  "expect_state": "completed"
+}

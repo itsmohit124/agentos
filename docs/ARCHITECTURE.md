@@ -3,6 +3,14 @@
 The locked V1 architecture is specified in [spec/ARCHITECTURE.md](spec/ARCHITECTURE.md), with
 product principles in [spec/VISION.md](spec/VISION.md) and per-subsystem contracts in `spec/`.
 
+## What exists after Phase 6
+
+Phase 6 adds `agentos-workflow`. It plans a task graph, expands skill dependencies through the
+Phase 1 resolver, builds one Phase 4 Context Pack per step, and consumes Phase 5
+`ValidationResult` values. Runs are files under `.agentos/runs/`. `MockRunner` is the test
+executor. `ManualRunner` prints the step and records a supplied result. There is no model call
+and no agent adapter.
+
 ## What exists after Phase 5
 
 Phase 5 adds `agentos-feedback` and `agentos-tools`. Validation providers construct commands and
@@ -37,13 +45,19 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
              ├─► agentos-feedback ─┬─► agentos-knowledge
              │                     ├─► agentos-permissions
              │                     └─► agentos-tools ─► agentos-permissions
+             ├─► agentos-workflow ─┬─► agentos-skills
+             │                     ├─► agentos-context
+             │                     ├─► agentos-feedback
+             │                     ├─► agentos-permissions
+             │                     └─► agentos-tools
              └─► agentos-evaluation ─┬─► agentos-core
                                      ├─► agentos-knowledge
                                      ├─► agentos-context
                                      ├─► agentos-skills
                                      ├─► agentos-permissions
                                      ├─► agentos-feedback
-                                     └─► agentos-tools
+                                     ├─► agentos-tools
+                                     └─► agentos-workflow
 ```
 
 | Crate | Contents |
@@ -54,10 +68,11 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
 | `agentos-skills` | `SKILL.md` front-matter parsing (schema `schemas/skill-manifest.schema.json` + semantic checks), `SkillLoader` (prioritized discovery, front-matter only), `SkillRegistry` (lazy body/reference loading), dependency resolver (topological order, cycle path, semver), rule-based `SkillRouter`, full `validate`, `SkillGraph` (text/DOT), local `install`, built-in skills embedded from `skills/` |
 | `agentos-knowledge` | Automatic project profile, ignore-aware scanner, `LanguageExtractor` (Python, TypeScript, JavaScript, Go, Java, Ruby), knowledge graph in SQLite (nodes, edges, fragments, FTS5), provenance, domain tables |
 | `agentos-context` | Context Pack assembly over that graph: intent, routing, lexical/graph retrieval, budget, trace, cache. `NullSemantic` is the semantic seam |
-| `agentos-evaluation` | Deterministic case runner; areas `skills`, `knowledge`, `ddd`, `context`, `feedback`, and `architecture` |
+| `agentos-evaluation` | Deterministic case runner; areas `skills`, `knowledge`, `ddd`, `context`, `feedback`, `architecture`, and `workflow` |
 | `agentos-feedback` | `ValidationProvider`, language providers, stored results, architecture detectors over the existing graph |
 | `agentos-tools` | Process runner: shell permission, timeout, capped stdout and stderr |
-| `agentos-cli` | The `agentos` binary: `init`, `doctor`, `config`, `project profile`, `scan`, `knowledge`, `domain`, `benchmark baseline`, `context`, `skills`, `validate`, `architecture analyze`, `evaluate {skills, knowledge, ddd, context, feedback, architecture}` |
+| `agentos-workflow` | Task graph, Phase 1 skill expansion, deterministic scheduler, resumable runs, MockRunner and ManualRunner |
+| `agentos-cli` | The `agentos` binary: `init`, `doctor`, `config`, `project profile`, `scan`, `knowledge`, `domain`, `benchmark baseline`, `context`, `skills`, `validate`, `architecture analyze`, `plan`, `run`, `evaluate {skills, knowledge, ddd, context, feedback, architecture, workflow}` |
 | `agentos-testkit` | Dev-only: `TempProject`, `CliRunner`, fixture loader |
 | all other crates | Compiling stubs, implemented by later phases |
 

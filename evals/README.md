@@ -108,3 +108,22 @@ A finding matches an expected item when the detector is the same and `paths` con
 path. The case passes only when false positives and false negatives are both zero and a second
 analysis returns the same findings. An empty oracle and an empty report is agreement
 (`precision 0/0`, `recall 0/0`). No percentage threshold is applied.
+
+## `workflow/` (Phase 6)
+
+| `kind` | What it checks |
+|---|---|
+| `graph` | ready frontier, join, and bounded concurrency waves |
+| `error` | task-graph cycle, missing skill, and zero concurrency |
+| `skill_cycle` | skill dependency cycle through the Phase 1 resolver |
+| `permission` | a denied capability blocks the step and does not call the runner |
+| `resume` | completed steps are not executed again |
+| `abort` | abort is persisted, and a second abort is rejected |
+| `context` | one Context Pack per step, declared dependency outputs, unrelated fragments excluded |
+| `fix` | a bounded fix loop that passes, and one that exhausts the cap |
+| `weaken` | deleting a test, removing a test, or dropping an assertion fails the run |
+| `transition` | the legal run and step tables, including every illegal edge |
+| `workflow` | feature, bugfix, and refactor definitions, including skip reasons |
+| `deterministic` | the same task yields the same plan; `--workflow` wins and the task text stays unchanged |
+
+Cases are synthetic. They do not spawn a validation tool or call a model.

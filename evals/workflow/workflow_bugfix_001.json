@@ -1,0 +1,26 @@
+{
+  "id": "workflow_bugfix_001",
+  "kind": "workflow",
+  "description": "The bugfix workflow skips design and architecture steps that do not apply, and completes under MockRunner.",
+  "workflow": "bugfix",
+  "task": "Fix the failing payment webhook",
+  "expect_skipped": [
+    {
+      "id": "domain_design",
+      "reason": "workflow does not require domain design for this task type"
+    },
+    {
+      "id": "interface",
+      "reason": "workflow does not require interface design for this task type"
+    },
+    {
+      "id": "integration_test",
+      "reason": "workflow does not require integration validation for this task type"
+    },
+    {
+      "id": "architecture_review",
+      "reason": "workflow does not require architecture review for this task type"
+    }
+  ],
+  "expect_state": "completed"
+}

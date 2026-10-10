@@ -1,0 +1,11 @@
+{
+  "id": "weaken_delete_001",
+  "kind": "weaken",
+  "description": "Deleting a test file during the fix loop fails the run.",
+  "weaken": "delete",
+  "steps": [
+    {"id": "check", "validation": "unit_test", "fix_loop": true, "permissions": ["shell"]}
+  ],
+  "expect_state": "failed",
+  "expect_error": "deleted"
+}

@@ -5,7 +5,7 @@
 //! always produce the same report.
 //!
 //! Implemented areas: [`skills`], [`knowledge`], [`ddd`], [`context`], [`feedback`],
-//! [`architecture`].
+//! [`architecture`], [`workflow`].
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
@@ -19,6 +19,7 @@ pub mod ddd;
 pub mod feedback;
 pub mod knowledge;
 pub mod skills;
+pub mod workflow;
 
 /// Outcome of one evaluation case.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
