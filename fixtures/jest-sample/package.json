@@ -1,0 +1,10 @@
+{
+  "name": "jest-sample",
+  "private": true,
+  "scripts": {
+    "test": "jest --watchAll=false"
+  },
+  "devDependencies": {
+    "jest": "29.7.0"
+  }
+}

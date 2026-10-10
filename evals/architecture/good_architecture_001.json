@@ -1,0 +1,7 @@
+{
+  "id": "good_architecture_001",
+  "kind": "architecture",
+  "description": "A layered catalog emits zero architecture findings.",
+  "fixture": "good-architecture",
+  "oracle": "expected/architecture.json"
+}

@@ -83,3 +83,28 @@ not read it. `max_tokens` and `max_irrelevant_ratio` are the measured pack size 
 ratio. A bounded-context id in `must_exclude` also rejects every selected node in that package.
 Recall of `must_include` and `required_fragments` must be complete. The detail line reports recall,
 precision, tokens, irrelevant tokens, latency, and reproducibility.
+
+## `feedback/` (Phase 5)
+
+| `kind` | Oracle |
+|---|---|
+| `detect` | sorted provider ids, or an error substring for an invalid override |
+| `command` | exact argv |
+| `parse` | outcome and, for a failure, file and line from a recorded output file |
+| `permission` | outcome `refused` and the marker file is not created |
+| `regression` | re-parse of the recorded stdout/stderr still matches `expected_outcome` and diagnostics |
+
+Detection is not a successful validation run. Timeout and crash are runner flags. A recorded text
+file cannot express them. Those two cases set the flag on the captured output and expect
+`timed_out` or `crashed`.
+
+## `architecture/` (Phase 5)
+
+| `kind` | Oracle |
+|---|---|
+| `architecture` | `fixtures/<fixture>/expected/architecture.json` |
+
+A finding matches an expected item when the detector is the same and `paths` contains the expected
+path. The case passes only when false positives and false negatives are both zero and a second
+analysis returns the same findings. An empty oracle and an empty report is agreement
+(`precision 0/0`, `recall 0/0`). No percentage threshold is applied.

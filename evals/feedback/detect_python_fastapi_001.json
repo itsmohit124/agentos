@@ -1,0 +1,10 @@
+{
+  "id": "detect_python_fastapi_001",
+  "kind": "detect",
+  "description": "The FastAPI fixture is detected as pytest.",
+  "fixture": "python-fastapi",
+  "oracle": "providers",
+  "expected_providers": [
+    "pytest"
+  ]
+}

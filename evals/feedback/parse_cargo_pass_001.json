@@ -1,0 +1,14 @@
+{
+  "id": "parse_cargo_pass_001",
+  "kind": "parse",
+  "description": "Cargo success with no diagnostics is a pass.",
+  "fixture": "cargo-sample",
+  "oracle": "recorded-output",
+  "provider": "cargo",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/cargo-pass.txt",
+  "expected_outcome": "passed",
+  "timed_out": false,
+  "crashed": false,
+  "exit_code": 0
+}

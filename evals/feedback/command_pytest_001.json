@@ -1,0 +1,17 @@
+{
+  "id": "command_pytest_001",
+  "kind": "command",
+  "description": "Pytest uses python3 -m pytest with a short traceback.",
+  "fixture": "pytest-fail",
+  "oracle": "argv",
+  "provider": "pytest",
+  "validation_kind": "unit_test",
+  "expected_command": [
+    "python3",
+    "-m",
+    "pytest",
+    "-q",
+    "--tb=short",
+    "--color=no"
+  ]
+}

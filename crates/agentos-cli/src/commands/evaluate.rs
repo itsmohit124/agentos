@@ -71,6 +71,28 @@ pub fn run(app: &App, args: &EvaluateArgs, format: OutputFormat) -> anyhow::Resu
                 .unwrap_or_else(|| app.root.path.join("fixtures"));
             agentos_evaluation::context::run(&cases, &fixtures)?
         }
+        EvalArea::Feedback => {
+            let cases = args
+                .evals_dir
+                .clone()
+                .unwrap_or_else(|| app.root.path.join("evals/feedback"));
+            let fixtures = args
+                .fixtures_dir
+                .clone()
+                .unwrap_or_else(|| app.root.path.join("fixtures"));
+            agentos_evaluation::feedback::run(&cases, &fixtures)?
+        }
+        EvalArea::Architecture => {
+            let cases = args
+                .evals_dir
+                .clone()
+                .unwrap_or_else(|| app.root.path.join("evals/architecture"));
+            let fixtures = args
+                .fixtures_dir
+                .clone()
+                .unwrap_or_else(|| app.root.path.join("fixtures"));
+            agentos_evaluation::architecture::run(&cases, &fixtures)?
+        }
     };
     match format {
         OutputFormat::Json => output::json(&Out {

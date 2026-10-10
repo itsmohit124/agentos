@@ -1,0 +1,13 @@
+{
+  "id": "parse_cargo_crash_001",
+  "kind": "parse",
+  "description": "A crash is not a pass. The recorded text cannot express it; the runner flag does.",
+  "fixture": "cargo-sample",
+  "oracle": "recorded-output",
+  "provider": "cargo",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/empty.txt",
+  "expected_outcome": "crashed",
+  "timed_out": false,
+  "crashed": true
+}

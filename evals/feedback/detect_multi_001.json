@@ -1,0 +1,14 @@
+{
+  "id": "detect_multi_001",
+  "kind": "detect",
+  "description": "Every recognizable tool manifest is selected, sorted by id.",
+  "fixture": "detect-multi",
+  "oracle": "providers",
+  "expected_providers": [
+    "go",
+    "gradle",
+    "jest",
+    "maven",
+    "rspec"
+  ]
+}

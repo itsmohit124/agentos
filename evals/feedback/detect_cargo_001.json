@@ -1,0 +1,10 @@
+{
+  "id": "detect_cargo_001",
+  "kind": "detect",
+  "description": "A Cargo.toml selects the cargo provider.",
+  "fixture": "cargo-sample",
+  "oracle": "providers",
+  "expected_providers": [
+    "cargo"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "id": "parse_cargo_fail_001",
+  "kind": "parse",
+  "description": "A Cargo panic keeps the file and the next-line message.",
+  "fixture": "cargo-fail",
+  "oracle": "recorded-output",
+  "provider": "cargo",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/cargo-fail.txt",
+  "expected_outcome": "failed",
+  "timed_out": false,
+  "crashed": false,
+  "exit_code": 101,
+  "expected_file": "src/lib.rs",
+  "expected_line": 5
+}

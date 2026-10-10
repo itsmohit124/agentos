@@ -43,6 +43,21 @@ level = "warn"
 [output]
 # Default output format: "text" or "json". Env: AGENTOS_OUTPUT. Flag: --json.
 format = "text"
+
+# Optional validation overrides. Uncomment to replace auto-detection.
+# [validation]
+# providers = ["pytest"]
+# timeout_secs = 600
+# max_output_bytes = 262144
+#
+# [validation.commands]
+# pytest = "python3 -m pytest -q --tb=short --color=no"
+#
+# [architecture]
+# A controller is fat when its method count is greater than this number.
+# fat_controller_methods = 5
+# A module is oversized when it has more public classes and functions than this.
+# public_surface_max = 6
 "#;
 
 /// Output format for command results.
@@ -225,6 +240,14 @@ impl EnvVars {
 struct FileConfig {
     log: Option<FileLog>,
     output: Option<FileOutput>,
+    /// Accepted so a project can store provider overrides. Resolved by `agentos-feedback`.
+    #[serde(default)]
+    #[allow(dead_code)]
+    validation: Option<toml::Value>,
+    /// Accepted so a project can store architecture thresholds. Resolved by `agentos-feedback`.
+    #[serde(default)]
+    #[allow(dead_code)]
+    architecture: Option<toml::Value>,
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -518,6 +541,28 @@ mod tests {
         let r = run(Some(DEFAULT_CONFIG_TOML), &[], ConfigOverrides::default()).unwrap();
         assert!(r.file_loaded);
         assert_eq!(r.config, Config::default());
+    }
+
+    #[test]
+    fn validation_and_architecture_tables_do_not_break_resolution() {
+        let text = r#"
+[log]
+level = "info"
+
+[validation]
+providers = ["pytest"]
+timeout_secs = 30
+
+[validation.commands]
+pytest = "python3 -m pytest -q"
+
+[architecture]
+fat_controller_methods = 5
+public_surface_max = 6
+"#;
+        let r = run(Some(text), &[], ConfigOverrides::default()).unwrap();
+        assert_eq!(r.config.log_level, "info");
+        assert_eq!(r.source(KEY_LOG_LEVEL), Some(&ConfigSource::File));
     }
 
     #[test]

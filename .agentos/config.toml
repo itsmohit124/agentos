@@ -1,0 +1,26 @@
+# AgentOS project configuration.
+# Precedence (later wins): built-in defaults < this file < AGENTOS_* environment variables < CLI flags.
+
+[log]
+# Log filter: a level (off|error|warn|info|debug|trace) or tracing directives,
+# e.g. "agentos_core=debug,warn". Env: AGENTOS_LOG. Flags: --log-level, -v, -vv.
+level = "warn"
+
+[output]
+# Default output format: "text" or "json". Env: AGENTOS_OUTPUT. Flag: --json.
+format = "text"
+
+# Optional validation overrides. Uncomment to replace auto-detection.
+# [validation]
+# providers = ["pytest"]
+# timeout_secs = 600
+# max_output_bytes = 262144
+#
+# [validation.commands]
+# pytest = "python3 -m pytest -q --tb=short --color=no"
+#
+# [architecture]
+# A controller is fat when its method count is greater than this number.
+# fat_controller_methods = 5
+# A module is oversized when it has more public classes and functions than this.
+# public_surface_max = 6

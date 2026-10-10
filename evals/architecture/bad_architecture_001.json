@@ -1,0 +1,7 @@
+{
+  "id": "bad_architecture_001",
+  "kind": "architecture",
+  "description": "Every seeded architecture smell is found and no extra finding is emitted.",
+  "fixture": "bad-architecture",
+  "oracle": "expected/architecture.json"
+}

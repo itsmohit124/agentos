@@ -1,0 +1,16 @@
+{
+  "id": "command_cargo_001",
+  "kind": "command",
+  "description": "Cargo unit tests stay offline and colorless.",
+  "fixture": "cargo-sample",
+  "oracle": "argv",
+  "provider": "cargo",
+  "validation_kind": "unit_test",
+  "expected_command": [
+    "cargo",
+    "test",
+    "--offline",
+    "--color",
+    "never"
+  ]
+}

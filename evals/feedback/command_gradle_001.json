@@ -1,0 +1,14 @@
+{
+  "id": "command_gradle_001",
+  "kind": "command",
+  "description": "Gradle uses the gradle binary when gradlew is absent.",
+  "fixture": "detect-multi",
+  "oracle": "argv",
+  "provider": "gradle",
+  "validation_kind": "unit_test",
+  "expected_command": [
+    "gradle",
+    "--offline",
+    "test"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "parse_maven_pass_001",
+  "kind": "parse",
+  "description": "Maven success is a pass.",
+  "fixture": "detect-multi",
+  "oracle": "recorded-output",
+  "provider": "maven",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/maven-pass.txt",
+  "expected_outcome": "passed",
+  "timed_out": false,
+  "crashed": false,
+  "exit_code": 0
+}

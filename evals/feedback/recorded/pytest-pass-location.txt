@@ -1,0 +1,2 @@
+tests/test_ok.py:3: see the example
+1 passed in 0.01s

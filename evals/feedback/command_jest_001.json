@@ -1,0 +1,17 @@
+{
+  "id": "command_jest_001",
+  "kind": "command",
+  "description": "A package test script that invokes Jest uses npm test without watch mode.",
+  "fixture": "detect-multi",
+  "oracle": "argv",
+  "provider": "jest",
+  "validation_kind": "unit_test",
+  "expected_command": [
+    "npm",
+    "test",
+    "--silent",
+    "--",
+    "--watchAll=false",
+    "--colors=false"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "id": "parse_pytest_pass_location_001",
+  "kind": "parse",
+  "description": "A passing Pytest run that mentions file:line stays a pass.",
+  "fixture": "pytest-fail",
+  "oracle": "recorded-output",
+  "provider": "pytest",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/pytest-pass-location.txt",
+  "expected_outcome": "passed",
+  "timed_out": false,
+  "crashed": false,
+  "exit_code": 0
+}

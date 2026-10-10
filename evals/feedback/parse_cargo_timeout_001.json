@@ -1,0 +1,13 @@
+{
+  "id": "parse_cargo_timeout_001",
+  "kind": "parse",
+  "description": "A timeout is not a pass. The recorded text cannot express it; the runner flag does.",
+  "fixture": "cargo-sample",
+  "oracle": "recorded-output",
+  "provider": "cargo",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/empty.txt",
+  "expected_outcome": "timed_out",
+  "timed_out": true,
+  "crashed": false
+}

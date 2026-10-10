@@ -1,5 +1,6 @@
 //! Subcommand implementations.
 
+pub mod architecture;
 pub mod benchmark;
 pub mod config;
 pub mod context;
@@ -11,3 +12,4 @@ pub mod knowledge;
 pub mod project;
 pub mod scan;
 pub mod skills;
+pub mod validate;

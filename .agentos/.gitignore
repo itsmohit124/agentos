@@ -1,0 +1,8 @@
+# Derived state, rebuildable from the project (do not commit).
+agentos.db
+agentos.db-journal
+agentos.db-wal
+agentos.db-shm
+project-profile.json
+context-cache/
+feedback/

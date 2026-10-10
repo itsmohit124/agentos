@@ -1,0 +1,23 @@
+{
+  "id": "cargo_panic_001",
+  "kind": "regression",
+  "description": "A Cargo panic at src/lib.rs:5 stays a failure with that location.",
+  "fixture": "cargo-fail",
+  "oracle": "recorded-output",
+  "provider": "cargo",
+  "validation_kind": "unit_test",
+  "exit_code": 101,
+  "timed_out": false,
+  "crashed": false,
+  "spawn_error": null,
+  "stdout": "thread 'tests::fails' panicked at src/lib.rs:5:9:\nassertion `amount > 0` failed\n",
+  "stderr": "",
+  "expected_outcome": "failed",
+  "expected_diagnostics": [
+    {
+      "file": "src/lib.rs",
+      "line": 5,
+      "summary_contains": "amount > 0"
+    }
+  ]
+}

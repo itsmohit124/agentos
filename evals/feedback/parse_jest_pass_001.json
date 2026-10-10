@@ -1,0 +1,14 @@
+{
+  "id": "parse_jest_pass_001",
+  "kind": "parse",
+  "description": "Jest success is a pass.",
+  "fixture": "detect-multi",
+  "oracle": "recorded-output",
+  "provider": "jest",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/jest-pass.txt",
+  "expected_outcome": "passed",
+  "timed_out": false,
+  "crashed": false,
+  "exit_code": 0
+}

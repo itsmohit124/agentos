@@ -1,0 +1,14 @@
+{
+  "id": "parse_go_pass_001",
+  "kind": "parse",
+  "description": "Go success is a pass.",
+  "fixture": "go-sample",
+  "oracle": "recorded-output",
+  "provider": "go",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/go-pass.txt",
+  "expected_outcome": "passed",
+  "timed_out": false,
+  "crashed": false,
+  "exit_code": 0
+}

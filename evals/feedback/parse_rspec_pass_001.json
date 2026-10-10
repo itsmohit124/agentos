@@ -1,0 +1,14 @@
+{
+  "id": "parse_rspec_pass_001",
+  "kind": "parse",
+  "description": "RSpec success is a pass.",
+  "fixture": "detect-multi",
+  "oracle": "recorded-output",
+  "provider": "rspec",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/rspec-pass.txt",
+  "expected_outcome": "passed",
+  "timed_out": false,
+  "crashed": false,
+  "exit_code": 0
+}

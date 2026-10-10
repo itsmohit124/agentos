@@ -1,0 +1,10 @@
+{
+  "id": "detect_go_001",
+  "kind": "detect",
+  "description": "A go.mod selects the go provider.",
+  "fixture": "go-sample",
+  "oracle": "providers",
+  "expected_providers": [
+    "go"
+  ]
+}

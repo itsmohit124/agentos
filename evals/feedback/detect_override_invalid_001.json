@@ -1,0 +1,10 @@
+{
+  "id": "detect_override_invalid_001",
+  "kind": "detect",
+  "description": "An unknown provider id is an error.",
+  "fixture": "cargo-sample",
+  "oracle": "providers",
+  "expected_providers": [],
+  "config_toml": "[validation]\nproviders = [\"nope\"]\n",
+  "expected_error": "unknown provider"
+}

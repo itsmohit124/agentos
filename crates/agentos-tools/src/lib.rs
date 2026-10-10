@@ -1,6 +1,14 @@
-//! AgentOS tools: capability abstractions behind permissions (e.g. browser).
+//! Process execution behind the permission check.
 //!
-//! Phase 0 stub. Implemented in later phases (browser capability in Phase 8).
+//! Callers describe a command. [`ProcessRunner`] refuses it when the subject did not declare
+//! `shell`, then enforces the timeout and the stdout/stderr byte cap. Providers must not spawn
+//! processes themselves.
+
+mod error;
+mod exec;
+
+pub use error::ToolError;
+pub use exec::{ExecOutcome, ExecRequest, ProcessRunner, ToolRunner};
 
 /// Name of this crate.
 pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");

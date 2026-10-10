@@ -26,10 +26,12 @@ dependencies = [
  "agentos-context",
  "agentos-core",
  "agentos-evaluation",
+ "agentos-feedback",
  "agentos-knowledge",
  "agentos-permissions",
  "agentos-skills",
  "agentos-testkit",
+ "agentos-tools",
  "anyhow",
  "assert_cmd",
  "clap",
@@ -79,9 +81,11 @@ version = "0.1.0"
 dependencies = [
  "agentos-context",
  "agentos-core",
+ "agentos-feedback",
  "agentos-knowledge",
  "agentos-permissions",
  "agentos-skills",
+ "agentos-tools",
  "serde",
  "serde_json",
  "tempfile",
@@ -91,6 +95,17 @@ dependencies = [
 [[package]]
 name = "agentos-feedback"
 version = "0.1.0"
+dependencies = [
+ "agentos-knowledge",
+ "agentos-permissions",
+ "agentos-tools",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+ "toml",
+ "tracing",
+]
 
 [[package]]
 name = "agentos-knowledge"
@@ -153,6 +168,12 @@ dependencies = [
 [[package]]
 name = "agentos-tools"
 version = "0.1.0"
+dependencies = [
+ "agentos-permissions",
+ "tempfile",
+ "thiserror",
+ "tracing",
+]
 
 [[package]]
 name = "agentos-workflow"

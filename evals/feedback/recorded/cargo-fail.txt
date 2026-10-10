@@ -1,0 +1,2 @@
+thread 'tests::fails' panicked at src/lib.rs:5:9:
+assertion `amount > 0` failed

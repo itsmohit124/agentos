@@ -33,8 +33,10 @@ agentos-evaluation = { path = "crates/agentos-evaluation" }
 agentos-knowledge = { path = "crates/agentos-knowledge" }
 agentos-context = { path = "crates/agentos-context" }
 agentos-permissions = { path = "crates/agentos-permissions" }
+agentos-feedback = { path = "crates/agentos-feedback" }
 agentos-skills = { path = "crates/agentos-skills" }
 agentos-testkit = { path = "crates/agentos-testkit" }
+agentos-tools = { path = "crates/agentos-tools" }
 
 anyhow = "1.0.104"
 assert_cmd = "2.2.2"

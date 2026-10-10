@@ -240,7 +240,7 @@ fn copy_tree(from: &Path, to: &Path) -> std::io::Result<()> {
     entries.sort_by_key(|entry| entry.file_name());
     for entry in entries {
         let name = entry.file_name();
-        if name == ".agentos" || name == ".git" {
+        if name == ".agentos" || name == ".git" || name == ".venv" || name == "node_modules" {
             continue;
         }
         let target = to.join(&name);

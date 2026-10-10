@@ -1,0 +1,14 @@
+{
+  "id": "command_go_001",
+  "kind": "command",
+  "description": "Go tests the module tree.",
+  "fixture": "go-sample",
+  "oracle": "argv",
+  "provider": "go",
+  "validation_kind": "unit_test",
+  "expected_command": [
+    "go",
+    "test",
+    "./..."
+  ]
+}

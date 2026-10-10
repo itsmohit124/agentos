@@ -1,0 +1,8 @@
+{
+  "id": "detect_jest_sample_001",
+  "kind": "detect",
+  "description": "A package.json test script that invokes Jest selects the jest provider.",
+  "fixture": "jest-sample",
+  "oracle": "providers",
+  "expected_providers": ["jest"]
+}

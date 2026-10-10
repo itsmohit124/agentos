@@ -1,0 +1,2 @@
+● amount must be positive
+    at Object.<anonymous> (src/sum.test.js:4:19)

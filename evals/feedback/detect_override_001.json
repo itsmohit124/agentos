@@ -1,0 +1,11 @@
+{
+  "id": "detect_override_001",
+  "kind": "detect",
+  "description": "An explicit provider list replaces auto-detection.",
+  "fixture": "cargo-sample",
+  "oracle": "providers",
+  "expected_providers": [
+    "pytest"
+  ],
+  "config_toml": "[validation]\nproviders = [\"pytest\"]\n"
+}

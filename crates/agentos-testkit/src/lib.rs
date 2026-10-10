@@ -167,7 +167,11 @@ fn copy_dir(from: &Path, to: &Path) {
         .collect();
     entries.sort_by_key(|e| e.file_name());
     for entry in entries {
-        let target = to.join(entry.file_name());
+        let name = entry.file_name();
+        if name == ".venv" || name == "node_modules" || name == "__pycache__" {
+            continue;
+        }
+        let target = to.join(&name);
         let file_type = entry.file_type().expect("fixture entry type");
         if file_type.is_dir() {
             std::fs::create_dir_all(&target).expect("create fixture dir");

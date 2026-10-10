@@ -9,9 +9,11 @@ publish.workspace = true
 [dependencies]
 agentos-context.workspace = true
 agentos-core.workspace = true
+agentos-feedback.workspace = true
 agentos-knowledge.workspace = true
 agentos-permissions.workspace = true
 agentos-skills.workspace = true
+agentos-tools.workspace = true
 serde.workspace = true
 serde_json.workspace = true
 thiserror.workspace = true

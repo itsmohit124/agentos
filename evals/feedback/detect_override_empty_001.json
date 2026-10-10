@@ -1,0 +1,9 @@
+{
+  "id": "detect_override_empty_001",
+  "kind": "detect",
+  "description": "An explicit empty provider list selects nothing.",
+  "fixture": "cargo-sample",
+  "oracle": "providers",
+  "expected_providers": [],
+  "config_toml": "[validation]\nproviders = []\n"
+}

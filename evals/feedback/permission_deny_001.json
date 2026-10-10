@@ -1,0 +1,7 @@
+{
+  "id": "permission_deny_001",
+  "kind": "permission",
+  "description": "Without shell permission the provider is refused and does not spawn.",
+  "fixture": "cargo-sample",
+  "oracle": "default-deny"
+}

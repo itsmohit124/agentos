@@ -1,0 +1,8 @@
+{
+  "id": "detect_none_001",
+  "kind": "detect",
+  "description": "A project with no tool manifest selects nothing.",
+  "fixture": "detect-none",
+  "oracle": "providers",
+  "expected_providers": []
+}

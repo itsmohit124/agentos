@@ -52,6 +52,10 @@ pub enum Command {
     Benchmark(BenchmarkArgs),
     /// Build a Context Pack from the project knowledge graph.
     Context(ContextArgs),
+    /// Run validation providers.
+    Validate(ValidateArgs),
+    /// Analyze the knowledge graph for architecture smells.
+    Architecture(ArchitectureArgs),
     /// Run a deterministic evaluation suite.
     Evaluate(EvaluateArgs),
 }
@@ -263,6 +267,74 @@ pub enum PackFormat {
     Md,
 }
 
+/// `agentos validate` arguments.
+#[derive(Debug, Args)]
+pub struct ValidateArgs {
+    /// Kind to run. Ignored by `detect`, `last`, and `record-regression`.
+    #[arg(long, value_enum)]
+    pub kind: Option<ValidateKind>,
+
+    /// Task id stored on the result and its feedback items.
+    #[arg(long)]
+    pub task: Option<String>,
+
+    /// Context Pack id stored on the result and its feedback items.
+    #[arg(long)]
+    pub context_pack: Option<String>,
+
+    #[command(subcommand)]
+    pub command: Option<ValidateCommand>,
+}
+
+/// `agentos validate` subcommands. Absent means run validation.
+#[derive(Debug, Subcommand)]
+pub enum ValidateCommand {
+    /// List providers selected for this project.
+    Detect,
+    /// Print the most recently stored validation result.
+    Last,
+    /// Promote a failed result to `evals/feedback/<id>.json`.
+    RecordRegression {
+        /// Stored validation id.
+        id: String,
+    },
+}
+
+/// Validation kinds accepted by `--kind`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+#[value(rename_all = "snake_case")]
+pub enum ValidateKind {
+    /// Static type check.
+    Typecheck,
+    /// Lint.
+    Lint,
+    /// Unit tests.
+    UnitTest,
+    /// Integration tests.
+    IntegrationTest,
+    /// Build or package.
+    Build,
+    /// Architecture detectors. Use `architecture analyze` for the report.
+    Architecture,
+}
+
+/// `agentos architecture` arguments.
+#[derive(Debug, Args)]
+pub struct ArchitectureArgs {
+    #[command(subcommand)]
+    pub command: ArchitectureCommand,
+}
+
+/// `agentos architecture` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum ArchitectureCommand {
+    /// Run deterministic detectors over the project knowledge graph.
+    Analyze {
+        /// Directory to analyze. Defaults to `--root` (the project root).
+        path: Option<PathBuf>,
+    },
+}
+
 /// `agentos evaluate` arguments.
 #[derive(Debug, Args)]
 pub struct EvaluateArgs {
@@ -290,6 +362,10 @@ pub enum EvalArea {
     Ddd,
     /// Context packs (`evals/context`).
     Context,
+    /// Validation providers (`evals/feedback`).
+    Feedback,
+    /// Architecture detectors (`evals/architecture`).
+    Architecture,
 }
 
 impl Cli {

@@ -1,0 +1,10 @@
+{
+  "id": "detect_pytest_001",
+  "kind": "detect",
+  "description": "A pytest tree selects pytest.",
+  "fixture": "pytest-fail",
+  "oracle": "providers",
+  "expected_providers": [
+    "pytest"
+  ]
+}

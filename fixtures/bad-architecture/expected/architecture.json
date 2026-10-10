@@ -1,0 +1,23 @@
+{
+  "findings": [
+    {
+      "detector": "boundary_leakage",
+      "path": "app/orders/domain/model.py",
+      "from": "app/orders/domain/model.py",
+      "to": "app/orders/adapter/db.py"
+    },
+    {"detector": "circular_dependency", "path": "app/cycle/left.py"},
+    {"detector": "domain_infrastructure", "path": "app/orders/domain/model.py"},
+    {"detector": "duplicate_terminology", "path": "docs/spec/requirements.md"},
+    {"detector": "fat_controller", "path": "app/orders/controller.py"},
+    {"detector": "missing_tests", "path": "app/billing/domain/model.py"},
+    {"detector": "oversized_surface", "path": "app/billing/surface.py"},
+    {"detector": "shallow_module", "path": "app/billing/passthrough.py"},
+    {
+      "detector": "unwanted_direction",
+      "path": "app/orders/application/checkout.py",
+      "from": "app/orders/application/checkout.py",
+      "to": "app/orders/adapter/db.py"
+    }
+  ]
+}

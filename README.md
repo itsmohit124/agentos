@@ -5,8 +5,8 @@ AgentOS is a local-first, agent-agnostic engineering intelligence layer. It give
 guardrails for a task — without replacing the agent.
 
 > Status: **early development**. The CLI can initialise a project, manage portable skills, build a
-> derived knowledge graph, and assemble a budgeted Context Pack. Workflow and the other engines
-> are not implemented yet.
+> derived knowledge graph, assemble a budgeted Context Pack, and run validation providers. Workflow
+> and the other engines are not implemented yet.
 
 ## Build
 
@@ -56,6 +56,14 @@ agentos evaluate skills           # run evals/skills; exit 3 if a case fails
 agentos evaluate knowledge        # project profiles and language graph fixtures
 agentos evaluate ddd              # domain lifecycle fixtures
 agentos evaluate context          # context packs against evals/context
+agentos validate detect           # providers selected for this project
+agentos validate --kind unit_test --json
+agentos validate last             # most recently stored result
+agentos validate record-regression <id>
+                              # write evals/feedback/<id>.json from a failed result
+agentos architecture analyze     # detectors over the knowledge graph; exit 3 if any finding
+agentos evaluate feedback         # detection, parsing, permission, regressions
+agentos evaluate architecture     # bad and good architecture fixtures
 ```
 
 Global flags: `--root <PATH>`, `--json`, `-v` / `-vv`, `--log-level <FILTER>`.

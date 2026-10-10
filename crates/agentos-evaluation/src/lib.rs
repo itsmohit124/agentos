@@ -4,17 +4,19 @@
 //! Every case names its fixture and its oracle; no LLM or network is involved, so the same inputs
 //! always produce the same report.
 //!
-//! Implemented areas: [`skills`], [`knowledge`], [`ddd`]. Context cases are measured by
-//! [`baseline`] before the context engine ranks them.
+//! Implemented areas: [`skills`], [`knowledge`], [`ddd`], [`context`], [`feedback`],
+//! [`architecture`].
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use serde::Serialize;
 
+pub mod architecture;
 pub mod baseline;
 pub mod context;
 pub mod ddd;
+pub mod feedback;
 pub mod knowledge;
 pub mod skills;
 

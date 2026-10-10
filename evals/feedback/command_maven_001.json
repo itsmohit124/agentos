@@ -1,0 +1,15 @@
+{
+  "id": "command_maven_001",
+  "kind": "command",
+  "description": "Maven tests stay offline.",
+  "fixture": "detect-multi",
+  "oracle": "argv",
+  "provider": "maven",
+  "validation_kind": "unit_test",
+  "expected_command": [
+    "mvn",
+    "-o",
+    "-q",
+    "test"
+  ]
+}

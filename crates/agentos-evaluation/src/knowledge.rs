@@ -375,7 +375,8 @@ fn copy_tree(from: &Path, to: &Path) -> std::io::Result<()> {
         let name = entry.file_name();
         // Derived index. A domain scan leaves rows that software `scan` preserves, so copying
         // them would make the graph case compare domain nodes against the software oracle.
-        if name == ".agentos" {
+        if name == ".agentos" || name == ".venv" || name == "node_modules" || name == "__pycache__"
+        {
             continue;
         }
         let target = to.join(&name);

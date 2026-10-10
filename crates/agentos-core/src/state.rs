@@ -22,6 +22,8 @@ agentos.db-journal
 agentos.db-wal
 agentos.db-shm
 project-profile.json
+context-cache/
+feedback/
 ";
 
 /// Error returned by [`StateLayout::ensure`].

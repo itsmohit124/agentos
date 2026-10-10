@@ -1,0 +1,14 @@
+{
+  "id": "command_rspec_001",
+  "kind": "command",
+  "description": "A Gemfile that mentions rspec uses bundle exec.",
+  "fixture": "detect-multi",
+  "oracle": "argv",
+  "provider": "rspec",
+  "validation_kind": "unit_test",
+  "expected_command": [
+    "bundle",
+    "exec",
+    "rspec"
+  ]
+}

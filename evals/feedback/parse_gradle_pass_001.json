@@ -1,0 +1,14 @@
+{
+  "id": "parse_gradle_pass_001",
+  "kind": "parse",
+  "description": "Gradle success is a pass.",
+  "fixture": "detect-multi",
+  "oracle": "recorded-output",
+  "provider": "gradle",
+  "validation_kind": "unit_test",
+  "recorded": "recorded/gradle-pass.txt",
+  "expected_outcome": "passed",
+  "timed_out": false,
+  "crashed": false,
+  "exit_code": 0
+}

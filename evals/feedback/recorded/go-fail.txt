@@ -1,0 +1,2 @@
+--- FAIL: TestAdd (0.00s)
+    add_test.go:11: amount must be positive
