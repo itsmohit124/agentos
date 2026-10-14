@@ -1,0 +1,6 @@
+{
+  "id": "unverified_claim_001",
+  "kind": "claim",
+  "description": "An adapter rejects a claimed pass that did not come from the feedback engine.",
+  "adapter": "all"
+}

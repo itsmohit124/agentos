@@ -1,0 +1,6 @@
+{
+  "id": "feedback_observe_001",
+  "kind": "feedback",
+  "description": "Architecture feedback runs the existing analyzer and reports the finding count.",
+  "adapter": "all"
+}

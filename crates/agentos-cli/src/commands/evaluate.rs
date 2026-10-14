@@ -115,6 +115,17 @@ pub fn run(app: &App, args: &EvaluateArgs, format: OutputFormat) -> anyhow::Resu
                 .unwrap_or_else(|| app.root.path.join("fixtures"));
             agentos_evaluation::memory::run(&cases, &fixtures)?
         }
+        EvalArea::Adapters => {
+            let cases = args
+                .evals_dir
+                .clone()
+                .unwrap_or_else(|| app.root.path.join("evals/adapters"));
+            let fixtures = args
+                .fixtures_dir
+                .clone()
+                .unwrap_or_else(|| app.root.path.join("fixtures"));
+            agentos_evaluation::adapters::run(&cases, &fixtures)?
+        }
     };
     match format {
         OutputFormat::Json => output::json(&Out {

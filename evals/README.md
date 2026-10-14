@@ -145,3 +145,22 @@ Cases are synthetic. They do not spawn a validation tool or call a model.
 | `pattern` | a context pattern is selected while its fingerprint matches, and is not reused after it changes |
 
 Memory cases do not call a model. Redaction covers the patterns named in the phase report, not every secret.
+
+## `adapters/` (Phase 9)
+
+| `kind` | What it checks |
+|---|---|
+| `install` | each adapter installs, and a second install leaves the files unchanged |
+| `uninstall` | a pre-existing file is restored byte for byte, and an edit outside the managed block is kept |
+| `invocation` | a user-only skill stays user-only in AgentOS discovery and authorization, and install writes `disable-model-invocation: true` plus `agents/openai.yaml`. This does not execute Cursor, Claude, or Codex |
+| `permission` | `unit_test` without `shell` is refused and is not a pass |
+| `context` | the context engine returns a pack whose task text is unchanged |
+| `workflow` | the planner returns a feature plan and does not start a run |
+| `feedback` | architecture analysis runs and reports a finding count |
+| `doctor` | doctor fails before install, passes after, and does not fail when an optional agent binary is missing |
+| `isolation` | install in one temporary project does not write a second project |
+| `capabilities` | local operations are supported; the generic adapter has no external agent |
+| `malformed` | duplicate markers are rejected and the file is not modified |
+| `claim` | a claimed pass is rejected |
+
+Cases use temporary directories. They do not modify `fixtures/` or the AgentOS repository. No model or network call is made. A missing `cursor`, `claude`, or `codex` binary is not a case failure.

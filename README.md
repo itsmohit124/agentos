@@ -5,8 +5,9 @@ AgentOS is a local-first, agent-agnostic engineering intelligence layer. It give
 guardrails for a task — without replacing the agent.
 
 > Status: **early development**. The CLI can initialise a project, manage portable skills, build a
-> derived knowledge graph, assemble a budgeted Context Pack, and run validation providers. Workflow
-> and the other engines are not implemented yet.
+> derived knowledge graph, assemble a budgeted Context Pack, run validation, plan a workflow, record
+> memory, and install an adapter for Cursor, Claude Code, Codex, or a generic agent. It does not
+> replace the coding agent.
 
 ## Build
 
@@ -79,7 +80,26 @@ agentos memory forget <id>
 agentos memory prune --stale
 agentos memory query "Add retry to payment webhook"
 agentos evaluate memory           # lessons, staleness, forget, redaction, budget
+
+agentos adapter list
+agentos adapter install generic  # also: cursor, claude, codex
+agentos adapter doctor generic   # exit 3 when the adapter is not installed or a check fails
+agentos adapter uninstall generic
+agentos evaluate adapters         # install, uninstall, skills, context, workflow, feedback
 ```
+
+`adapter install` writes only AgentOS-managed files in the project selected by `--root`. Run it
+against the project you want to integrate, not against a checkout you do not mean to modify.
+Installing twice does not duplicate the managed section. `adapter uninstall` removes that section
+and leaves the rest of a pre-existing file in place. Copies of those pre-existing files are stored
+under `.agentos/adapters/originals/`. Install appends `adapters/originals/` to an existing
+`.agentos/.gitignore` without rewriting the lines already there. A user-only skill stays
+user-only inside AgentOS: generated instructions do not grant permissions and do not mark it
+model-invocable. Install also writes the host controls those products document:
+`disable-model-invocation: true` in a user-only `.agents/skills/<name>/SKILL.md`, and
+`agents/openai.yaml` with `allow_implicit_invocation: false`. Those lines restate the AgentOS
+flag. They do not grant tools. Uninstall does not remove them. No Cursor, Claude, or Codex
+process is started by install.
 
 Global flags: `--root <PATH>`, `--json`, `-v` / `-vv`, `--log-level <FILTER>`.
 
@@ -130,7 +150,7 @@ Logs are written to stderr; command results to stdout.
 | 0 | success |
 | 1 | runtime error |
 | 2 | usage error |
-| 3 | a check failed: `doctor` critical failure, `skills validate` errors, `evaluate` case failures, a workflow run that is `failed` or `blocked` |
+| 3 | a check failed: `doctor` critical failure, `skills validate` errors, `evaluate` case failures, a workflow run that is `failed` or `blocked`, `adapter doctor` when a check fails, `adapter uninstall` when a managed file cannot be changed safely |
 
 ### Project state
 

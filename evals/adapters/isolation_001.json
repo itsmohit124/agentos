@@ -1,0 +1,6 @@
+{
+  "id": "isolation_001",
+  "kind": "isolation",
+  "description": "Installing into one temporary project does not modify a second project.",
+  "adapter": "all"
+}

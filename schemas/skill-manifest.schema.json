@@ -34,6 +34,10 @@
       "description": "The agent may choose this skill autonomously. Default: false (never implicit).",
       "type": "boolean"
     },
+    "disable-model-invocation": {
+      "description": "Native-host control used by Cursor and Claude Code. true means the host must not invoke the skill on its own. It must agree with model_invocable and never widens it. Optional; adapter install writes true onto user-only skills under .agents/skills/.",
+      "type": "boolean"
+    },
     "requires": {
       "description": "Skills that must run before this one, with optional semver constraints.",
       "type": "array",

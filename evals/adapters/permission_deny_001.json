@@ -1,0 +1,6 @@
+{
+  "id": "permission_deny_001",
+  "kind": "permission",
+  "description": "A unit-test request without shell permission is refused and does not pass.",
+  "adapter": "all"
+}

@@ -1,0 +1,6 @@
+{
+  "id": "uninstall_bytes_001",
+  "kind": "uninstall",
+  "description": "Uninstall restores a pre-existing file and keeps edits made outside the managed block.",
+  "adapter": "all"
+}

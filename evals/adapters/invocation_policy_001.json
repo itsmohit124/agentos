@@ -1,0 +1,6 @@
+{
+  "id": "invocation_policy_001",
+  "kind": "invocation",
+  "description": "A user-only skill stays user-only in discovery, authorization, and generated files.",
+  "adapter": "all"
+}

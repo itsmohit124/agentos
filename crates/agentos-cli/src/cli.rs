@@ -62,6 +62,8 @@ pub enum Command {
     Run(RunArgs),
     /// Inspect and record project memory.
     Memory(MemoryArgs),
+    /// Install and inspect coding-agent integrations.
+    Adapter(AdapterArgs),
     /// Run a deterministic evaluation suite.
     Evaluate(EvaluateArgs),
 }
@@ -518,6 +520,35 @@ impl MemoryTypeArg {
     }
 }
 
+/// `agentos adapter` arguments.
+#[derive(Debug, Args)]
+pub struct AdapterArgs {
+    #[command(subcommand)]
+    pub command: AdapterCommand,
+}
+
+/// `agentos adapter` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum AdapterCommand {
+    /// List adapters and their capabilities. Does not write files.
+    List,
+    /// Install one adapter into the project.
+    Install {
+        /// `generic`, `cursor`, `claude`, or `codex`.
+        adapter: String,
+    },
+    /// Remove AgentOS-managed files for one adapter.
+    Uninstall {
+        /// `generic`, `cursor`, `claude`, or `codex`.
+        adapter: String,
+    },
+    /// Check one adapter without modifying the project.
+    Doctor {
+        /// `generic`, `cursor`, `claude`, or `codex`.
+        adapter: String,
+    },
+}
+
 /// `agentos evaluate` arguments.
 #[derive(Debug, Args)]
 pub struct EvaluateArgs {
@@ -553,6 +584,8 @@ pub enum EvalArea {
     Workflow,
     /// Project memory (`evals/memory`).
     Memory,
+    /// Agent adapters (`evals/adapters`).
+    Adapters,
 }
 
 impl Cli {

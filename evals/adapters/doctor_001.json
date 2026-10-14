@@ -1,0 +1,6 @@
+{
+  "id": "doctor_001",
+  "kind": "doctor",
+  "description": "Doctor fails before install, passes after install, and does not fail when the external agent is missing.",
+  "adapter": "all"
+}

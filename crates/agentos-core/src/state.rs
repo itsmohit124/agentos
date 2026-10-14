@@ -14,6 +14,11 @@ pub const CONFIG_FILE: &str = "config.toml";
 /// File name of the derived SQLite index inside [`STATE_DIR`].
 pub const DB_FILE: &str = "agentos.db";
 
+/// Ignore line for adapter backups of pre-existing user files.
+///
+/// The pattern is relative to `.agentos/`.
+pub const ORIGINALS_IGNORE_LINE: &str = "adapters/originals/";
+
 /// Contents of `.agentos/.gitignore`: the SQLite index is derived state and is not committed.
 const STATE_GITIGNORE: &str = "\
 # Derived state, rebuildable from the project (do not commit).
@@ -25,6 +30,7 @@ project-profile.json
 context-cache/
 feedback/
 runs/
+adapters/originals/
 ";
 
 /// Error returned by [`StateLayout::ensure`].
@@ -143,12 +149,70 @@ impl StateLayout {
         Ok(entries)
     }
 
+    /// Makes sure `.agentos/.gitignore` ignores [`ORIGINALS_IGNORE_LINE`].
+    ///
+    /// A missing file is created with the standard derived-state ignore list. An existing file
+    /// keeps every current byte. The ignore line is appended only when no active line already
+    /// names that directory. Returns `true` when the file was written.
+    pub fn ensure_originals_ignored(&self, fs: &dyn FileSystem) -> Result<bool, StateError> {
+        let dir = self.dir();
+        if !fs.is_dir(&dir) {
+            if fs.exists(&dir) {
+                return Err(StateError::NotADirectory(dir));
+            }
+            fs.create_dir_all(&dir)?;
+        }
+        let path = self.gitignore_file();
+        if !fs.exists(&path) {
+            fs.write(&path, STATE_GITIGNORE.as_bytes())?;
+            return Ok(true);
+        }
+        let current = fs.read_to_string(&path)?;
+        let Some(updated) = merge_gitignore_line(&current, ORIGINALS_IGNORE_LINE) else {
+            return Ok(false);
+        };
+        fs.write(&path, updated.as_bytes())?;
+        Ok(true)
+    }
+
     /// `path` relative to the project root, or `path` itself if it is outside the root.
     pub fn relative(&self, path: &Path) -> PathBuf {
         path.strip_prefix(&self.root)
             .map(Path::to_path_buf)
             .unwrap_or_else(|_| path.to_path_buf())
     }
+}
+
+/// Appends `line` when no active gitignore line already names that path.
+///
+/// `None` means `existing` already covers it and must be left byte for byte.
+pub fn merge_gitignore_line(existing: &str, line: &str) -> Option<String> {
+    if gitignore_covers(existing, line) {
+        return None;
+    }
+    let mut out = existing.to_owned();
+    if !out.is_empty() && !out.ends_with('\n') {
+        out.push('\n');
+    }
+    out.push_str(line.trim_end_matches(['\n', '\r']));
+    out.push('\n');
+    Some(out)
+}
+
+fn gitignore_covers(existing: &str, line: &str) -> bool {
+    let wanted = normalize_ignore(line);
+    if wanted.is_empty() {
+        return true;
+    }
+    existing.lines().any(|raw| normalize_ignore(raw) == wanted)
+}
+
+fn normalize_ignore(line: &str) -> String {
+    let trimmed = line.trim();
+    if trimmed.is_empty() || trimmed.starts_with('#') {
+        return String::new();
+    }
+    trimmed.trim_end_matches('/').to_owned()
 }
 
 #[cfg(test)]
@@ -239,5 +303,46 @@ mod tests {
         let (fs, layout) = setup();
         fs.set_read_only(Path::new("/proj"));
         assert!(matches!(layout.ensure(&fs, ""), Err(StateError::Fs(_))));
+    }
+
+    #[test]
+    fn new_gitignore_ignores_adapter_originals() {
+        let (fs, layout) = setup();
+        layout.ensure(&fs, "x = 1\n").unwrap();
+        let text = fs.read_to_string(&layout.gitignore_file()).unwrap();
+        assert!(text.contains("adapters/originals/\n"));
+        assert!(!layout.ensure_originals_ignored(&fs).unwrap());
+        assert_eq!(fs.read_to_string(&layout.gitignore_file()).unwrap(), text);
+    }
+
+    #[test]
+    fn existing_gitignore_keeps_user_bytes_and_gains_one_line() {
+        let (fs, layout) = setup();
+        fs.create_dir_all(&layout.dir()).unwrap();
+        let original = "keep-me\n# adapters/originals/\n";
+        fs.write(&layout.gitignore_file(), original.as_bytes())
+            .unwrap();
+        assert!(layout.ensure_originals_ignored(&fs).unwrap());
+        let text = fs.read_to_string(&layout.gitignore_file()).unwrap();
+        assert_eq!(
+            text,
+            "keep-me\n# adapters/originals/\nadapters/originals/\n"
+        );
+        assert!(!layout.ensure_originals_ignored(&fs).unwrap());
+        assert_eq!(fs.read_to_string(&layout.gitignore_file()).unwrap(), text);
+    }
+
+    #[test]
+    fn an_ignore_line_without_a_trailing_slash_is_enough() {
+        let (fs, layout) = setup();
+        fs.create_dir_all(&layout.dir()).unwrap();
+        let original = "custom\nadapters/originals\n";
+        fs.write(&layout.gitignore_file(), original.as_bytes())
+            .unwrap();
+        assert!(!layout.ensure_originals_ignored(&fs).unwrap());
+        assert_eq!(
+            fs.read_to_string(&layout.gitignore_file()).unwrap(),
+            original
+        );
     }
 }

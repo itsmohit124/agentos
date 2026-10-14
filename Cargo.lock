@@ -5,23 +5,55 @@ version = 4
 [[package]]
 name = "agentos-adapter-claude"
 version = "0.1.0"
+dependencies = [
+ "agentos-adapter-generic",
+ "tempfile",
+]
 
 [[package]]
 name = "agentos-adapter-codex"
 version = "0.1.0"
+dependencies = [
+ "agentos-adapter-generic",
+ "tempfile",
+]
 
 [[package]]
 name = "agentos-adapter-cursor"
 version = "0.1.0"
+dependencies = [
+ "agentos-adapter-generic",
+ "tempfile",
+]
 
 [[package]]
 name = "agentos-adapter-generic"
 version = "0.1.0"
+dependencies = [
+ "agentos-context",
+ "agentos-core",
+ "agentos-feedback",
+ "agentos-knowledge",
+ "agentos-memory",
+ "agentos-permissions",
+ "agentos-skills",
+ "agentos-tools",
+ "agentos-workflow",
+ "serde",
+ "serde_json",
+ "tempfile",
+ "thiserror",
+ "tracing",
+]
 
 [[package]]
 name = "agentos-cli"
 version = "0.1.0"
 dependencies = [
+ "agentos-adapter-claude",
+ "agentos-adapter-codex",
+ "agentos-adapter-cursor",
+ "agentos-adapter-generic",
  "agentos-config",
  "agentos-context",
  "agentos-core",
@@ -81,6 +113,10 @@ dependencies = [
 name = "agentos-evaluation"
 version = "0.1.0"
 dependencies = [
+ "agentos-adapter-claude",
+ "agentos-adapter-codex",
+ "agentos-adapter-cursor",
+ "agentos-adapter-generic",
  "agentos-context",
  "agentos-core",
  "agentos-feedback",

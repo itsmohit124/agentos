@@ -1,0 +1,6 @@
+{
+  "id": "workflow_plan_001",
+  "kind": "workflow",
+  "description": "Each adapter can plan a feature workflow without starting a run.",
+  "adapter": "all"
+}

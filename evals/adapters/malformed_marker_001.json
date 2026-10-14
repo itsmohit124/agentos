@@ -1,0 +1,6 @@
+{
+  "id": "malformed_marker_001",
+  "kind": "malformed",
+  "description": "Duplicate AgentOS markers are rejected and the file bytes stay unchanged.",
+  "adapter": "claude"
+}

@@ -39,6 +39,10 @@ agentos-testkit = { path = "crates/agentos-testkit" }
 agentos-tools = { path = "crates/agentos-tools" }
 agentos-workflow = { path = "crates/agentos-workflow" }
 agentos-memory = { path = "crates/agentos-memory" }
+agentos-adapter-generic = { path = "crates/agentos-adapters/generic" }
+agentos-adapter-cursor = { path = "crates/agentos-adapters/cursor" }
+agentos-adapter-claude = { path = "crates/agentos-adapters/claude" }
+agentos-adapter-codex = { path = "crates/agentos-adapters/codex" }
 
 anyhow = "1.0.104"
 assert_cmd = "2.2.2"

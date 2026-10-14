@@ -279,6 +279,8 @@ struct RawManifest {
     invocation: Option<InvocationMode>,
     user_invocable: Option<bool>,
     model_invocable: Option<bool>,
+    #[serde(rename = "disable-model-invocation")]
+    disable_model_invocation: Option<bool>,
     #[serde(default)]
     requires: Vec<RawDependency>,
     #[serde(default)]
@@ -572,6 +574,15 @@ fn resolve_invocation(raw: &RawManifest, err: &mut impl FnMut(&'static str, Stri
             "skill is neither user- nor model-invocable (model invocation is never enabled implicitly; set model_invocable: true explicitly)".to_owned(),
         );
     }
+    if let Some(disabled) = raw.disable_model_invocation {
+        let host_allows_model = !disabled;
+        if host_allows_model != invocation.model_invocable {
+            err(
+                codes::INVOCATION_CONFLICT,
+                "disable-model-invocation contradicts model invocation; it cannot widen a user-only skill".to_owned(),
+            );
+        }
+    }
     invocation
 }
 
@@ -765,6 +776,26 @@ mod tests {
             [codes::NOT_INVOCABLE]
         );
         // An explicit user-only mode cannot be widened by a contradicting flag.
+        assert!(
+            !parse(&format!(
+                "{MIN}invocation: user\ndisable-model-invocation: true\n"
+            ))
+            .unwrap()
+            .invocation
+            .model_invocable
+        );
+        assert_eq!(
+            codes_of(&format!(
+                "{MIN}invocation: user\ndisable-model-invocation: false\n"
+            )),
+            [codes::INVOCATION_CONFLICT]
+        );
+        assert_eq!(
+            codes_of(&format!(
+                "{MIN}invocation: both\ndisable-model-invocation: true\n"
+            )),
+            [codes::INVOCATION_CONFLICT]
+        );
         assert_eq!(
             codes_of(&format!("{MIN}invocation: user\nmodel_invocable: true\n")),
             [codes::INVOCATION_CONFLICT]

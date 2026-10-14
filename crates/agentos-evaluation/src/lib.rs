@@ -5,13 +5,14 @@
 //! always produce the same report.
 //!
 //! Implemented areas: [`skills`], [`knowledge`], [`ddd`], [`context`], [`feedback`],
-//! [`architecture`], [`workflow`], [`memory`].
+//! [`architecture`], [`workflow`], [`memory`], [`adapters`].
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
 use serde::Serialize;
 
+pub mod adapters;
 pub mod architecture;
 pub mod baseline;
 pub mod context;

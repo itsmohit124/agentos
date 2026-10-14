@@ -1,10 +1,28 @@
 [package]
 name = "agentos-adapter-generic"
-description = "AgentOS generic agent adapter (plain CLI/JSON/Markdown)."
+description = "AgentOS generic agent adapter and the shared adapter contract."
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 publish.workspace = true
+
+[dependencies]
+agentos-context.workspace = true
+agentos-core.workspace = true
+agentos-feedback.workspace = true
+agentos-knowledge.workspace = true
+agentos-memory.workspace = true
+agentos-permissions.workspace = true
+agentos-skills.workspace = true
+agentos-tools.workspace = true
+agentos-workflow.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+
+[dev-dependencies]
+tempfile.workspace = true
 
 [lints]
 workspace = true

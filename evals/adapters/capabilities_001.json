@@ -1,0 +1,6 @@
+{
+  "id": "capabilities_001",
+  "kind": "capabilities",
+  "description": "Capabilities report local operations as supported and do not claim an external agent is required.",
+  "adapter": "all"
+}

@@ -3,6 +3,20 @@
 The locked V1 architecture is specified in [spec/ARCHITECTURE.md](spec/ARCHITECTURE.md), with
 product principles in [spec/VISION.md](spec/VISION.md) and per-subsystem contracts in `spec/`.
 
+## What exists after Phase 9
+
+Phase 9 adds the four adapter crates. They install managed project files and call the existing
+skill registry, context engine, workflow planner, and feedback engine. Agent-specific code stays
+in `crates/agentos-adapters/`. The generic adapter is the shared contract. Cursor writes
+`.cursor/rules/agentos.mdc`. Claude Code writes a marked section of `CLAUDE.md` and discovery
+passthroughs under `.claude/skills/`. Codex writes a marked section of `AGENTS.md`. None of those
+files executes a command. AgentOS authorization keeps a user-only skill user-only. Install writes
+Cursor's `disable-model-invocation: true` and Codex's `allow_implicit_invocation: false` onto
+user-only skills under `.agents/skills/`. Those controls agree with the AgentOS flag and are not
+removed on uninstall. No native agent process is started. Uninstall removes the managed section
+and can restore a pre-existing file byte for byte when the rest of the file was not edited. The backup used for that restore is ignored by
+`.agentos/.gitignore` (`adapters/originals/`). An existing ignore file keeps its previous lines.
+
 ## What exists after Phase 8
 
 Phase 8 adds browser validation as a capability, not a hard-wired core feature. `BrowserTool`
@@ -69,15 +83,18 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
              ├─► agentos-memory ─┬─► agentos-context ──► agentos-knowledge
              │                   ├─► agentos-knowledge
              │                   └─► agentos-core
-             └─► agentos-evaluation ─┬─► agentos-core
-                                     ├─► agentos-knowledge
-                                     ├─► agentos-context
-                                     ├─► agentos-skills
-                                     ├─► agentos-permissions
-                                     ├─► agentos-feedback
-                                     ├─► agentos-tools
-                                     ├─► agentos-workflow
-                                     └─► agentos-memory
+             ├─► agentos-evaluation ─┬─► agentos-core
+             │                       ├─► agentos-knowledge
+             │                       ├─► agentos-context
+             │                       ├─► agentos-skills
+             │                       ├─► agentos-permissions
+             │                       ├─► agentos-feedback
+             │                       ├─► agentos-tools
+             │                       ├─► agentos-workflow
+             │                       ├─► agentos-memory
+             │                       └─► agentos-adapters/{generic,cursor,claude,codex}
+             ├─► agentos-adapters/generic ─► context, skills, workflow, feedback, memory
+             └─► agentos-adapters/{cursor,claude,codex} ─► agentos-adapter-generic
 ```
 
 | Crate | Contents |
@@ -89,13 +106,16 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
 | `agentos-knowledge` | Automatic project profile, ignore-aware scanner, `LanguageExtractor` (Python, TypeScript, JavaScript, Go, Java, Ruby), knowledge graph in SQLite (nodes, edges, fragments, FTS5), provenance, domain tables |
 | `agentos-context` | Context Pack assembly over that graph: intent, routing, lexical/graph retrieval, budget, trace, cache. Memory candidates join that pipeline. `NullSemantic` is the semantic seam |
 | `agentos-memory` | Episodic, semantic, procedural, decision, and lesson records. Files under `.agentos/memory/` plus a SQLite mirror. Proposed until confirmed. Stale when a linked fingerprint changes |
-| `agentos-evaluation` | Deterministic case runner; areas `skills`, `knowledge`, `ddd`, `context`, `feedback`, `architecture`, `workflow`, and `memory` |
+| `agentos-evaluation` | Deterministic case runner; areas `skills`, `knowledge`, `ddd`, `context`, `feedback`, `architecture`, `workflow`, `memory`, and `adapters` |
+| `agentos-adapter-generic` | Adapter contract, managed-file install/uninstall, generic `.agentos/adapters/generic/` instructions and `skills.json` |
+| `agentos-adapter-cursor` | `.cursor/rules/agentos.mdc` instructions. Does not copy skills into `.cursor/skills/` |
+| `agentos-adapter-claude` | Marked `CLAUDE.md` section and `.claude/skills/<name>/SKILL.md` passthroughs. No `allowed-tools`, no hooks |
+| `agentos-adapter-codex` | Marked `AGENTS.md` section. Skills stay in `.agents/skills/` |
+| `agentos-cli` | The `agentos` binary, including `adapter list|install|uninstall|doctor` and `evaluate adapters` |
 | `agentos-feedback` | `ValidationProvider`, language providers, browser provider (`expected/ui.json`), stored results, architecture detectors over the existing graph |
 | `agentos-tools` | Process runner (shell permission, timeout, capped stdout and stderr) and `BrowserTool` (`NullBrowser` by default, `FakeBrowser` for tests, optional `PlaywrightBrowser`) |
 | `agentos-workflow` | Task graph, Phase 1 skill expansion, deterministic scheduler, resumable runs, MockRunner and ManualRunner |
-| `agentos-cli` | The `agentos` binary: `init`, `doctor`, `config`, `project profile`, `scan`, `knowledge`, `domain`, `benchmark baseline`, `context`, `skills`, `validate`, `architecture analyze`, `plan`, `run`, `memory`, `evaluate {skills, knowledge, ddd, context, feedback, architecture, workflow, memory}` |
 | `agentos-testkit` | Dev-only: `TempProject`, `CliRunner`, fixture loader |
-| all other crates | Compiling stubs, implemented by later phases |
 
 ### Skill system data flow
 

@@ -52,6 +52,7 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
         Command::Plan(args) => commands::workflow::plan(&app, &args, format),
         Command::Run(args) => commands::workflow::run(&app, &args, format),
         Command::Memory(args) => commands::memory::run(&app, &args.command, format),
+        Command::Adapter(args) => commands::adapter::run(&app, &args.command, format),
         Command::Evaluate(args) => commands::evaluate::run(&app, &args, format),
     }
 }

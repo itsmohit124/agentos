@@ -1,0 +1,6 @@
+{
+  "id": "install_idempotent_001",
+  "kind": "install",
+  "description": "Installing each adapter twice does not duplicate managed content.",
+  "adapter": "all"
+}

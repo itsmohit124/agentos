@@ -1,5 +1,6 @@
 //! Subcommand implementations.
 
+pub mod adapter;
 pub mod architecture;
 pub mod benchmark;
 pub mod config;
