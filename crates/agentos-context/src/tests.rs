@@ -13,7 +13,10 @@ use agentos_knowledge::{
 
 use crate::pack::ContextPack;
 use crate::semantic::{SemanticHit, SemanticRetriever};
-use crate::{ContextConfig, MemoryView, NullSemantic, build, render_json};
+use crate::{
+    ContextConfig, MemoryCandidate, MemoryView, NullSemantic, build, build_with_memory,
+    render_json, render_json_with_memory,
+};
 
 fn provenance(source: &str) -> Provenance {
     Provenance {
@@ -614,4 +617,229 @@ fn sqlite_payment_task_excludes_notifications() {
     )
     .expect("first");
     assert_eq!(first, again);
+}
+
+fn lesson_candidate(stale: bool) -> MemoryCandidate {
+    MemoryCandidate {
+        id: "memory.lesson.idem".to_owned(),
+        memory_type: "lesson".to_owned(),
+        name: "Idempotency".to_owned(),
+        status: "proposed".to_owned(),
+        content: "lesson: missing idempotency\ntask: Add retry support to payment webhook processing\noutcome: failed\n".to_owned(),
+        source: "run:run-1".to_owned(),
+        task: "Add retry support to payment webhook processing".to_owned(),
+        outcome: "failed".to_owned(),
+        links: vec!["app/payments/service.py".to_owned()],
+        stale,
+        pattern: false,
+        intent_kind: String::new(),
+    }
+}
+
+#[test]
+fn empty_memory_matches_a_pack_built_without_it() {
+    let view = payments_graph();
+    let task = "Add retry support to payment webhook processing";
+    let config = ContextConfig::default();
+    let plain = render_json(&view, task, &config, &NullSemantic).unwrap();
+    let with_memory = render_json_with_memory(&view, task, &config, &NullSemantic, &[]).unwrap();
+    assert_eq!(plain, with_memory);
+}
+
+#[test]
+fn a_relevant_lesson_is_selected_and_traced() {
+    let view = payments_graph();
+    let task = "Add idempotency to payment webhook processing";
+    let pack = build_with_memory(
+        &view,
+        task,
+        &ContextConfig::default(),
+        &NullSemantic,
+        &[lesson_candidate(false)],
+    )
+    .unwrap();
+    let node = pack
+        .selected_nodes
+        .iter()
+        .find(|node| node.id == "memory.lesson.idem")
+        .expect("lesson");
+    assert_eq!(node.status, "proposed");
+    assert!(node.reason.starts_with("previous_failure:"));
+    let trace = pack
+        .retrieval_trace
+        .entries
+        .iter()
+        .find(|entry| entry.id == "memory.lesson.idem")
+        .unwrap();
+    assert_eq!(trace.outcome, "selected");
+    assert!(trace.reason.starts_with("previous_failure:"));
+    assert!(
+        pack.selected_fragments
+            .iter()
+            .any(|fragment| fragment.content.contains("idempotency"))
+    );
+}
+
+#[test]
+fn an_unrelated_task_excludes_the_lesson() {
+    let view = payments_graph();
+    let pack = build_with_memory(
+        &view,
+        "Rename the cooking recipe parser",
+        &ContextConfig::default(),
+        &NullSemantic,
+        &[lesson_candidate(false)],
+    )
+    .unwrap();
+    assert!(
+        pack.selected_nodes
+            .iter()
+            .all(|node| node.id != "memory.lesson.idem")
+    );
+    assert!(
+        pack.selected_fragments
+            .iter()
+            .all(|fragment| !fragment.content.contains("idempotency"))
+    );
+}
+
+#[test]
+fn stale_memory_is_down_ranked() {
+    let view = payments_graph();
+    let task = "Add idempotency to payment webhook processing";
+    let config = ContextConfig::default();
+    let fresh = build_with_memory(
+        &view,
+        task,
+        &config,
+        &NullSemantic,
+        &[lesson_candidate(false)],
+    )
+    .unwrap();
+    let stale = build_with_memory(
+        &view,
+        task,
+        &config,
+        &NullSemantic,
+        &[lesson_candidate(true)],
+    )
+    .unwrap();
+    let fresh_score = fresh
+        .selected_nodes
+        .iter()
+        .find(|node| node.id == "memory.lesson.idem")
+        .unwrap()
+        .score;
+    let stale_node = stale
+        .selected_nodes
+        .iter()
+        .find(|node| node.id == "memory.lesson.idem")
+        .unwrap();
+    assert_eq!(stale_node.status, "stale");
+    assert!(stale_node.score < fresh_score);
+    assert!(stale_node.reason.starts_with("stale:"));
+}
+
+#[test]
+fn memory_respects_the_token_budget() {
+    let view = payments_graph();
+    let task = "Add idempotency to payment webhook processing";
+    let config = ContextConfig::default();
+    let baseline = build(&view, task, &config, &NullSemantic).unwrap();
+    let mut item = lesson_candidate(false);
+    item.content = format!("missing idempotency {}", "x".repeat(20_000));
+    let limited = ContextConfig {
+        budget: Some(baseline.budget.used),
+        cache_dir: None,
+    };
+    let pack = build_with_memory(&view, task, &limited, &NullSemantic, &[item]).unwrap();
+    assert!(pack.budget.used <= baseline.budget.used);
+    assert!(
+        pack.selected_fragments
+            .iter()
+            .all(|fragment| fragment.id != "memory.lesson.idem#0")
+    );
+    let trace = pack
+        .retrieval_trace
+        .entries
+        .iter()
+        .find(|entry| entry.id == "memory.lesson.idem#0")
+        .unwrap();
+    assert_eq!(trace.reason, "over_budget");
+}
+
+#[test]
+fn a_stale_pattern_is_not_reused_as_fresh_context() {
+    let view = payments_graph();
+    let task = "Add retry support to payment webhook processing";
+    let mut pattern = MemoryCandidate {
+        id: "memory.procedural.pattern".to_owned(),
+        memory_type: "procedural".to_owned(),
+        name: "context pattern feature".to_owned(),
+        status: "proposed".to_owned(),
+        content: "context pattern\nintent: feature\nshape: class\ntask: Add retry support to payment webhook processing\n".to_owned(),
+        source: "run:run-1".to_owned(),
+        task: task.to_owned(),
+        outcome: "completed".to_owned(),
+        links: vec!["app/payments/service.py".to_owned()],
+        stale: false,
+        pattern: true,
+        intent_kind: "feature".to_owned(),
+    };
+    let fresh = build_with_memory(
+        &view,
+        task,
+        &ContextConfig::default(),
+        &NullSemantic,
+        &[pattern.clone()],
+    )
+    .unwrap();
+    assert!(
+        fresh
+            .selected_nodes
+            .iter()
+            .any(|node| node.id == "memory.procedural.pattern"
+                && node.reason.starts_with("context_pattern:"))
+    );
+    pattern.stale = true;
+    let stale = build_with_memory(
+        &view,
+        task,
+        &ContextConfig::default(),
+        &NullSemantic,
+        &[pattern],
+    )
+    .unwrap();
+    assert!(
+        stale
+            .selected_nodes
+            .iter()
+            .all(|node| node.id != "memory.procedural.pattern")
+    );
+    let trace = stale
+        .retrieval_trace
+        .entries
+        .iter()
+        .find(|entry| entry.id == "memory.procedural.pattern")
+        .unwrap();
+    assert_eq!(trace.reason, "stale_pattern");
+    assert_eq!(trace.outcome, "excluded");
+}
+
+#[test]
+fn forgotten_memory_passed_to_the_engine_is_omitted() {
+    let view = payments_graph();
+    let task = "Add idempotency to payment webhook processing";
+    let mut item = lesson_candidate(false);
+    item.status = "forgotten".to_owned();
+    let with_forgotten = render_json_with_memory(
+        &view,
+        task,
+        &ContextConfig::default(),
+        &NullSemantic,
+        &[item],
+    )
+    .unwrap();
+    let plain = render_json(&view, task, &ContextConfig::default(), &NullSemantic).unwrap();
+    assert_eq!(with_forgotten, plain);
 }

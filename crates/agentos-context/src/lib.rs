@@ -14,14 +14,18 @@ mod budget;
 mod cache;
 mod engine;
 mod error;
+mod memory;
 mod pack;
 mod render;
 mod semantic;
 mod tokens;
 mod view;
 
-pub use engine::{ContextConfig, build, render_json, stats, to_json};
+pub use engine::{
+    ContextConfig, build, build_with_memory, render_json, render_json_with_memory, stats, to_json,
+};
 pub use error::ContextError;
+pub use memory::MemoryCandidate;
 pub use pack::{
     Budget, ConstraintLink, ContextPack, ContextStats, Exclusion, Intent, RefItem, RetrievalTrace,
     ScoreParts, SelectedFragment, SelectedNode, TermHit, TerminologyEntry, TraceEntry,

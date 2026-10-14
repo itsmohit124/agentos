@@ -60,6 +60,8 @@ pub enum Command {
     Plan(PlanArgs),
     /// Execute, resume, abort, or inspect a run.
     Run(RunArgs),
+    /// Inspect and record project memory.
+    Memory(MemoryArgs),
     /// Run a deterministic evaluation suite.
     Evaluate(EvaluateArgs),
 }
@@ -404,6 +406,116 @@ pub enum RunnerChoice {
     Manual,
 }
 
+/// `agentos memory` arguments.
+#[derive(Debug, Args)]
+pub struct MemoryArgs {
+    #[command(subcommand)]
+    pub command: MemoryCommand,
+}
+
+/// `agentos memory` subcommands.
+#[derive(Debug, Subcommand)]
+pub enum MemoryCommand {
+    /// List memory records, including forgotten ones.
+    List,
+    /// Show one memory record.
+    Show {
+        /// Memory id.
+        id: String,
+    },
+    /// Add a memory record. It is proposed unless `--confirm` is set.
+    Add {
+        /// `episodic`, `semantic`, `procedural`, `decision`, or `lesson`.
+        #[arg(long, value_enum)]
+        r#type: MemoryTypeArg,
+        /// Short name.
+        #[arg(long)]
+        name: String,
+        /// Body. Secret-like patterns are redacted before they are stored.
+        #[arg(long)]
+        content: String,
+        /// Task this memory is about.
+        #[arg(long, default_value = "")]
+        task: String,
+        /// Run id. Empty when the record did not come from a run.
+        #[arg(long, default_value = "")]
+        run: String,
+        /// Outcome such as `failed` or `completed`.
+        #[arg(long, default_value = "")]
+        outcome: String,
+        /// Link `kind|id|fingerprint`. `kind` is `source`, `domain`, or `symbol`. Repeatable.
+        #[arg(long = "link", value_name = "KIND|ID|FINGERPRINT")]
+        links: Vec<String>,
+        /// Timestamp `YYYY-MM-DDTHH:MM:SSZ`. Default: current UTC time.
+        #[arg(long)]
+        at: Option<String>,
+        /// Store the record as confirmed. Omit it to store `proposed`.
+        #[arg(long)]
+        confirm: bool,
+    },
+    /// Confirm a proposed memory. This does not make it canonical.
+    Confirm {
+        /// Memory id.
+        id: String,
+        /// Who is confirming. Default: operator.
+        #[arg(long)]
+        by: Option<String>,
+        /// Timestamp. Default: current UTC time.
+        #[arg(long)]
+        at: Option<String>,
+    },
+    /// Forget a memory. Retrieval will not return it.
+    Forget {
+        /// Memory id.
+        id: String,
+        /// Timestamp. Default: current UTC time.
+        #[arg(long)]
+        at: Option<String>,
+    },
+    /// Delete stale memories. Fresh records are kept.
+    Prune {
+        /// Required. Deletes records whose linked fingerprints no longer match.
+        #[arg(long, required = true)]
+        stale: bool,
+        /// Timestamp. Default: current UTC time.
+        #[arg(long)]
+        at: Option<String>,
+    },
+    /// Ask the Context Engine which memories it would select for a task.
+    Query {
+        /// Task text.
+        task: String,
+    },
+}
+
+/// Memory types accepted by `memory add --type`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, ValueEnum)]
+pub enum MemoryTypeArg {
+    /// What happened during a task or run.
+    Episodic,
+    /// A stable fact about the project.
+    Semantic,
+    /// How work is performed, including a context pattern.
+    Procedural,
+    /// An explicit engineering or domain decision.
+    Decision,
+    /// Knowledge derived from a failure or a review.
+    Lesson,
+}
+
+impl MemoryTypeArg {
+    /// Wire name.
+    pub fn as_str(self) -> &'static str {
+        match self {
+            Self::Episodic => "episodic",
+            Self::Semantic => "semantic",
+            Self::Procedural => "procedural",
+            Self::Decision => "decision",
+            Self::Lesson => "lesson",
+        }
+    }
+}
+
 /// `agentos evaluate` arguments.
 #[derive(Debug, Args)]
 pub struct EvaluateArgs {
@@ -437,6 +549,8 @@ pub enum EvalArea {
     Architecture,
     /// Workflow plans and runs (`evals/workflow`).
     Workflow,
+    /// Project memory (`evals/memory`).
+    Memory,
 }
 
 impl Cli {

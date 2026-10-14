@@ -81,6 +81,19 @@ pub fn explain(pack: &ContextPack) -> String {
     let _ = writeln!(out, "tokens: {}", pack.budget.used);
     let _ = writeln!(out, "budget: {budget}");
     let _ = writeln!(out, "excluded: {}", pack.exclusions.len());
+    let mut memory: Vec<&crate::pack::TraceEntry> = pack
+        .retrieval_trace
+        .entries
+        .iter()
+        .filter(|entry| entry.item_kind == "node" && entry.id.starts_with("memory."))
+        .collect();
+    memory.sort_by(|left, right| left.id.cmp(&right.id));
+    if !memory.is_empty() {
+        let _ = writeln!(out, "memory:");
+        for entry in memory {
+            let _ = writeln!(out, "  {} {} {}", entry.id, entry.outcome, entry.reason);
+        }
+    }
     out
 }
 

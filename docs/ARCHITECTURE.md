@@ -3,6 +3,14 @@
 The locked V1 architecture is specified in [spec/ARCHITECTURE.md](spec/ARCHITECTURE.md), with
 product principles in [spec/VISION.md](spec/VISION.md) and per-subsystem contracts in `spec/`.
 
+## What exists after Phase 7
+
+Phase 7 adds `agentos-memory`. Records live as JSON files under `.agentos/memory/` and are mirrored
+in SQLite table `memory_records`. That table is separate from the knowledge schema, which stays at
+version 2. Memory is a candidate source for the Phase 4 Context Engine. It is ranked, budgeted,
+and traced with the graph. An empty memory store does not change a Context Pack. New records are
+`proposed` until `memory confirm`. There is no canonical memory status. No model is called.
+
 ## What exists after Phase 6
 
 Phase 6 adds `agentos-workflow`. It plans a task graph, expands skill dependencies through the
@@ -50,6 +58,9 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
              │                     ├─► agentos-feedback
              │                     ├─► agentos-permissions
              │                     └─► agentos-tools
+             ├─► agentos-memory ─┬─► agentos-context ──► agentos-knowledge
+             │                   ├─► agentos-knowledge
+             │                   └─► agentos-core
              └─► agentos-evaluation ─┬─► agentos-core
                                      ├─► agentos-knowledge
                                      ├─► agentos-context
@@ -57,7 +68,8 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
                                      ├─► agentos-permissions
                                      ├─► agentos-feedback
                                      ├─► agentos-tools
-                                     └─► agentos-workflow
+                                     ├─► agentos-workflow
+                                     └─► agentos-memory
 ```
 
 | Crate | Contents |
@@ -67,12 +79,13 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
 | `agentos-permissions` | `Capability`, `PermissionSet`, `PermissionSubject`, `check(subject, capability) -> Decision` (default-deny, with reason) |
 | `agentos-skills` | `SKILL.md` front-matter parsing (schema `schemas/skill-manifest.schema.json` + semantic checks), `SkillLoader` (prioritized discovery, front-matter only), `SkillRegistry` (lazy body/reference loading), dependency resolver (topological order, cycle path, semver), rule-based `SkillRouter`, full `validate`, `SkillGraph` (text/DOT), local `install`, built-in skills embedded from `skills/` |
 | `agentos-knowledge` | Automatic project profile, ignore-aware scanner, `LanguageExtractor` (Python, TypeScript, JavaScript, Go, Java, Ruby), knowledge graph in SQLite (nodes, edges, fragments, FTS5), provenance, domain tables |
-| `agentos-context` | Context Pack assembly over that graph: intent, routing, lexical/graph retrieval, budget, trace, cache. `NullSemantic` is the semantic seam |
-| `agentos-evaluation` | Deterministic case runner; areas `skills`, `knowledge`, `ddd`, `context`, `feedback`, `architecture`, and `workflow` |
+| `agentos-context` | Context Pack assembly over that graph: intent, routing, lexical/graph retrieval, budget, trace, cache. Memory candidates join that pipeline. `NullSemantic` is the semantic seam |
+| `agentos-memory` | Episodic, semantic, procedural, decision, and lesson records. Files under `.agentos/memory/` plus a SQLite mirror. Proposed until confirmed. Stale when a linked fingerprint changes |
+| `agentos-evaluation` | Deterministic case runner; areas `skills`, `knowledge`, `ddd`, `context`, `feedback`, `architecture`, `workflow`, and `memory` |
 | `agentos-feedback` | `ValidationProvider`, language providers, stored results, architecture detectors over the existing graph |
 | `agentos-tools` | Process runner: shell permission, timeout, capped stdout and stderr |
 | `agentos-workflow` | Task graph, Phase 1 skill expansion, deterministic scheduler, resumable runs, MockRunner and ManualRunner |
-| `agentos-cli` | The `agentos` binary: `init`, `doctor`, `config`, `project profile`, `scan`, `knowledge`, `domain`, `benchmark baseline`, `context`, `skills`, `validate`, `architecture analyze`, `plan`, `run`, `evaluate {skills, knowledge, ddd, context, feedback, architecture, workflow}` |
+| `agentos-cli` | The `agentos` binary: `init`, `doctor`, `config`, `project profile`, `scan`, `knowledge`, `domain`, `benchmark baseline`, `context`, `skills`, `validate`, `architecture analyze`, `plan`, `run`, `memory`, `evaluate {skills, knowledge, ddd, context, feedback, architecture, workflow, memory}` |
 | `agentos-testkit` | Dev-only: `TempProject`, `CliRunner`, fixture loader |
 | all other crates | Compiling stubs, implemented by later phases |
 

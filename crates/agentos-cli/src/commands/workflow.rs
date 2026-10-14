@@ -6,12 +6,13 @@ use std::process::ExitCode;
 use std::sync::Arc;
 
 use agentos_config::OutputFormat;
-use agentos_context::{ContextConfig, SqliteView};
+use agentos_context::{ContextConfig, SqliteView, intent_kind};
 use agentos_core::fs::RealFs;
 use agentos_knowledge::{KnowledgeStore, domain_scan, scan};
+use agentos_memory::{FingerprintIndex, MemoryLink, MemoryStore, RunCapture, record_run, utc_now};
 use agentos_skills::{SkillLoader, builtin};
 use agentos_workflow::{
-    EngineContext, ManualRunner, MockRunner, Phase5Validator, Plan, PlanInput, RunRecord,
+    EngineContext, ManualRunner, MockRunner, Phase5Validator, Plan, PlanInput, RunRecord, RunState,
     RunnerResult, ScriptedValidator, Session, WorkflowError, plan as build_plan, start,
 };
 use anyhow::Context;
@@ -117,7 +118,7 @@ fn execute(
             cache_dir: None,
         },
     };
-    match choice {
+    let run = match choice {
         RunnerChoice::Mock => {
             let mut runner = MockRunner::succeed();
             let mut validator = ScriptedValidator::pass();
@@ -127,7 +128,7 @@ fn execute(
                 validator: &mut validator,
                 context: &context,
             };
-            dispatch(&mut session, mode)
+            dispatch(&mut session, mode)?
         }
         RunnerChoice::Manual => {
             let mut runner = ManualRunner::new();
@@ -139,9 +140,13 @@ fn execute(
                 validator: &mut validator,
                 context: &context,
             };
-            dispatch(&mut session, mode)
+            dispatch(&mut session, mode)?
         }
+    };
+    if run.state.is_terminal() && !run.waiting {
+        remember(root, &store, &run)?;
     }
+    Ok(run)
 }
 
 fn dispatch(session: &mut Session<'_>, mode: ExecuteMode<'_>) -> anyhow::Result<RunRecord> {
@@ -183,6 +188,114 @@ fn queue_manual(
     Ok(())
 }
 
+fn remember(root: &Path, store: &KnowledgeStore, run: &RunRecord) -> anyhow::Result<()> {
+    let capture = capture_of(store, run)?;
+    let memory = MemoryStore::open(root)?;
+    record_run(&memory, &capture)?;
+    Ok(())
+}
+
+fn capture_of(store: &KnowledgeStore, run: &RunRecord) -> anyhow::Result<RunCapture> {
+    let index = FingerprintIndex::from_store(store)?;
+    let nodes = store.nodes()?;
+    let mut links = Vec::new();
+    let mut shape = Vec::new();
+    let mut pack_ids = Vec::new();
+    let mut failures = Vec::new();
+    let mut validation = Vec::new();
+    let mut agent = Vec::new();
+    if let Some(reason) = &run.failure_reason
+        && !reason.is_empty()
+    {
+        failures.push(reason.clone());
+    }
+    for step in &run.steps {
+        if let Some(reason) = &step.failure_reason
+            && !reason.is_empty()
+        {
+            failures.push(format!("{}: {reason}", step.id));
+        }
+        if let Some(id) = &step.context_pack_id {
+            pack_ids.push(id.clone());
+        }
+        if let Some(pack) = &step.context_pack {
+            for node in &pack.selected_nodes {
+                shape.push(node.node_type.clone());
+                if let Some(found) = nodes.iter().find(|item| item.id == node.id) {
+                    links.push(MemoryLink {
+                        kind: if found.node_type.is_domain() {
+                            "domain"
+                        } else {
+                            "symbol"
+                        }
+                        .to_owned(),
+                        id: found.id.clone(),
+                        fingerprint: found.fingerprint.clone(),
+                    });
+                }
+            }
+            for fragment in &pack.selected_fragments {
+                if let Some(fingerprint) = index.values.get(&fragment.source_ref) {
+                    links.push(MemoryLink {
+                        kind: "source".to_owned(),
+                        id: fragment.source_ref.clone(),
+                        fingerprint: fingerprint.clone(),
+                    });
+                }
+            }
+        }
+        for result in &step.validations {
+            validation.push(format!(
+                "{} {} {}",
+                step.id,
+                result.kind.as_str(),
+                result.outcome.as_str()
+            ));
+            if !result.passed {
+                for item in &result.feedback {
+                    failures.push(item.summary.clone());
+                }
+                for diagnostic in &result.diagnostics {
+                    failures.push(diagnostic.summary.clone());
+                }
+            }
+        }
+        for (key, value) in &step.outputs_produced {
+            agent.push(format!("{} {key}={value}", step.id));
+        }
+    }
+    validation.sort();
+    agent.sort();
+    shape.sort();
+    shape.dedup();
+    pack_ids.sort();
+    pack_ids.dedup();
+    failures.sort();
+    failures.dedup();
+    links.sort_by(|left, right| {
+        left.kind
+            .cmp(&right.kind)
+            .then(left.id.cmp(&right.id))
+            .then(left.fingerprint.cmp(&right.fingerprint))
+    });
+    links.dedup();
+    let (intent, _) = intent_kind(&run.task);
+    Ok(RunCapture {
+        run_id: run.id.clone(),
+        task: run.task.clone(),
+        outcome: run.state.as_str().to_owned(),
+        context_pack_id: pack_ids.last().cloned().unwrap_or_default(),
+        pack_ids,
+        agent_summary: agent.join("\n"),
+        validation: validation.join("\n"),
+        failures,
+        links,
+        recorded_at: utc_now(),
+        intent_kind: intent,
+        shape,
+    })
+}
+
 fn discover(root: &Path) -> agentos_skills::SkillRegistry {
     SkillLoader::for_project(root, Arc::new(RealFs), None, builtin::location())
         .discover()
@@ -190,10 +303,7 @@ fn discover(root: &Path) -> agentos_skills::SkillRegistry {
 }
 
 fn exit_for(run: &RunRecord) -> ExitCode {
-    if matches!(
-        run.state,
-        agentos_workflow::RunState::Failed | agentos_workflow::RunState::Blocked
-    ) {
+    if matches!(run.state, RunState::Failed | RunState::Blocked) {
         ExitCode::from(EXIT_CHECK)
     } else {
         ExitCode::SUCCESS

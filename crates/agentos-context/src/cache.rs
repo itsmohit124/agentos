@@ -9,6 +9,7 @@ use std::path::Path;
 use sha2::{Digest, Sha256};
 
 use crate::error::ContextError;
+use crate::memory::{self, MemoryCandidate};
 use crate::view::hex_encode;
 
 /// Ranking configuration mixed into the cache key. Bump when selection rules change.
@@ -27,6 +28,20 @@ pub fn cache_key(fingerprint: &str, task: &str, budget: Option<u32>) -> String {
     hasher.update(budget.as_bytes());
     hasher.update(b"\n");
     hasher.update(CONFIG_ID.as_bytes());
+    hex_encode(&hasher.finalize())
+}
+
+/// Cache key when memory candidates are present. Empty memory keeps [`cache_key`].
+pub fn cache_key_with_memory(
+    fingerprint: &str,
+    task: &str,
+    budget: Option<u32>,
+    memory: &[MemoryCandidate],
+) -> String {
+    let mut hasher = Sha256::new();
+    hasher.update(cache_key(fingerprint, task, budget).as_bytes());
+    hasher.update(b"\ncontext-v1-memory\n");
+    hasher.update(memory::memory_fingerprint(memory).as_bytes());
     hex_encode(&hasher.finalize())
 }
 

@@ -18,6 +18,7 @@ use agentos_knowledge::{
 use crate::budget::{self, BudgetItem};
 use crate::cache::{self, cache_key};
 use crate::error::ContextError;
+use crate::memory::{self, MemoryCandidate};
 use crate::pack::{
     Budget, ConstraintLink, ContextPack, ContextStats, Exclusion, Intent, RefItem, RetrievalTrace,
     ScoreParts, SelectedFragment, SelectedNode, TermHit, TerminologyEntry, TraceEntry,
@@ -36,14 +37,27 @@ pub struct ContextConfig {
 }
 
 /// Builds a Context Pack. A cache hit is byte-identical to the JSON of a fresh build.
+///
+/// Memory is empty. [`build_with_memory`] is the same pipeline with memory candidates.
 pub fn build(
     view: &impl KnowledgeView,
     task: &str,
     config: &ContextConfig,
     semantic: &dyn SemanticRetriever,
 ) -> Result<ContextPack, ContextError> {
-    Ok(serde_json::from_str(&render_json(
-        view, task, config, semantic,
+    build_with_memory(view, task, config, semantic, &[])
+}
+
+/// Builds a Context Pack. Memory candidates share ranking, the token budget, and the trace.
+pub fn build_with_memory(
+    view: &impl KnowledgeView,
+    task: &str,
+    config: &ContextConfig,
+    semantic: &dyn SemanticRetriever,
+    memory: &[MemoryCandidate],
+) -> Result<ContextPack, ContextError> {
+    Ok(serde_json::from_str(&render_json_with_memory(
+        view, task, config, semantic, memory,
     )?)?)
 }
 
@@ -54,21 +68,36 @@ pub fn render_json(
     config: &ContextConfig,
     semantic: &dyn SemanticRetriever,
 ) -> Result<String, ContextError> {
+    render_json_with_memory(view, task, config, semantic, &[])
+}
+
+/// Canonical JSON. An empty `memory` slice uses the Phase 4 cache key.
+pub fn render_json_with_memory(
+    view: &impl KnowledgeView,
+    task: &str,
+    config: &ContextConfig,
+    semantic: &dyn SemanticRetriever,
+    memory: &[MemoryCandidate],
+) -> Result<String, ContextError> {
     if let Some(dir) = &config.cache_dir {
         let fingerprint = view.fingerprint()?;
-        let key = cache_key(&fingerprint, task, config.budget);
+        let key = if memory.is_empty() {
+            cache_key(&fingerprint, task, config.budget)
+        } else {
+            cache::cache_key_with_memory(&fingerprint, task, config.budget, memory)
+        };
         if let Some(hit) = cache::read(dir, &key)?
             && serde_json::from_str::<ContextPack>(&hit).is_ok()
         {
             tracing::debug!(key, "context cache hit");
             return Ok(hit);
         }
-        let pack = assemble(view, task, config.budget, semantic)?;
+        let pack = assemble(view, task, config.budget, semantic, memory)?;
         let json = to_json(&pack)?;
         cache::write(dir, &key, &json)?;
         return Ok(json);
     }
-    to_json(&assemble(view, task, config.budget, semantic)?)
+    to_json(&assemble(view, task, config.budget, semantic, memory)?)
 }
 
 /// Stats for a pack.
@@ -88,6 +117,7 @@ fn assemble(
     task: &str,
     limit: Option<u32>,
     semantic: &dyn SemanticRetriever,
+    memory: &[MemoryCandidate],
 ) -> Result<ContextPack, ContextError> {
     let nodes = view.nodes()?;
     let edges = view.edges()?;
@@ -190,6 +220,9 @@ fn assemble(
         }
     }
 
+    let memory_decisions = memory::rank(memory, &terms, &kind, &route.contexts, &route.matched);
+    items.extend(memory::budget_items(&memory_decisions));
+
     let kept = budget::allocate(&items, limit);
     let mut selected_ids = BTreeSet::new();
     for node in &nodes {
@@ -202,6 +235,9 @@ fn assemble(
         if kept.contains(&node_key(&node.id)) || fragment_kept {
             selected_ids.insert(node.id.clone());
         }
+    }
+    for id in memory::selected_ids(&memory_decisions, &kept) {
+        selected_ids.insert(id);
     }
 
     let mut used = 0u32;
@@ -364,6 +400,16 @@ fn assemble(
             });
         }
     }
+
+    memory::apply(
+        &memory_decisions,
+        &kept,
+        &selected_ids,
+        &mut selected_nodes,
+        &mut selected_fragments,
+        &mut exclusions,
+        &mut trace,
+    );
 
     selected_nodes.sort_by(|left, right| left.id.cmp(&right.id));
     selected_fragments.sort_by(|left, right| left.id.cmp(&right.id));

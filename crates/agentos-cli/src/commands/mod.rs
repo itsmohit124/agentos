@@ -9,6 +9,7 @@ pub mod domain;
 pub mod evaluate;
 pub mod init;
 pub mod knowledge;
+pub mod memory;
 pub mod project;
 pub mod scan;
 pub mod skills;

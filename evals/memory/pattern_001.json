@@ -1,0 +1,5 @@
+{
+  "id": "pattern_001",
+  "kind": "pattern",
+  "description": "A successful context pattern is selected while its fingerprint matches, and is not reused once that fingerprint changes."
+}

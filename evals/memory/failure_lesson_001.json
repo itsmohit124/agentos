@@ -1,0 +1,5 @@
+{
+  "id": "failure_lesson_001",
+  "kind": "lesson",
+  "description": "A failed run records a proposed lesson. A later similar task selects it and the trace says why."
+}

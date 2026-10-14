@@ -127,3 +127,20 @@ analysis returns the same findings. An empty oracle and an empty report is agree
 | `deterministic` | the same task yields the same plan; `--workflow` wins and the task text stays unchanged |
 
 Cases are synthetic. They do not spawn a validation tool or call a model.
+
+## `memory/` (Phase 7)
+
+| `kind` | What it checks |
+|---|---|
+| `lesson` | a failed run records a proposed lesson; a later similar task selects it and the trace says why |
+| `exclusion` | that lesson is not selected for an unrelated task |
+| `stale` | a changed fingerprint marks the lesson stale, lowers its score, and leaves it inspectable |
+| `forget` | a forgotten lesson is absent from the pack and from the trace |
+| `phase4` | empty memory leaves the python-fastapi payment Context Pack unchanged |
+| `canonical` | proposed stays proposed; confirm writes `confirmed` and never `canonical` |
+| `budget` | a large memory fragment is excluded when it does not fit the token budget |
+| `redaction` | a password assignment and an AWS access key id are removed before the file is written |
+| `reproducible` | the same memory and task produce the same pack, with no timestamp in the pack |
+| `pattern` | a context pattern is selected while its fingerprint matches, and is not reused after it changes |
+
+Memory cases do not call a model. Redaction covers the patterns named in the phase report, not every secret.

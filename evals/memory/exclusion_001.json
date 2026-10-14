@@ -1,0 +1,5 @@
+{
+  "id": "exclusion_001",
+  "kind": "exclusion",
+  "description": "A payment-webhook lesson is not selected for an unrelated cooking task."
+}

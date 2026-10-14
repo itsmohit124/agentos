@@ -1,0 +1,5 @@
+{
+  "id": "budget_001",
+  "kind": "budget",
+  "description": "A large memory fragment is excluded when it does not fit the Context Engine token budget."
+}

@@ -70,6 +70,14 @@ agentos run status <run-id>
 agentos run resume <run-id>
 agentos run abort <run-id>
 agentos evaluate workflow         # plans, scheduler, resume, fix loop
+agentos memory list
+agentos memory show <id>
+agentos memory add --type lesson --name "Idempotency" --content "..."
+agentos memory confirm <id>
+agentos memory forget <id>
+agentos memory prune --stale
+agentos memory query "Add retry to payment webhook"
+agentos evaluate memory           # lessons, staleness, forget, redaction, budget
 ```
 
 Global flags: `--root <PATH>`, `--json`, `-v` / `-vv`, `--log-level <FILTER>`.

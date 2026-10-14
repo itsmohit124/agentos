@@ -11,6 +11,7 @@ agentos-context.workspace = true
 agentos-core.workspace = true
 agentos-feedback.workspace = true
 agentos-knowledge.workspace = true
+agentos-memory.workspace = true
 agentos-permissions.workspace = true
 agentos-skills.workspace = true
 agentos-tools.workspace = true

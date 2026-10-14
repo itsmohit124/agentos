@@ -1,0 +1,7 @@
+{
+  "id": "phase4_001",
+  "kind": "phase4",
+  "description": "With empty memory, the python-fastapi payment task produces the same Context Pack as Phase 4.",
+  "fixture": "python-fastapi",
+  "task": "Add retry support to payment webhook processing"
+}

@@ -28,6 +28,7 @@ dependencies = [
  "agentos-evaluation",
  "agentos-feedback",
  "agentos-knowledge",
+ "agentos-memory",
  "agentos-permissions",
  "agentos-skills",
  "agentos-testkit",
@@ -84,6 +85,7 @@ dependencies = [
  "agentos-core",
  "agentos-feedback",
  "agentos-knowledge",
+ "agentos-memory",
  "agentos-permissions",
  "agentos-skills",
  "agentos-tools",
@@ -133,6 +135,18 @@ dependencies = [
 [[package]]
 name = "agentos-memory"
 version = "0.1.0"
+dependencies = [
+ "agentos-context",
+ "agentos-core",
+ "agentos-knowledge",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "sha2",
+ "tempfile",
+ "thiserror",
+ "tracing",
+]
 
 [[package]]
 name = "agentos-permissions"

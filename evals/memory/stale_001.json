@@ -1,0 +1,5 @@
+{
+  "id": "stale_001",
+  "kind": "stale",
+  "description": "A changed source fingerprint marks the lesson stale, down-ranks it, and leaves it inspectable."
+}

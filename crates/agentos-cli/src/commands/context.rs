@@ -4,7 +4,8 @@ use std::process::ExitCode;
 
 use agentos_config::OutputFormat;
 use agentos_context::{
-    ContextConfig, NullSemantic, SqliteView, build, explain, render_json, stats, to_markdown,
+    ContextConfig, NullSemantic, SqliteView, build_with_memory, explain, render_json_with_memory,
+    stats, to_markdown,
 };
 use agentos_knowledge::{KnowledgeStore, domain_scan, scan};
 use anyhow::Context;
@@ -22,15 +23,22 @@ pub fn run(app: &App, args: &ContextArgs, format: OutputFormat) -> anyhow::Resul
     let store = KnowledgeStore::open(root)
         .with_context(|| format!("cannot open knowledge index in {}", root.display()))?;
     let view = SqliteView::new(&store);
+    let memory = crate::commands::memory::candidates(root, &store)?;
     let config = ContextConfig {
         budget: args.budget,
         cache_dir: Some(root.join(".agentos/context-cache")),
     };
     let task = task_of(&args.command);
-    let pack = build(&view, task, &config, &NullSemantic)?;
+    let pack = build_with_memory(&view, task, &config, &NullSemantic, &memory)?;
     match &args.command {
         ContextCommand::Explain { .. } => match format {
-            OutputFormat::Json => output::text(&render_json(&view, task, &config, &NullSemantic)?)?,
+            OutputFormat::Json => output::text(&render_json_with_memory(
+                &view,
+                task,
+                &config,
+                &NullSemantic,
+                &memory,
+            )?)?,
             OutputFormat::Text => output::text(&explain(&pack))?,
         },
         ContextCommand::Build {
@@ -38,7 +46,13 @@ pub fn run(app: &App, args: &ContextArgs, format: OutputFormat) -> anyhow::Resul
             ..
         } => {
             if format == OutputFormat::Json || *pack_format == PackFormat::Json {
-                output::text(&render_json(&view, task, &config, &NullSemantic)?)?;
+                output::text(&render_json_with_memory(
+                    &view,
+                    task,
+                    &config,
+                    &NullSemantic,
+                    &memory,
+                )?)?;
             } else {
                 output::text(&to_markdown(&pack))?;
             }

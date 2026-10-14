@@ -5,7 +5,7 @@
 //! always produce the same report.
 //!
 //! Implemented areas: [`skills`], [`knowledge`], [`ddd`], [`context`], [`feedback`],
-//! [`architecture`], [`workflow`].
+//! [`architecture`], [`workflow`], [`memory`].
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
@@ -18,6 +18,7 @@ pub mod context;
 pub mod ddd;
 pub mod feedback;
 pub mod knowledge;
+pub mod memory;
 pub mod skills;
 pub mod workflow;
 

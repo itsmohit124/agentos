@@ -1,0 +1,5 @@
+{
+  "id": "redaction_001",
+  "kind": "redaction",
+  "description": "A password assignment and an AWS access key id are redacted before the memory file is written."
+}

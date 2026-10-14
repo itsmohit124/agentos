@@ -1,0 +1,5 @@
+{
+  "id": "reproducible_001",
+  "kind": "reproducible",
+  "description": "The same memory, task, and configuration produce the same Context Pack, with no timestamp in the pack."
+}

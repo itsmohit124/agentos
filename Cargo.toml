@@ -38,6 +38,7 @@ agentos-skills = { path = "crates/agentos-skills" }
 agentos-testkit = { path = "crates/agentos-testkit" }
 agentos-tools = { path = "crates/agentos-tools" }
 agentos-workflow = { path = "crates/agentos-workflow" }
+agentos-memory = { path = "crates/agentos-memory" }
 
 anyhow = "1.0.104"
 assert_cmd = "2.2.2"
