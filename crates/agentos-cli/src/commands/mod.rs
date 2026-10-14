@@ -3,6 +3,7 @@
 pub mod adapter;
 pub mod architecture;
 pub mod benchmark;
+pub mod cleanup;
 pub mod config;
 pub mod context;
 pub mod doctor;

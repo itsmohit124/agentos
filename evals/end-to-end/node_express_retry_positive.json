@@ -1,0 +1,31 @@
+{
+  "id": "node_express_retry_positive",
+  "kind": "golden",
+  "description": "The same retry task on the Express fixture stays on Payment and leaves users and notifications unchanged.",
+  "fixture": "node-express",
+  "oracle": "golden-workflow",
+  "task": "Add retry support to payment webhook processing",
+  "expect": "pass",
+  "patch": "positive",
+  "must_include": [
+    "software.app.payments.models.class.Payment",
+    "software.app.payments.service.class.PaymentService"
+  ],
+  "must_exclude": [
+    "software.app.notifications.service.class.NotificationService",
+    "software.app.users.service.class.UserService"
+  ],
+  "required_fragments": [
+    "app/payments/controller.js",
+    "app/payments/service.js"
+  ],
+  "terminology": [
+    "Payment"
+  ],
+  "unrelated": [
+    "app/users/service.js",
+    "app/notifications/service.js",
+    "app/users/models.js",
+    "tests/test_users.js"
+  ]
+}

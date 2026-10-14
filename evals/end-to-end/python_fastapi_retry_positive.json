@@ -1,0 +1,35 @@
+{
+  "id": "python_fastapi_retry_positive",
+  "kind": "golden",
+  "description": "Retry support for payment webhooks stays inside the payment aggregate and leaves other contexts unchanged.",
+  "fixture": "python-fastapi",
+  "oracle": "golden-workflow",
+  "task": "Add retry support to payment webhook processing",
+  "expect": "pass",
+  "patch": "positive",
+  "must_include": [
+    "domain.payments.bounded_context.Payments",
+    "domain.payments.entity.Payment",
+    "domain.payments.aggregate.PaymentAggregate",
+    "software.app.payments.service.class.PaymentService"
+  ],
+  "must_exclude": [
+    "domain.notifications.bounded_context.Notifications",
+    "domain.users.bounded_context.Users",
+    "software.app.notifications.service.class.NotificationService"
+  ],
+  "required_fragments": [
+    "app/payments/controller.py",
+    "app/payments/service.py"
+  ],
+  "terminology": [
+    "Payment",
+    "PaymentAggregate"
+  ],
+  "unrelated": [
+    "app/users/service.py",
+    "app/notifications/service.py",
+    "app/users/models.py",
+    "tests/test_users.py"
+  ]
+}

@@ -123,3 +123,27 @@ pub fn execute(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::split_command;
+
+    #[test]
+    fn a_command_override_is_argv_and_not_a_shell_script() {
+        let argv = split_command("python3 -m pytest; touch pwned").unwrap();
+        assert_eq!(
+            argv,
+            [
+                "python3".to_owned(),
+                "-m".to_owned(),
+                "pytest;".to_owned(),
+                "touch".to_owned(),
+                "pwned".to_owned()
+            ]
+        );
+        assert!(
+            argv.iter()
+                .all(|part| part != "sh" && part != "bash" && part != "-c")
+        );
+    }
+}

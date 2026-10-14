@@ -4,10 +4,10 @@ AgentOS is a local-first, agent-agnostic engineering intelligence layer. It give
 (Cursor, Claude Code, Codex, or any other) the right knowledge, skills, workflow, feedback and
 guardrails for a task — without replacing the agent.
 
-> Status: **early development**. The CLI can initialise a project, manage portable skills, build a
+> Status: **V1 evaluation**. The CLI can initialise a project, manage portable skills, build a
 > derived knowledge graph, assemble a budgeted Context Pack, run validation, plan a workflow, record
-> memory, and install an adapter for Cursor, Claude Code, Codex, or a generic agent. It does not
-> replace the coding agent.
+> memory, and install an adapter for Cursor, Claude Code, Codex, or a generic agent. `agentos evaluate`
+> reports the measured suites. It does not replace the coding agent. AgentOS does not send telemetry.
 
 ## Build
 
@@ -86,6 +86,12 @@ agentos adapter install generic  # also: cursor, claude, codex
 agentos adapter doctor generic   # exit 3 when the adapter is not installed or a check fails
 agentos adapter uninstall generic
 agentos evaluate adapters         # install, uninstall, skills, context, workflow, feedback
+agentos evaluate                 # dashboard for every suite; exit 3 if one fails
+agentos evaluate --json          # the same dashboard for CI
+agentos evaluate e2e             # golden workflows, including a patch that must be rejected
+
+agentos cleanup                  # prints what would be removed and exits 2
+agentos cleanup --yes            # removes .agentos/ and managed adapter blocks
 ```
 
 `adapter install` writes only AgentOS-managed files in the project selected by `--root`. Run it
@@ -140,6 +146,7 @@ Resolved per key, later layers winning:
 |---|---|---|
 | `log.level` | `warn` | a level (`off`, `error`, `warn`, `info`, `debug`, `trace`) or tracing directives such as `agentos_core=debug,warn` |
 | `output.format` | `text` | `text`, `json` |
+| `telemetry.enabled` | `false` | `true` or `false`. Nothing is transmitted. Env: `AGENTOS_TELEMETRY` |
 
 Logs are written to stderr; command results to stdout.
 
@@ -149,8 +156,8 @@ Logs are written to stderr; command results to stdout.
 |---|---|
 | 0 | success |
 | 1 | runtime error |
-| 2 | usage error |
-| 3 | a check failed: `doctor` critical failure, `skills validate` errors, `evaluate` case failures, a workflow run that is `failed` or `blocked`, `adapter doctor` when a check fails, `adapter uninstall` when a managed file cannot be changed safely |
+| 2 | usage error, including `cleanup` without `--yes` |
+| 3 | a check failed: `doctor` critical failure, `skills validate` errors, `evaluate` case failures, a workflow run that is `failed` or `blocked`, `adapter doctor` when a check fails, `adapter uninstall` or `cleanup` when a managed file cannot be changed safely |
 
 ### Project state
 
@@ -168,7 +175,14 @@ Logs are written to stderr; command results to stdout.
 ## Development
 
 ```bash
-scripts/check.sh   # cargo fmt --check, clippy -D warnings, cargo test --workspace
+scripts/check.sh   # fmt, clippy, tests, agentos evaluate, agentos evaluate e2e
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and
+[docs/user-guide.md](docs/user-guide.md). Guides: [write a skill](docs/guides/write-a-skill.md),
+[add a language extractor](docs/guides/add-a-language-extractor.md),
+[add an adapter](docs/guides/add-an-adapter.md).
+
+`agentos cleanup --yes` deletes `.agentos/` after removing managed adapter blocks. It leaves
+`.agents/skills/` and `agents/openai.yaml` in place, including `disable-model-invocation: true`
+and `allow_implicit_invocation: false`.

@@ -5,6 +5,7 @@ use std::process::ExitCode;
 
 use agentos_config::OutputFormat;
 use agentos_evaluation::EvalReport;
+use agentos_evaluation::dashboard::{self, Dashboard};
 use serde::Serialize;
 
 use crate::app::App;
@@ -26,7 +27,19 @@ struct Out<'a> {
 
 /// Runs `agentos evaluate`.
 pub fn run(app: &App, args: &EvaluateArgs, format: OutputFormat) -> anyhow::Result<ExitCode> {
-    let report = match args.area {
+    let Some(area) = args.area else {
+        let evals = args
+            .evals_dir
+            .clone()
+            .unwrap_or_else(|| app.root.path.join("evals"));
+        let fixtures = args
+            .fixtures_dir
+            .clone()
+            .unwrap_or_else(|| app.root.path.join("fixtures"));
+        let dashboard = dashboard::run(&evals, &fixtures)?;
+        return emit_dashboard(format, &dashboard);
+    };
+    let report = match area {
         EvalArea::Skills => {
             let cases = args
                 .evals_dir
@@ -126,6 +139,17 @@ pub fn run(app: &App, args: &EvaluateArgs, format: OutputFormat) -> anyhow::Resu
                 .unwrap_or_else(|| app.root.path.join("fixtures"));
             agentos_evaluation::adapters::run(&cases, &fixtures)?
         }
+        EvalArea::E2e => {
+            let cases = args
+                .evals_dir
+                .clone()
+                .unwrap_or_else(|| app.root.path.join("evals/end-to-end"));
+            let fixtures = args
+                .fixtures_dir
+                .clone()
+                .unwrap_or_else(|| app.root.path.join("fixtures"));
+            agentos_evaluation::e2e::run(&cases, &fixtures)?
+        }
     };
     match format {
         OutputFormat::Json => output::json(&Out {
@@ -138,6 +162,18 @@ pub fn run(app: &App, args: &EvaluateArgs, format: OutputFormat) -> anyhow::Resu
         OutputFormat::Text => output::text(&render_text(&report))?,
     }
     Ok(if report.is_ok() {
+        ExitCode::SUCCESS
+    } else {
+        ExitCode::from(EXIT_FAILED)
+    })
+}
+
+fn emit_dashboard(format: OutputFormat, dashboard: &Dashboard) -> anyhow::Result<ExitCode> {
+    match format {
+        OutputFormat::Json => output::json(dashboard)?,
+        OutputFormat::Text => output::text(&dashboard::render(dashboard))?,
+    }
+    Ok(if dashboard.ok {
         ExitCode::SUCCESS
     } else {
         ExitCode::from(EXIT_FAILED)

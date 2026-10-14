@@ -3,6 +3,19 @@
 The locked V1 architecture is specified in [spec/ARCHITECTURE.md](spec/ARCHITECTURE.md), with
 product principles in [spec/VISION.md](spec/VISION.md) and per-subsystem contracts in `spec/`.
 
+## What exists after Phase 10
+
+Phase 10 evaluates the system that Phases 0–9 built. `agentos evaluate` with no area runs the
+knowledge, DDD, context, skills, workflow, feedback, architecture, memory, and adapter suites and
+prints a dashboard. `agentos evaluate e2e` runs the golden payment-webhook workflow on the Python
+and Node fixtures, including a scripted patch that must be rejected. Thresholds in
+`evals/thresholds.json` are the measured suite counts and the context token ceiling already stored
+on the context cases.
+
+`agentos cleanup --yes` uninstalls managed adapter blocks and then deletes `.agentos/`. It does not
+delete skill files or restore the invocation controls written onto user-only skills. There is no
+telemetry client. `telemetry.enabled` defaults to false.
+
 ## What exists after Phase 9
 
 Phase 9 adds the four adapter crates. They install managed project files and call the existing
@@ -106,7 +119,7 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
 | `agentos-knowledge` | Automatic project profile, ignore-aware scanner, `LanguageExtractor` (Python, TypeScript, JavaScript, Go, Java, Ruby), knowledge graph in SQLite (nodes, edges, fragments, FTS5), provenance, domain tables |
 | `agentos-context` | Context Pack assembly over that graph: intent, routing, lexical/graph retrieval, budget, trace, cache. Memory candidates join that pipeline. `NullSemantic` is the semantic seam |
 | `agentos-memory` | Episodic, semantic, procedural, decision, and lesson records. Files under `.agentos/memory/` plus a SQLite mirror. Proposed until confirmed. Stale when a linked fingerprint changes |
-| `agentos-evaluation` | Deterministic case runner; areas `skills`, `knowledge`, `ddd`, `context`, `feedback`, `architecture`, `workflow`, `memory`, and `adapters` |
+| `agentos-evaluation` | Deterministic case runner; areas `skills`, `knowledge`, `ddd`, `context`, `feedback`, `architecture`, `workflow`, `memory`, `adapters`, and `e2e`. The dashboard runs every area except `e2e` |
 | `agentos-adapter-generic` | Adapter contract, managed-file install/uninstall, generic `.agentos/adapters/generic/` instructions and `skills.json` |
 | `agentos-adapter-cursor` | `.cursor/rules/agentos.mdc` instructions. Does not copy skills into `.cursor/skills/` |
 | `agentos-adapter-claude` | Marked `CLAUDE.md` section and `.claude/skills/<name>/SKILL.md` passthroughs. No `allowed-tools`, no hooks |

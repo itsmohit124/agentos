@@ -468,6 +468,7 @@ fn execute_regression(case: &agentos_feedback::RegressionCase) -> CaseResult {
             description: case.description.clone(),
             passed: true,
             detail: format!("outcome {}", case.expected_outcome),
+            trace: None,
         },
         Err(detail) => CaseResult {
             id: case.id.clone(),
@@ -475,6 +476,7 @@ fn execute_regression(case: &agentos_feedback::RegressionCase) -> CaseResult {
             description: case.description.clone(),
             passed: false,
             detail,
+            trace: None,
         },
     }
 }
@@ -507,6 +509,7 @@ fn passed(case: &Case, detail: String) -> CaseResult {
         description: case.description.clone(),
         passed: true,
         detail,
+        trace: None,
     }
 }
 
@@ -517,6 +520,7 @@ fn failed(case: &Case, detail: String) -> CaseResult {
         description: case.description.clone(),
         passed: false,
         detail,
+        trace: None,
     }
 }
 

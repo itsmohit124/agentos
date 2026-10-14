@@ -1,8 +1,11 @@
 //! Scan a repository into the derived knowledge index.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
+use agentos_core::db::Database;
+use agentos_core::state::{DB_FILE, STATE_DIR};
+use rusqlite::ErrorCode;
 use serde::Serialize;
 
 use crate::assemble::{self, Draft, StoredSymbol};
@@ -139,6 +142,9 @@ pub fn scan_with(
 }
 
 /// Deletes the derived graph and scans again.
+///
+/// A file that SQLite cannot open is removed first. The index is derived state, so the
+/// next scan reproduces it from the project files.
 pub fn rebuild(root: &Path) -> Result<ScanReport, KnowledgeError> {
     rebuild_with(root, &ExtractorRegistry::builtin())
 }
@@ -148,9 +154,55 @@ pub fn rebuild_with(
     root: &Path,
     extractors: &ExtractorRegistry,
 ) -> Result<ScanReport, KnowledgeError> {
+    replace_unreadable_index(root)?;
     let store = KnowledgeStore::open(root)?;
     store.clear()?;
     scan_with(root, extractors)
+}
+
+/// Removes `agentos.db` when SQLite reports that the file is not a database or is corrupt.
+fn replace_unreadable_index(root: &Path) -> Result<(), KnowledgeError> {
+    let path = root.join(STATE_DIR).join(DB_FILE);
+    if !path.is_file() {
+        return Ok(());
+    }
+    match Database::open(&path) {
+        Ok(_) => Ok(()),
+        Err(agentos_core::db::DbError::Sqlite(err)) if sqlite_file_unreadable(&err) => {
+            remove_index_files(&path)?;
+            Ok(())
+        }
+        Err(err) => Err(err.into()),
+    }
+}
+
+fn sqlite_file_unreadable(err: &rusqlite::Error) -> bool {
+    match err {
+        rusqlite::Error::SqliteFailure(code, _) => {
+            matches!(
+                code.code,
+                ErrorCode::NotADatabase | ErrorCode::DatabaseCorrupt
+            )
+        }
+        _ => false,
+    }
+}
+
+fn remove_index_files(path: &Path) -> Result<(), std::io::Error> {
+    std::fs::remove_file(path)?;
+    for suffix in ["-wal", "-shm"] {
+        let sidecar = sidecar_path(path, suffix);
+        if sidecar.is_file() {
+            std::fs::remove_file(sidecar)?;
+        }
+    }
+    Ok(())
+}
+
+fn sidecar_path(path: &Path, suffix: &str) -> PathBuf {
+    let mut name = path.as_os_str().to_owned();
+    name.push(suffix);
+    PathBuf::from(name)
 }
 
 fn draft_for(file: &SourceFile, extractors: &ExtractorRegistry) -> Result<Draft, KnowledgeError> {

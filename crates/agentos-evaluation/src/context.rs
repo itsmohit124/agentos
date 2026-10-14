@@ -12,7 +12,7 @@ use agentos_context::{ContextConfig, NullSemantic, SqliteView, build, render_jso
 use agentos_knowledge::{KnowledgeStore, domain_scan, scan};
 
 use crate::baseline::{self, ContextCase};
-use crate::{CaseResult, EvalError, EvalReport};
+use crate::{CaseResult, EvalError, EvalReport, EvalTrace, TraceExclusion};
 
 /// Runs every case in `cases_dir`.
 pub fn run(cases_dir: &Path, fixtures_dir: &Path) -> Result<EvalReport, EvalError> {
@@ -29,22 +29,41 @@ pub fn run(cases_dir: &Path, fixtures_dir: &Path) -> Result<EvalReport, EvalErro
 }
 
 fn execute(case: &ContextCase, fixtures_dir: &Path) -> CaseResult {
-    let (passed, detail) = match evaluate(case, fixtures_dir) {
-        Ok(detail) => (detail.passed, detail.text),
-        Err(err) => (false, err),
-    };
-    CaseResult {
-        id: case.id.clone(),
-        kind: "context".to_owned(),
-        description: case.description.clone(),
-        passed,
-        detail,
+    match evaluate(case, fixtures_dir) {
+        Ok(detail) => CaseResult {
+            id: case.id.clone(),
+            kind: "context".to_owned(),
+            description: case.description.clone(),
+            passed: detail.passed,
+            detail: detail.text,
+            trace: Some(detail.trace),
+        },
+        Err(err) => CaseResult {
+            id: case.id.clone(),
+            kind: "context".to_owned(),
+            description: case.description.clone(),
+            passed: false,
+            detail: err,
+            trace: Some(EvalTrace {
+                inputs: vec![
+                    format!("fixture={}", case.fixture),
+                    format!("task={}", case.task),
+                    format!("oracle={}", case.oracle),
+                ],
+                selected: Vec::new(),
+                excluded: Vec::new(),
+                tools: vec!["context-engine".to_owned()],
+                permissions: vec!["fs.read".to_owned()],
+                validation: vec!["context pack was not built".to_owned()],
+            }),
+        },
     }
 }
 
 struct Detail {
     passed: bool,
     text: String,
+    trace: EvalTrace,
 }
 
 fn evaluate(case: &ContextCase, fixtures_dir: &Path) -> Result<Detail, String> {
@@ -159,7 +178,45 @@ fn evaluate(case: &ContextCase, fixtures_dir: &Path) -> Result<Detail, String> {
     if !ratio_ok {
         text.push_str("; over max_irrelevant_ratio");
     }
-    Ok(Detail { passed, text })
+    let mut excluded: Vec<TraceExclusion> = pack
+        .exclusions
+        .iter()
+        .map(|item| TraceExclusion {
+            id: item.id.clone(),
+            reason: item.reason.clone(),
+        })
+        .collect();
+    excluded.sort_by(|left, right| left.id.cmp(&right.id).then(left.reason.cmp(&right.reason)));
+    let mut selected: Vec<String> = pack
+        .selected_nodes
+        .iter()
+        .map(|node| node.id.clone())
+        .collect();
+    selected.extend(
+        pack.selected_fragments
+            .iter()
+            .map(|fragment| fragment.id.clone()),
+    );
+    selected.sort();
+    let trace = EvalTrace {
+        inputs: vec![
+            format!("fixture={}", case.fixture),
+            format!("task={}", case.task),
+            format!("oracle={}", case.oracle),
+        ],
+        selected,
+        excluded,
+        tools: vec!["context-engine".to_owned()],
+        permissions: vec!["fs.read".to_owned()],
+        validation: vec![format!(
+            "reproducible={reproducible}; tokens={used}; irrelevant_tokens={irrelevant_tokens}"
+        )],
+    };
+    Ok(Detail {
+        passed,
+        text,
+        trace,
+    })
 }
 
 /// A bounded-context id in `must_exclude` also rejects every node in that package.

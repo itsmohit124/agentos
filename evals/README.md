@@ -20,12 +20,20 @@ evals/
 ## Running
 
 ```bash
-agentos evaluate skills      # exit 0 if every case passes, 3 if any fails
+agentos evaluate              # dashboard; exit 0 only when every suite meets evals/thresholds.json
+agentos evaluate --json       # the same dashboard as JSON
+agentos evaluate skills       # exit 0 if every case passes, 3 if any fails
 agentos evaluate knowledge
 agentos evaluate ddd
 agentos evaluate context
+agentos evaluate e2e          # golden workflows under evals/end-to-end
 agentos benchmark baseline fixtures/python-fastapi
 ```
+
+`evals/thresholds.json` records the measured case counts and the highest context `max_tokens`
+already stored on a context case. It is not a target chosen before those measurements. Context and
+workflow case results include a trace: inputs, selected knowledge, exclusions and why, tools,
+permissions, and validation evidence. Golden workflow results include the same fields.
 
 The harness lives in `crates/agentos-evaluation`; `cargo test --workspace` also runs the committed
 suite. A case file with an unknown field, an `id` that differs from its file name, or an empty

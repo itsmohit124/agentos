@@ -115,6 +115,7 @@ fn execute(case: &Case, fixtures_dir: &Path) -> CaseResult {
         description: case.description.clone(),
         passed,
         detail,
+        trace: None,
     }
 }
 

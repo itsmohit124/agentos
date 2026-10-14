@@ -379,4 +379,24 @@ mod tests {
         assert!(!outcome.crashed());
         assert!(outcome.started());
     }
+
+    #[test]
+    fn shell_metacharacters_are_arguments() {
+        let dir = tempdir().unwrap();
+        let marker = dir.path().join("pwned");
+        let request = ExecRequest {
+            program: "/bin/echo".to_owned(),
+            args: vec![
+                ";".to_owned(),
+                "touch".to_owned(),
+                marker.display().to_string(),
+            ],
+            cwd: dir.path().to_path_buf(),
+            env: Vec::new(),
+            timeout: Duration::from_secs(2),
+            max_output_bytes: 1024,
+        };
+        ProcessRunner.execute(&allow_shell(), &request).unwrap();
+        assert!(!marker.exists());
+    }
 }

@@ -13,7 +13,7 @@ use agentos_workflow::{
 };
 use serde::Deserialize;
 
-use crate::{CaseResult, EvalError, EvalReport};
+use crate::{CaseResult, EvalError, EvalReport, EvalTrace, TraceExclusion};
 
 /// Runs every case in `cases_dir`. `fixtures_dir` is unused; the cases are synthetic.
 pub fn run(cases_dir: &Path, _fixtures_dir: &Path) -> Result<EvalReport, EvalError> {
@@ -151,6 +151,7 @@ fn execute(case: &Case) -> CaseResult {
         "skill_cycle" => skill_cycle_case(case),
         other => Err(format!("unknown kind {other}")),
     };
+    let trace = trace_from_case(case);
     match detail {
         Ok(detail) => CaseResult {
             id: case.id.clone(),
@@ -158,6 +159,7 @@ fn execute(case: &Case) -> CaseResult {
             description: case.description.clone(),
             passed: true,
             detail,
+            trace: Some(trace),
         },
         Err(detail) => CaseResult {
             id: case.id.clone(),
@@ -165,7 +167,79 @@ fn execute(case: &Case) -> CaseResult {
             description: case.description.clone(),
             passed: false,
             detail,
+            trace: Some(trace),
         },
+    }
+}
+
+fn trace_from_case(case: &Case) -> EvalTrace {
+    let mut inputs = vec![
+        format!("kind={}", case.kind),
+        format!("task={}", case.task),
+        "runner=MockRunner".to_owned(),
+    ];
+    if let Some(workflow) = &case.workflow {
+        inputs.push(format!("workflow={workflow}"));
+    }
+    if let Some(limit) = case.concurrency {
+        inputs.push(format!("concurrency={limit}"));
+    }
+    let mut selected: Vec<String> = case
+        .steps
+        .iter()
+        .filter(|step| step.skip_reason.is_none())
+        .map(|step| step.id.clone())
+        .collect();
+    selected.sort();
+    let mut excluded: Vec<TraceExclusion> = case
+        .steps
+        .iter()
+        .filter_map(|step| {
+            step.skip_reason.as_ref().map(|reason| TraceExclusion {
+                id: step.id.clone(),
+                reason: reason.clone(),
+            })
+        })
+        .chain(case.expect_skipped.iter().map(|skip| TraceExclusion {
+            id: skip.id.clone(),
+            reason: skip.reason.clone(),
+        }))
+        .collect();
+    excluded.sort_by(|left, right| left.id.cmp(&right.id).then(left.reason.cmp(&right.reason)));
+    excluded.dedup();
+    let mut tools: Vec<String> = case
+        .steps
+        .iter()
+        .filter_map(|step| step.validation.clone())
+        .collect();
+    tools.sort();
+    tools.dedup();
+    let mut permissions: Vec<String> = case
+        .steps
+        .iter()
+        .flat_map(|step| step.permissions.clone())
+        .collect();
+    permissions.sort();
+    permissions.dedup();
+    let validation: Vec<String> = case
+        .validations
+        .iter()
+        .enumerate()
+        .map(|(index, pass)| {
+            format!(
+                "scripted attempt {}: {}",
+                index + 1,
+                if *pass { "pass" } else { "fail" }
+            )
+        })
+        .collect();
+    EvalTrace {
+        inputs,
+        selected,
+        excluded,
+        tools,
+        permissions,
+        validation,
     }
 }
 

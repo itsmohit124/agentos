@@ -1,0 +1,31 @@
+{
+  "id": "node_express_retry_negative",
+  "kind": "golden",
+  "description": "A patch that pulls PaymentRepository into the payment model and edits the users service is rejected.",
+  "fixture": "node-express",
+  "oracle": "golden-workflow",
+  "task": "Add retry support to payment webhook processing",
+  "expect": "fail",
+  "patch": "negative",
+  "must_include": [
+    "software.app.payments.models.class.Payment",
+    "software.app.payments.service.class.PaymentService"
+  ],
+  "must_exclude": [
+    "software.app.notifications.service.class.NotificationService",
+    "software.app.users.service.class.UserService"
+  ],
+  "required_fragments": [
+    "app/payments/controller.js",
+    "app/payments/service.js"
+  ],
+  "terminology": [
+    "Payment"
+  ],
+  "unrelated": [
+    "app/users/service.js",
+    "app/notifications/service.js",
+    "app/users/models.js",
+    "tests/test_users.js"
+  ]
+}

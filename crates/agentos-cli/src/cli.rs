@@ -66,6 +66,8 @@ pub enum Command {
     Adapter(AdapterArgs),
     /// Run a deterministic evaluation suite.
     Evaluate(EvaluateArgs),
+    /// Remove `.agentos/` and managed adapter blocks after confirmation.
+    Cleanup(CleanupArgs),
 }
 
 /// `agentos skills` arguments.
@@ -552,17 +554,25 @@ pub enum AdapterCommand {
 /// `agentos evaluate` arguments.
 #[derive(Debug, Args)]
 pub struct EvaluateArgs {
-    /// Area to evaluate.
+    /// Area to evaluate. Omit it to print the dashboard.
     #[arg(value_enum)]
-    pub area: EvalArea,
+    pub area: Option<EvalArea>,
 
-    /// Directory with the case files [default: <root>/evals/<area>].
+    /// Case directory for one area, or the `evals/` directory for the dashboard and `e2e`.
     #[arg(long, value_name = "DIR")]
     pub evals_dir: Option<PathBuf>,
 
     /// Fixtures directory [default: <root>/fixtures].
     #[arg(long, value_name = "DIR")]
     pub fixtures_dir: Option<PathBuf>,
+}
+
+/// `agentos cleanup` arguments.
+#[derive(Debug, Args)]
+pub struct CleanupArgs {
+    /// Confirm removal of `.agentos/` and managed adapter blocks.
+    #[arg(long)]
+    pub yes: bool,
 }
 
 /// Evaluation areas.
@@ -586,6 +596,8 @@ pub enum EvalArea {
     Memory,
     /// Agent adapters (`evals/adapters`).
     Adapters,
+    /// Golden workflows (`evals/end-to-end`).
+    E2e,
 }
 
 impl Cli {

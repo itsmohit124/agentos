@@ -21,12 +21,22 @@ use serde::Deserialize;
 pub const KEY_LOG_LEVEL: &str = "log.level";
 /// Config key for the default output format.
 pub const KEY_OUTPUT_FORMAT: &str = "output.format";
+/// Config key for the telemetry opt-in. The default is off, and this build does not transmit.
+pub const KEY_TELEMETRY: &str = "telemetry.enabled";
 
 /// Environment variables recognised by the environment layer, and the key each one sets.
 pub const ENV_VARS: &[(&str, &str)] = &[
     ("AGENTOS_LOG", KEY_LOG_LEVEL),
     ("AGENTOS_OUTPUT", KEY_OUTPUT_FORMAT),
+    ("AGENTOS_TELEMETRY", KEY_TELEMETRY),
 ];
+
+/// Whether this build transmits telemetry.
+///
+/// Always false. [`Config::telemetry_enabled`] records the opt-in and does not start a client.
+pub fn telemetry_transmits() -> bool {
+    false
+}
 
 const DEFAULT_LOG_LEVEL: &str = "warn";
 const LEVELS: &[&str] = &["off", "error", "warn", "info", "debug", "trace"];
@@ -58,6 +68,10 @@ format = "text"
 # fat_controller_methods = 5
 # A module is oversized when it has more public classes and functions than this.
 # public_surface_max = 6
+#
+# [telemetry]
+# Opt-in only. The default is false. This build has no telemetry client, so true does not transmit.
+# enabled = false
 "#;
 
 /// Output format for command results.
@@ -105,6 +119,8 @@ pub struct Config {
     pub log_level: String,
     /// Default output format. Key `output.format`.
     pub output_format: OutputFormat,
+    /// Telemetry opt-in. Key `telemetry.enabled`. Default false. Nothing is transmitted.
+    pub telemetry_enabled: bool,
 }
 
 impl Default for Config {
@@ -112,6 +128,7 @@ impl Default for Config {
         Self {
             log_level: DEFAULT_LOG_LEVEL.to_owned(),
             output_format: OutputFormat::Text,
+            telemetry_enabled: false,
         }
     }
 }
@@ -122,6 +139,14 @@ impl Config {
         vec![
             (KEY_LOG_LEVEL, self.log_level.clone()),
             (KEY_OUTPUT_FORMAT, self.output_format.as_str().to_owned()),
+            (
+                KEY_TELEMETRY,
+                if self.telemetry_enabled {
+                    "true".to_owned()
+                } else {
+                    "false".to_owned()
+                },
+            ),
         ]
     }
 }
@@ -248,6 +273,14 @@ struct FileConfig {
     #[serde(default)]
     #[allow(dead_code)]
     architecture: Option<toml::Value>,
+    #[serde(default)]
+    telemetry: Option<FileTelemetry>,
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct FileTelemetry {
+    enabled: Option<bool>,
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -294,6 +327,12 @@ pub fn resolve(
     let file_values = [
         (KEY_LOG_LEVEL, file.log.and_then(|l| l.level)),
         (KEY_OUTPUT_FORMAT, file.output.and_then(|o| o.format)),
+        (
+            KEY_TELEMETRY,
+            file.telemetry
+                .and_then(|telemetry| telemetry.enabled)
+                .map(|enabled| enabled.to_string()),
+        ),
     ];
     for (key, value) in file_values {
         if let Some(value) = value {
@@ -345,10 +384,14 @@ pub fn resolve(
         .value
         .parse::<OutputFormat>()
         .map_err(|reason| invalid(KEY_OUTPUT_FORMAT, out, reason))?;
+    let telemetry = &layers[KEY_TELEMETRY];
+    let telemetry_enabled =
+        parse_bool(&telemetry.value).map_err(|reason| invalid(KEY_TELEMETRY, telemetry, reason))?;
 
     let config = Config {
         log_level: log.value.clone(),
         output_format,
+        telemetry_enabled,
     };
     let sources = layers.into_iter().map(|(k, raw)| (k, raw.source)).collect();
     Ok(ResolvedConfig {
@@ -357,6 +400,14 @@ pub fn resolve(
         file: config_file.to_path_buf(),
         file_loaded,
     })
+}
+
+fn parse_bool(value: &str) -> Result<bool, String> {
+    match value {
+        "true" => Ok(true),
+        "false" => Ok(false),
+        _ => Err("expected true or false".to_owned()),
+    }
 }
 
 fn invalid(key: &'static str, raw: &Raw, reason: String) -> ConfigError {
@@ -627,5 +678,28 @@ public_surface_max = 6
                 "{bad:?} should fail to parse"
             );
         }
+    }
+
+    #[test]
+    fn telemetry_is_off_unless_opted_in_and_still_does_not_transmit() {
+        let off = run(None, &[], ConfigOverrides::default()).unwrap();
+        assert!(!off.config.telemetry_enabled);
+        assert_eq!(off.source(KEY_TELEMETRY), Some(&ConfigSource::Default));
+        let on = run(
+            Some("[telemetry]\nenabled = true\n"),
+            &[],
+            ConfigOverrides::default(),
+        )
+        .unwrap();
+        assert!(on.config.telemetry_enabled);
+        assert_eq!(on.source(KEY_TELEMETRY), Some(&ConfigSource::File));
+        let env = run(
+            None,
+            &[("AGENTOS_TELEMETRY", "true")],
+            ConfigOverrides::default(),
+        )
+        .unwrap();
+        assert!(env.config.telemetry_enabled);
+        assert!(!telemetry_transmits());
     }
 }

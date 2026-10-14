@@ -5,18 +5,21 @@
 //! always produce the same report.
 //!
 //! Implemented areas: [`skills`], [`knowledge`], [`ddd`], [`context`], [`feedback`],
-//! [`architecture`], [`workflow`], [`memory`], [`adapters`].
+//! [`architecture`], [`workflow`], [`memory`], [`adapters`], [`e2e`]. [`dashboard`] runs every
+//! area except the golden workflows.
 
 use std::collections::BTreeMap;
 use std::path::PathBuf;
 
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 pub mod adapters;
 pub mod architecture;
 pub mod baseline;
 pub mod context;
+pub mod dashboard;
 pub mod ddd;
+pub mod e2e;
 pub mod feedback;
 pub mod knowledge;
 pub mod memory;
@@ -36,6 +39,37 @@ pub struct CaseResult {
     pub passed: bool,
     /// What was observed (and, on failure, what was expected).
     pub detail: String,
+    /// Inputs, selection, exclusions, tools, permissions, and validation evidence.
+    ///
+    /// Present for context, workflow, and end-to-end cases. Other areas leave it empty.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub trace: Option<EvalTrace>,
+}
+
+/// One item left out of an evaluation, with the reason.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct TraceExclusion {
+    /// Logical id, path, or step id.
+    pub id: String,
+    /// Why it was left out.
+    pub reason: String,
+}
+
+/// Traceability record for a context, workflow, or end-to-end case.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct EvalTrace {
+    /// Inputs the case used, in a stable order.
+    pub inputs: Vec<String>,
+    /// Knowledge, steps, or files that were selected.
+    pub selected: Vec<String>,
+    /// Items that were left out, each with a reason.
+    pub excluded: Vec<TraceExclusion>,
+    /// Tools the case ran or planned.
+    pub tools: Vec<String>,
+    /// Capabilities granted to the work.
+    pub permissions: Vec<String>,
+    /// Validation evidence the case produced.
+    pub validation: Vec<String>,
 }
 
 /// Pass/total counts for one case kind.

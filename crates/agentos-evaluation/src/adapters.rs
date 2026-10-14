@@ -103,6 +103,7 @@ fn execute(case: &Case) -> CaseResult {
         description: case.description.clone(),
         passed,
         detail,
+        trace: None,
     }
 }
 

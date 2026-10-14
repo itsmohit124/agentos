@@ -225,4 +225,12 @@ token budget
         assert!(!clean.contains("secret"));
         assert!(clean.contains(MARK));
     }
+
+    #[test]
+    fn secret_redaction_does_not_depend_on_a_permission_grant() {
+        let raw = "password=hunter2 AKIAIOSFODNN7EXAMPLE";
+        let clean = redact(raw);
+        assert!(!clean.contains("hunter2"));
+        assert!(!clean.contains("AKIAIOSFODNN7EXAMPLE"));
+    }
 }

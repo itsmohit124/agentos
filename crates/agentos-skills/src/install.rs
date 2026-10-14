@@ -1,7 +1,7 @@
 //! Installing a skill directory into the project's `.agents/skills/`.
 
 use std::io::Read;
-use std::path::{Path, PathBuf};
+use std::path::{Component, Path, PathBuf};
 
 use agentos_core::fs::{FileSystem, FsError};
 use serde::Serialize;
@@ -76,6 +76,9 @@ pub enum InstallError {
     /// The source tree is deeper than allowed (or contains a symlink loop).
     #[error("{} is nested more than {MAX_DEPTH} levels deep", .0.display())]
     TooDeep(PathBuf),
+    /// A path would leave the skill directory.
+    #[error("{} escapes the skill directory", .0.display())]
+    Escapes(PathBuf),
     /// Filesystem failure.
     #[error(transparent)]
     Fs(#[from] FsError),
@@ -138,7 +141,15 @@ pub fn install(
         return Err(invalid(missing));
     }
 
-    let destination = project_root.join(PROJECT_SKILLS_DIR).join(&manifest.name);
+    let skills_root = project_root.join(PROJECT_SKILLS_DIR);
+    let destination = skills_root.join(&manifest.name);
+    if manifest.name.contains("..")
+        || manifest.name.contains('/')
+        || manifest.name.contains('\\')
+        || !destination.starts_with(&skills_root)
+    {
+        return Err(InstallError::Escapes(destination));
+    }
     if fs.exists(&destination) {
         return Err(InstallError::AlreadyInstalled(destination));
     }
@@ -147,6 +158,9 @@ pub fn install(
     collect(fs, dir, dir, 0, &mut files)?;
     for (relative, bytes) in &files {
         let target = destination.join(relative);
+        if !target.starts_with(&destination) {
+            return Err(InstallError::Escapes(target));
+        }
         if let Some(parent) = target.parent() {
             fs.create_dir_all(parent)?;
         }
@@ -176,6 +190,9 @@ fn collect(
         if path.file_name().is_some_and(|n| n == ".git") {
             continue;
         }
+        if is_symlink(&path) {
+            return Err(InstallError::Escapes(path));
+        }
         if fs.is_dir(&path) {
             collect(fs, base, &path, depth + 1, out)?;
             continue;
@@ -188,15 +205,80 @@ fn collect(
                 path: path.clone(),
                 source: e,
             })?;
-        let relative = path
-            .strip_prefix(base)
-            .expect("inside source dir")
-            .components()
-            .map(|c| c.as_os_str().to_string_lossy().into_owned())
-            .collect::<Vec<_>>()
-            .join("/");
+        let relative = relative_path(base, &path)?;
         out.push((relative, bytes));
     }
     out.sort();
     Ok(())
+}
+
+fn relative_path(base: &Path, path: &Path) -> Result<String, InstallError> {
+    let relative = path
+        .strip_prefix(base)
+        .map_err(|_| InstallError::Escapes(path.to_path_buf()))?;
+    let mut parts = Vec::new();
+    for component in relative.components() {
+        match component {
+            Component::Normal(part) => parts.push(part.to_string_lossy().into_owned()),
+            _ => return Err(InstallError::Escapes(path.to_path_buf())),
+        }
+    }
+    if parts.is_empty() {
+        return Err(InstallError::Escapes(path.to_path_buf()));
+    }
+    Ok(parts.join("/"))
+}
+
+fn is_symlink(path: &Path) -> bool {
+    std::fs::symlink_metadata(path).is_ok_and(|meta| meta.file_type().is_symlink())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use agentos_core::fs::RealFs;
+
+    #[test]
+    fn path_traversal_in_the_skill_name_is_rejected() {
+        let root = tempfile::tempdir().unwrap();
+        let source = root.path().join("src-skill");
+        std::fs::create_dir_all(&source).unwrap();
+        std::fs::write(
+            source.join("SKILL.md"),
+            "---\nname: \"../evil\"\ndescription: d\nversion: \"0.1.0\"\n---\n# Body\n",
+        )
+        .unwrap();
+        let err = install(&RealFs, &InstallSource::Local(source), root.path()).unwrap_err();
+        assert!(
+            matches!(err, InstallError::Invalid { .. } | InstallError::Escapes(_)),
+            "{err}"
+        );
+        assert!(!root.path().join("evil").exists());
+        assert!(!root.path().join(".agents").join("evil").exists());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn a_symlink_inside_the_skill_is_not_followed() {
+        use std::os::unix::fs::symlink;
+
+        let root = tempfile::tempdir().unwrap();
+        let outside = root.path().join("outside");
+        std::fs::create_dir_all(&outside).unwrap();
+        std::fs::write(outside.join("secret.txt"), b"secret").unwrap();
+        let source = root.path().join("src-skill");
+        std::fs::create_dir_all(&source).unwrap();
+        std::fs::write(
+            source.join("SKILL.md"),
+            "---\nname: demo\ndescription: d\nversion: \"0.1.0\"\n---\n# Body\n",
+        )
+        .unwrap();
+        symlink(&outside, source.join("escape")).unwrap();
+        let project = root.path().join("project");
+        std::fs::create_dir_all(&project).unwrap();
+        let err = install(&RealFs, &InstallSource::Local(source), &project).unwrap_err();
+        assert!(matches!(err, InstallError::Escapes(_)), "{err}");
+        assert!(!project.join(".agents/skills/demo").exists());
+        assert!(outside.join("secret.txt").is_file());
+    }
 }

@@ -251,8 +251,8 @@ fn migrate(conn: &mut Connection, migrations: &[Migration]) -> Result<MigrationR
 fn apply(tx: &Transaction<'_>, m: &Migration) -> rusqlite::Result<()> {
     tx.execute_batch(m.sql)?;
     tx.execute(
-        "INSERT INTO schema_migrations (version, name) VALUES (?1, ?2)",
-        (m.version, m.name),
+        "INSERT INTO schema_migrations (version, name, applied_at) VALUES (?1, ?2, ?3)",
+        (m.version, m.name, "1970-01-01T00:00:00Z"),
     )?;
     Ok(())
 }
@@ -413,5 +413,25 @@ mod tests {
         let (db, report) = Database::open_in_memory().unwrap();
         assert_eq!(report.current_version, latest_version());
         assert_eq!(db.schema_version().unwrap(), latest_version());
+    }
+
+    #[test]
+    fn migration_timestamp_is_fixed() {
+        let tmp = tempfile::tempdir().unwrap();
+        let left = tmp.path().join("left.db");
+        let right = tmp.path().join("right.db");
+        drop(Database::open(&left).unwrap());
+        drop(Database::open(&right).unwrap());
+        let stamp = |path: &Path| {
+            let conn = Connection::open(path).unwrap();
+            conn.query_row(
+                "SELECT applied_at FROM schema_migrations WHERE version = 1",
+                [],
+                |row| row.get::<_, String>(0),
+            )
+            .unwrap()
+        };
+        assert_eq!(stamp(&left), "1970-01-01T00:00:00Z");
+        assert_eq!(stamp(&left), stamp(&right));
     }
 }

@@ -241,6 +241,7 @@ fn result(id: &str, kind: &str, description: &str, passed: bool, detail: String)
         description: description.to_owned(),
         passed,
         detail,
+        trace: None,
     }
 }
 

@@ -98,6 +98,7 @@ fn execute(case: &Case, fixtures_dir: &Path) -> CaseResult {
         detail: match result {
             Ok(detail) | Err(detail) => detail,
         },
+        trace: None,
     }
 }
 

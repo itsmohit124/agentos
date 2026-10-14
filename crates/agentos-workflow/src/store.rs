@@ -97,6 +97,60 @@ pub fn load_run(root: &Path, run_id: &str) -> Result<RunRecord, WorkflowError> {
     read_json(&path)
 }
 
+/// Rebuilds `index.json` from plan and run files.
+///
+/// A missing or unreadable index is replaced. A run file that is not valid JSON is left
+/// in place and reported by [`load_run`]; it is not invented back into the index.
+pub fn recover_index(root: &Path) -> Result<usize, WorkflowError> {
+    let dir = runs_dir(root);
+    let mut index = IndexFile::default();
+    let plans = dir.join("plans");
+    if plans.is_dir() {
+        let mut entries = fs::read_dir(&plans)
+            .map_err(store)?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(store)?;
+        entries.sort_by_key(|entry| entry.file_name());
+        for entry in entries {
+            let path = entry.path();
+            if path.extension().is_some_and(|ext| ext == "json")
+                && let Ok(plan) = read_json::<Plan>(&path)
+            {
+                index.plans.push(plan.id);
+            }
+        }
+    }
+    if dir.is_dir() {
+        let mut entries = fs::read_dir(&dir)
+            .map_err(store)?
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(store)?;
+        entries.sort_by_key(|entry| entry.file_name());
+        for entry in entries {
+            let path = entry.path();
+            if !path.is_dir() {
+                continue;
+            }
+            let run_path = path.join("run.json");
+            if let Ok(run) = read_json::<crate::run::RunRecord>(&run_path) {
+                index.runs.push(IndexRun {
+                    id: run.id,
+                    plan_id: run.plan_id,
+                    state: run.state.as_str().to_owned(),
+                });
+            }
+        }
+    }
+    index.plans.sort();
+    index.plans.dedup();
+    index.runs.sort_by(|left, right| left.id.cmp(&right.id));
+    let count = index.plans.len() + index.runs.len();
+    if dir.exists() || count > 0 {
+        write_index(&dir, &index)?;
+    }
+    Ok(count)
+}
+
 /// How many runs already exist for `plan_id`.
 pub fn runs_for_plan(root: &Path, plan_id: &str) -> Result<usize, WorkflowError> {
     let index = read_index(&runs_dir(root))?;

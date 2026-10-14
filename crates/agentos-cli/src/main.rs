@@ -54,5 +54,6 @@ fn run(cli: Cli) -> anyhow::Result<ExitCode> {
         Command::Memory(args) => commands::memory::run(&app, &args.command, format),
         Command::Adapter(args) => commands::adapter::run(&app, &args.command, format),
         Command::Evaluate(args) => commands::evaluate::run(&app, &args, format),
+        Command::Cleanup(args) => commands::cleanup::run(&app, &args, format),
     }
 }

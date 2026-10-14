@@ -31,7 +31,7 @@ pub use runner::{
     AgentRunner, ManualRunner, MockReaction, MockRunner, RunMode, RunnerResult, StepRequest,
 };
 pub use state::{RunState, Scope, Transition, allows};
-pub use store::{load_plan, save_plan};
+pub use store::{load_plan, load_run, recover_index, save_plan};
 pub use validation::{
     PermissionCheck, Phase5Validator, ScriptedValidator, ValidationRequest, Validator,
     feedback_text, from_architecture, rejected, scripted_result,

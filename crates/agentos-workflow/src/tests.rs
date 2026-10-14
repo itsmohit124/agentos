@@ -17,8 +17,8 @@ use crate::runner::{ManualRunner, MockReaction, MockRunner, RunnerResult};
 use crate::state::{RunState, Scope, allows};
 use crate::weaken::TestEdit;
 use crate::{
-    EngineContext, Plan, ScriptedValidator, WorkflowError, detect, load, load_plan,
-    normalize_for_resume, plan, resume, start, status,
+    EngineContext, Plan, ScriptedValidator, WorkflowError, detect, load, load_plan, load_run,
+    normalize_for_resume, plan, recover_index, resume, start, status,
 };
 
 fn empty_registry() -> SkillRegistry {
@@ -1050,6 +1050,41 @@ fn node(id: &str, kind: NodeKind, name: &str) -> KnowledgeNode {
         source_id: "app/x.py".to_owned(),
         parent: None,
     }
+}
+
+#[test]
+fn interrupted_run_resumes_and_a_corrupt_index_can_be_rebuilt() {
+    let registry = empty_registry();
+    let definition = linear();
+    let planned = plan_def("task", &definition, &registry);
+    let root = tempfile::tempdir().unwrap();
+    let mut runner = MockRunner::succeed().suspend_after("b");
+    let mut validator = ScriptedValidator::pass();
+    let context = context_of(MemoryView::default());
+    let run = {
+        let mut session = Session {
+            root: root.path(),
+            runner: &mut runner,
+            validator: &mut validator,
+            context: &context,
+        };
+        start(&mut session, &planned).unwrap()
+    };
+    assert!(run.interrupted);
+    let index = root.path().join(".agentos/runs/index.json");
+    std::fs::write(&index, b"{").unwrap();
+    let restored = recover_index(root.path()).unwrap();
+    assert!(restored >= 1);
+    let loaded = load_run(root.path(), &run.id).unwrap();
+    assert!(loaded.interrupted);
+    let run_file = root
+        .path()
+        .join(".agentos/runs")
+        .join(&run.id)
+        .join("run.json");
+    std::fs::write(&run_file, b"{").unwrap();
+    let err = load_run(root.path(), &run.id).unwrap_err();
+    assert!(matches!(err, WorkflowError::Store(_)), "{err}");
 }
 
 fn fragment(node_id: &str, content: &str) -> KnowledgeFragment {

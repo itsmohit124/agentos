@@ -877,4 +877,19 @@ mod tests {
         );
         assert!(errs.iter().all(|d| d.skill.as_deref() == Some("demo")));
     }
+
+    #[test]
+    fn a_manifest_from_before_disable_model_invocation_still_parses() {
+        let previous = "name: demo\ndescription: A skill written before the host control existed.\nversion: \"1.2.0\"\n";
+        let manifest = parse_manifest(previous, Some("demo"), "previous").unwrap();
+        assert_eq!(manifest.version.to_string(), "1.2.0");
+        assert!(!manifest.invocation.model_invocable);
+        let accepted = SkillDependency {
+            name: "demo".to_owned(),
+            version: Some("^1.0".parse().unwrap()),
+        };
+        assert!(accepted.accepts(&manifest.version));
+        let next_major = SkillVersion(semver::Version::new(2, 0, 0));
+        assert!(!accepted.accepts(&next_major));
+    }
 }

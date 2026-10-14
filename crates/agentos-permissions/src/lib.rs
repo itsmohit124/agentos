@@ -191,6 +191,25 @@ mod tests {
     }
 
     #[test]
+    fn a_caller_cannot_bypass_a_missing_declaration() {
+        let subject = Subject(PermissionSet::none());
+        for capability in Capability::ALL {
+            let decision = check(&subject, capability);
+            assert!(!decision.is_allowed(), "{capability}");
+            assert!(
+                decision.reason.contains("default deny"),
+                "{}",
+                decision.reason
+            );
+        }
+        let shell_only = Subject([Capability::Shell].into_iter().collect());
+        assert!(check(&shell_only, Capability::Shell).is_allowed());
+        assert!(!check(&shell_only, Capability::FsWrite).is_allowed());
+        assert!(!check(&shell_only, Capability::Browser).is_allowed());
+        assert!(!check(&shell_only, Capability::Network).is_allowed());
+    }
+
+    #[test]
     fn empty_set_denies_everything() {
         let s = Subject(PermissionSet::none());
         for cap in Capability::ALL {
