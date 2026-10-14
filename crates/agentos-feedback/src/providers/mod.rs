@@ -3,6 +3,7 @@
 //! The trait surface is [`crate::ValidationProvider`]. These modules own command lines and
 //! output grammars for each toolchain.
 
+mod browser;
 mod cargo;
 mod go;
 mod gradle;
@@ -11,6 +12,7 @@ mod maven;
 mod pytest;
 mod rspec;
 
+pub use browser::BrowserProvider;
 pub use cargo::CargoTestProvider;
 pub use go::GoTestProvider;
 pub use gradle::GradleProvider;
@@ -24,6 +26,7 @@ use crate::provider::ValidationProvider;
 /// Every built-in provider, sorted by id.
 pub fn builtin_providers() -> Vec<Box<dyn ValidationProvider>> {
     vec![
+        Box::new(BrowserProvider::null()),
         Box::new(CargoTestProvider),
         Box::new(GoTestProvider),
         Box::new(GradleProvider),

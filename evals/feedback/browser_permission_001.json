@@ -1,0 +1,7 @@
+{
+  "id": "browser_permission_001",
+  "kind": "browser",
+  "description": "A skill that does not declare browser cannot invoke browser tools.",
+  "fixture": "typescript-react",
+  "oracle": "permission-deny"
+}

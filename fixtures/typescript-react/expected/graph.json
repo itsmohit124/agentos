@@ -223,6 +223,18 @@
       "to": "software.app.payments.card.function.paymentLabel"
     },
     {
+      "from": "software.app.payments.checkout.file",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.checkout.module"
+    },
+    {
+      "from": "software.app.payments.checkout.module",
+      "provenance_kind": "observed",
+      "relation": "CONTAINS",
+      "to": "software.app.payments.checkout.function.CheckoutPage"
+    },
+    {
       "from": "software.app.payments.controller.class.PaymentController",
       "provenance_kind": "observed",
       "relation": "CALLS",
@@ -590,6 +602,21 @@
     },
     {
       "id": "software.app.payments.card.module",
+      "node_type": "module",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.checkout.file",
+      "node_type": "file",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.checkout.function.CheckoutPage",
+      "node_type": "function",
+      "provenance_kind": "observed"
+    },
+    {
+      "id": "software.app.payments.checkout.module",
       "node_type": "module",
       "provenance_kind": "observed"
     },

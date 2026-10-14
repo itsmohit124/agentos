@@ -1,0 +1,7 @@
+{
+  "id": "browser_fake_001",
+  "kind": "browser",
+  "description": "FakeBrowser runs open, fill, click, and inspect and matches the checkout inspection.",
+  "fixture": "typescript-react",
+  "oracle": "fake-scenario"
+}

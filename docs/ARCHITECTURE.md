@@ -3,6 +3,14 @@
 The locked V1 architecture is specified in [spec/ARCHITECTURE.md](spec/ARCHITECTURE.md), with
 product principles in [spec/VISION.md](spec/VISION.md) and per-subsystem contracts in `spec/`.
 
+## What exists after Phase 8
+
+Phase 8 adds browser validation as a capability, not a hard-wired core feature. `BrowserTool`
+checks `Capability::Browser` and then calls `NullBrowser` (the default), `FakeBrowser`, or, when
+the `playwright` feature is compiled, `PlaywrightBrowser`. `ValidationKind::Browser` is a Phase 5
+provider. It is selected only when `expected/ui.json` exists. Screenshots and inspection files go
+under `.agentos/runs/<id>/artifacts/`. The default build does not require Node.
+
 ## What exists after Phase 7
 
 Phase 7 adds `agentos-memory`. Records live as JSON files under `.agentos/memory/` and are mirrored
@@ -82,8 +90,8 @@ agentos-cli ─┬─► agentos-config ───► agentos-core
 | `agentos-context` | Context Pack assembly over that graph: intent, routing, lexical/graph retrieval, budget, trace, cache. Memory candidates join that pipeline. `NullSemantic` is the semantic seam |
 | `agentos-memory` | Episodic, semantic, procedural, decision, and lesson records. Files under `.agentos/memory/` plus a SQLite mirror. Proposed until confirmed. Stale when a linked fingerprint changes |
 | `agentos-evaluation` | Deterministic case runner; areas `skills`, `knowledge`, `ddd`, `context`, `feedback`, `architecture`, `workflow`, and `memory` |
-| `agentos-feedback` | `ValidationProvider`, language providers, stored results, architecture detectors over the existing graph |
-| `agentos-tools` | Process runner: shell permission, timeout, capped stdout and stderr |
+| `agentos-feedback` | `ValidationProvider`, language providers, browser provider (`expected/ui.json`), stored results, architecture detectors over the existing graph |
+| `agentos-tools` | Process runner (shell permission, timeout, capped stdout and stderr) and `BrowserTool` (`NullBrowser` by default, `FakeBrowser` for tests, optional `PlaywrightBrowser`) |
 | `agentos-workflow` | Task graph, Phase 1 skill expansion, deterministic scheduler, resumable runs, MockRunner and ManualRunner |
 | `agentos-cli` | The `agentos` binary: `init`, `doctor`, `config`, `project profile`, `scan`, `knowledge`, `domain`, `benchmark baseline`, `context`, `skills`, `validate`, `architecture analyze`, `plan`, `run`, `memory`, `evaluate {skills, knowledge, ddd, context, feedback, architecture, workflow, memory}` |
 | `agentos-testkit` | Dev-only: `TempProject`, `CliRunner`, fixture loader |

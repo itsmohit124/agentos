@@ -219,6 +219,7 @@ pub fn plan(input: &PlanInput<'_>) -> Result<Plan, WorkflowError> {
                 .map_err(|err: String| WorkflowError::Definition(err))?;
             let extra = match parsed {
                 ValidationKind::Architecture => Capability::FsRead,
+                ValidationKind::Browser => Capability::Browser,
                 ValidationKind::UnitTest
                 | ValidationKind::IntegrationTest
                 | ValidationKind::Typecheck

@@ -322,6 +322,8 @@ pub enum ValidateKind {
     Build,
     /// Architecture detectors. Use `architecture analyze` for the report.
     Architecture,
+    /// Browser validation. Requires the `browser` capability.
+    Browser,
 }
 
 /// `agentos architecture` arguments.

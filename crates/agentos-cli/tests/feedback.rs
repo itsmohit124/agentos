@@ -60,6 +60,38 @@ fn validate_with_no_provider_fails_the_check() {
 }
 
 #[test]
+fn validate_browser_on_react_uses_null_and_fails_the_check() {
+    let project = copy_fixture("typescript-react");
+    let out = runner()
+        .command(project.path())
+        .args(["validate", "--kind", "browser", "--json"])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(3), "{:?}", out);
+    let body = json_of(&out.stdout);
+    let result = &body["results"][0];
+    assert_eq!(result["provider"], "browser");
+    assert_eq!(result["kind"], "browser");
+    assert_eq!(result["capability"], "browser");
+    assert_eq!(result["outcome"], "unavailable");
+    assert_eq!(result["passed"], false);
+    assert!(!project.path().join(".agentos/runs").exists());
+}
+
+#[test]
+fn validate_detect_on_a_non_web_fixture_has_no_browser() {
+    let project = copy_fixture("go");
+    let out = runner()
+        .command(project.path())
+        .args(["validate", "detect", "--json"])
+        .output()
+        .unwrap();
+    assert_eq!(out.status.code(), Some(0), "{:?}", out);
+    let text = String::from_utf8_lossy(&out.stdout);
+    assert!(!text.to_ascii_lowercase().contains("browser"), "{text}");
+}
+
+#[test]
 fn validate_last_without_a_result_is_a_runtime_error() {
     let project = copy_fixture("detect-none");
     runner()

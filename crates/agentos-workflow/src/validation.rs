@@ -174,7 +174,11 @@ pub fn scripted_result(request: &ValidationRequest, pass: bool) -> ValidationRes
         kind,
         target: request.target.clone(),
         command: Vec::new(),
-        capability: "shell".to_owned(),
+        capability: if kind == ValidationKind::Browser {
+            "browser".to_owned()
+        } else {
+            "shell".to_owned()
+        },
         exit_status: Some(if pass { 0 } else { 1 }),
         passed: pass,
         outcome,

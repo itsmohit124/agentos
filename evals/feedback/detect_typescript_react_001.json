@@ -1,8 +1,8 @@
 {
   "id": "detect_typescript_react_001",
   "kind": "detect",
-  "description": "React without Jest is not a Jest project.",
+  "description": "React without Jest is not a Jest project. expected/ui.json selects the browser provider.",
   "fixture": "typescript-react",
   "oracle": "providers",
-  "expected_providers": []
+  "expected_providers": ["browser"]
 }

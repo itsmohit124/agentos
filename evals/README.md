@@ -93,6 +93,7 @@ precision, tokens, irrelevant tokens, latency, and reproducibility.
 | `parse` | outcome and, for a failure, file and line from a recorded output file |
 | `permission` | outcome `refused` and the marker file is not created |
 | `regression` | re-parse of the recorded stdout/stderr still matches `expected_outcome` and diagnostics |
+| `browser` | permission denial, null unavailable, fake `open → fill → click → inspect`, or no browser text on a non-web fixture |
 
 Detection is not a successful validation run. Timeout and crash are runner flags. A recorded text
 file cannot express them. Those two cases set the flag on the captured output and expect

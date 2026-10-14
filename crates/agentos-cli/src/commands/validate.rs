@@ -94,7 +94,11 @@ pub fn run(app: &App, args: &ValidateArgs, format: OutputFormat) -> anyhow::Resu
                 anyhow::bail!("kind architecture is reported by `agentos architecture analyze`");
             }
             let operator = Operator {
-                permissions: [Capability::Shell].into_iter().collect(),
+                permissions: if kind == ValidationKind::Browser {
+                    [Capability::Browser].into_iter().collect()
+                } else {
+                    [Capability::Shell].into_iter().collect()
+                },
             };
             let results = run_and_store(
                 root,
@@ -141,6 +145,7 @@ fn to_kind(kind: ValidateKind) -> ValidationKind {
         ValidateKind::IntegrationTest => ValidationKind::IntegrationTest,
         ValidateKind::Build => ValidationKind::Build,
         ValidateKind::Architecture => ValidationKind::Architecture,
+        ValidateKind::Browser => ValidationKind::Browser,
     }
 }
 

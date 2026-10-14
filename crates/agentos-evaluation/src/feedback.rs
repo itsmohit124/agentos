@@ -6,13 +6,16 @@ use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::Duration;
 
+use agentos_context::{ContextConfig, NullSemantic, SqliteView, build, to_json, to_markdown};
 use agentos_core::fs::{FileSystem, RealFs};
 use agentos_feedback::{
-    CargoTestProvider, GoTestProvider, GradleProvider, JestProvider, MavenProvider, PytestProvider,
-    RSpecProvider, ValidationKind, ValidationProvider, check_regression_case,
+    BrowserProvider, CargoTestProvider, GoTestProvider, GradleProvider, JestProvider,
+    MavenProvider, PytestProvider, RSpecProvider, ValidationKind, ValidationProvider,
+    check_regression_case,
 };
-use agentos_permissions::{PermissionSet, PermissionSubject};
-use agentos_tools::ProcessRunner;
+use agentos_knowledge::{KnowledgeStore, domain_scan, scan};
+use agentos_permissions::{Capability, PermissionSet, PermissionSubject};
+use agentos_tools::{BrowserStatus, BrowserTool, FakeBrowser, NullBrowser, ProcessRunner};
 use serde::Deserialize;
 use serde_json::Value;
 
@@ -110,6 +113,8 @@ struct Case {
     recorded: Option<String>,
     #[serde(default)]
     expected_command: Vec<String>,
+    #[serde(default)]
+    task: Option<String>,
 }
 
 fn execute(case: &Case, cases_dir: &Path, fixtures_dir: &Path) -> CaseResult {
@@ -118,6 +123,7 @@ fn execute(case: &Case, cases_dir: &Path, fixtures_dir: &Path) -> CaseResult {
         "parse" => execute_parse(case, cases_dir),
         "permission" => execute_permission(case, fixtures_dir),
         "command" => execute_command(case, fixtures_dir),
+        "browser" => execute_browser(case, fixtures_dir),
         other => Err(format!("unknown feedback case kind {other}")),
     };
     match result {
@@ -272,6 +278,188 @@ fn execute_permission(case: &Case, fixtures_dir: &Path) -> Result<String, String
     Ok("refused".to_owned())
 }
 
+fn execute_browser(case: &Case, fixtures_dir: &Path) -> Result<String, String> {
+    match case.oracle.as_str() {
+        "permission-deny" => browser_permission(),
+        "null-unavailable" => browser_null(case, fixtures_dir),
+        "fake-scenario" => browser_fake(case, fixtures_dir),
+        "non-web-overhead" => browser_overhead(case, fixtures_dir),
+        other => Err(format!("unknown browser oracle {other}")),
+    }
+}
+
+fn browser_permission() -> Result<String, String> {
+    let subject = SkillSubject {
+        name: "ui-review",
+        permissions: [Capability::Shell, Capability::FsRead]
+            .into_iter()
+            .collect(),
+    };
+    let mut tool = BrowserTool::new(FakeBrowser::new());
+    let err = tool
+        .open(&subject, "http://payments.local/checkout")
+        .map_err(|err| err.to_string())
+        .err()
+        .ok_or("browser open was allowed without the browser capability")?;
+    if !err.contains("does not declare browser") {
+        return Err(err);
+    }
+    if !tool.inner().calls().is_empty() {
+        return Err(format!("capability ran: {:?}", tool.inner().calls()));
+    }
+    Ok("denied".to_owned())
+}
+
+fn browser_null(case: &Case, fixtures_dir: &Path) -> Result<String, String> {
+    let copied = TempCopy::of(&fixtures_dir.join(&case.fixture))?;
+    let subject = SkillSubject {
+        name: "ui-review",
+        permissions: [Capability::Browser].into_iter().collect(),
+    };
+    let mut tool = BrowserTool::new(NullBrowser);
+    let step = tool
+        .open(&subject, "http://payments.local/checkout")
+        .map_err(|err| err.to_string())?;
+    if step.status != BrowserStatus::Unavailable
+        || step.inspection.is_some()
+        || step.detail.contains("payments.local")
+    {
+        return Err(format!("null open {:?}", step.detail));
+    }
+    let result = BrowserProvider::null()
+        .run(&browser_request(copied.path(), &subject))
+        .map_err(|err| err.to_string())?;
+    if result.outcome.as_str() != "unavailable" || result.passed || !result.artifacts.is_empty() {
+        return Err(format!(
+            "outcome {} artifacts {:?}",
+            result.outcome.as_str(),
+            result.artifacts
+        ));
+    }
+    if copied.path().join(".agentos/runs").exists() {
+        return Err("null browser created a run directory".to_owned());
+    }
+    Ok("unavailable".to_owned())
+}
+
+fn browser_fake(case: &Case, fixtures_dir: &Path) -> Result<String, String> {
+    let copied = TempCopy::of(&fixtures_dir.join(&case.fixture))?;
+    let subject = SkillSubject {
+        name: "ui-review",
+        permissions: [Capability::Browser].into_iter().collect(),
+    };
+    let result = BrowserProvider::fake()
+        .run(&browser_request(copied.path(), &subject))
+        .map_err(|err| err.to_string())?;
+    if result.outcome.as_str() != "passed" || !result.passed {
+        return Err(format!(
+            "outcome {} {:?}",
+            result.outcome.as_str(),
+            result.diagnostics
+        ));
+    }
+    let relative = ".agentos/runs/browser-ui/artifacts/inspect.json";
+    if result.artifacts != [relative] {
+        return Err(format!("artifacts {:?}", result.artifacts));
+    }
+    let path = copied.path().join(relative);
+    let canon = path.canonicalize().map_err(|err| err.to_string())?;
+    let artifacts = copied
+        .path()
+        .join(".agentos/runs/browser-ui/artifacts")
+        .canonicalize()
+        .map_err(|err| err.to_string())?;
+    let root = copied
+        .path()
+        .canonicalize()
+        .map_err(|err| err.to_string())?;
+    if !canon.starts_with(&artifacts) || !artifacts.starts_with(&root) {
+        return Err(format!(
+            "artifact {} escaped the run directory",
+            canon.display()
+        ));
+    }
+    let body: Value =
+        serde_json::from_str(&fs::read_to_string(&path).map_err(|err| err.to_string())?)
+            .map_err(|err| err.to_string())?;
+    let dom = body["dom"].as_array().ok_or("inspect.json has no dom")?;
+    let lines: Vec<&str> = dom.iter().filter_map(|item| item.as_str()).collect();
+    if lines != ["button#charge=clicked", "input#amount=42"] {
+        return Err(format!("dom {lines:?}"));
+    }
+    let console: Vec<&str> = body["console"]
+        .as_array()
+        .ok_or("inspect.json has no console")?
+        .iter()
+        .filter_map(|item| item.as_str())
+        .collect();
+    if console != ["charge submitted"] {
+        return Err(format!("console {console:?}"));
+    }
+    let network = &body["network"][0];
+    if network["method"] != "POST" || network["url"] != "http://payments.local/charge" {
+        return Err(format!("network {network}"));
+    }
+    Ok("open fill click inspect".to_owned())
+}
+
+fn browser_overhead(case: &Case, fixtures_dir: &Path) -> Result<String, String> {
+    let copied = TempCopy::of(&fixtures_dir.join(&case.fixture))?;
+    let config = agentos_feedback::load_project_config(&copied.path().join(".agentos/config.toml"))
+        .map_err(|err| err.to_string())?;
+    let providers =
+        agentos_feedback::detect(copied.path(), &config).map_err(|err| err.to_string())?;
+    let rendered = serde_json::to_string(&providers).map_err(|err| err.to_string())?;
+    if rendered.to_ascii_lowercase().contains("browser") {
+        return Err(format!("detect output contained browser: {rendered}"));
+    }
+    for provider in &providers {
+        if provider.id == "browser"
+            || provider
+                .capabilities
+                .iter()
+                .any(|kind| kind.as_str() == "browser")
+        {
+            return Err(format!("detected browser provider {}", provider.id));
+        }
+    }
+    scan(copied.path()).map_err(|err| err.to_string())?;
+    domain_scan(copied.path()).map_err(|err| err.to_string())?;
+    let store = KnowledgeStore::open(copied.path()).map_err(|err| err.to_string())?;
+    let view = SqliteView::new(&store);
+    let task = case.task.as_deref().unwrap_or("register a user");
+    let pack = build(&view, task, &ContextConfig::default(), &NullSemantic)
+        .map_err(|err| err.to_string())?;
+    let json = to_json(&pack).map_err(|err| err.to_string())?;
+    let markdown = to_markdown(&pack);
+    if json.to_ascii_lowercase().contains("browser")
+        || markdown.to_ascii_lowercase().contains("browser")
+    {
+        return Err("context pack contained browser".to_owned());
+    }
+    Ok(format!(
+        "providers {} pack has no browser text",
+        providers.len()
+    ))
+}
+
+fn browser_request<'a>(
+    root: &'a Path,
+    subject: &'a dyn PermissionSubject,
+) -> agentos_feedback::RunRequest<'a> {
+    agentos_feedback::RunRequest {
+        root,
+        kind: ValidationKind::Browser,
+        tools: &ProcessRunner,
+        subject,
+        task_id: None,
+        context_pack_id: None,
+        command_override: None,
+        timeout: Duration::from_secs(2),
+        max_output_bytes: 1024,
+    }
+}
+
 fn execute_regression(case: &agentos_feedback::RegressionCase) -> CaseResult {
     match check_regression_case(case) {
         Ok(()) => CaseResult {
@@ -329,6 +517,21 @@ fn failed(case: &Case, detail: String) -> CaseResult {
         description: case.description.clone(),
         passed: false,
         detail,
+    }
+}
+
+struct SkillSubject {
+    name: &'static str,
+    permissions: PermissionSet,
+}
+
+impl PermissionSubject for SkillSubject {
+    fn subject(&self) -> String {
+        format!("skill '{name}'", name = self.name)
+    }
+
+    fn permissions(&self) -> &PermissionSet {
+        &self.permissions
     }
 }
 

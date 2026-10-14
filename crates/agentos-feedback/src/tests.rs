@@ -964,7 +964,7 @@ fn workspace_fixtures_detect_expected_providers() {
         ["go", "gradle", "jest", "maven", "rspec"]
     );
     assert_eq!(ids("python-fastapi"), ["pytest"]);
-    assert!(ids("typescript-react").is_empty());
+    assert_eq!(ids("typescript-react"), ["browser"]);
 }
 
 #[test]

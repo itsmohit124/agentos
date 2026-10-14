@@ -21,6 +21,8 @@ pub enum ValidationKind {
     Build,
     /// Architecture detectors. The shell is not required.
     Architecture,
+    /// Browser validation. Requires the `browser` capability. Shell is not implied.
+    Browser,
 }
 
 impl ValidationKind {
@@ -33,17 +35,19 @@ impl ValidationKind {
             Self::IntegrationTest => "integration_test",
             Self::Build => "build",
             Self::Architecture => "architecture",
+            Self::Browser => "browser",
         }
     }
 
     /// Every kind, in a fixed order.
-    pub const ALL: [Self; 6] = [
+    pub const ALL: [Self; 7] = [
         Self::Typecheck,
         Self::Lint,
         Self::UnitTest,
         Self::IntegrationTest,
         Self::Build,
         Self::Architecture,
+        Self::Browser,
     ];
 }
 

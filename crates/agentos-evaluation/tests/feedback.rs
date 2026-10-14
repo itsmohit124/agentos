@@ -24,5 +24,5 @@ fn feedback_suite_passes() {
         "failing cases:\n{}",
         failures.join("\n")
     );
-    assert_eq!(report.passed(), 37, "{report:?}");
+    assert_eq!(report.passed(), 41, "{report:?}");
 }

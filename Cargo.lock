@@ -186,6 +186,8 @@ name = "agentos-tools"
 version = "0.1.0"
 dependencies = [
  "agentos-permissions",
+ "serde",
+ "serde_json",
  "tempfile",
  "thiserror",
  "tracing",

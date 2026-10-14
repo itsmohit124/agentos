@@ -58,6 +58,7 @@ agentos evaluate ddd              # domain lifecycle fixtures
 agentos evaluate context          # context packs against evals/context
 agentos validate detect           # providers selected for this project
 agentos validate --kind unit_test --json
+agentos validate --kind browser --json   # optional; expected/ui.json selects the provider; the CLI still uses NullBrowser
 agentos validate last             # most recently stored result
 agentos validate record-regression <id>
                               # write evals/feedback/<id>.json from a failed result
@@ -141,7 +142,7 @@ Logs are written to stderr; command results to stdout.
 ├── agentos.db           # SQLite knowledge index: derived state, safe to delete and rebuild
 ├── context-cache/       # derived Context Pack cache
 ├── feedback/            # derived validation results
-└── runs/                # derived plans and resumable runs
+└── runs/                # derived plans, resumable runs, and browser artifacts
 ```
 
 ## Development

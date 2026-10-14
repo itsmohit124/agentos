@@ -1,0 +1,13 @@
+{
+  "steps": [
+    {"action": "open", "url": "http://payments.local/checkout"},
+    {"action": "fill", "selector": "#amount", "value": "42"},
+    {"action": "click", "selector": "#charge"},
+    {"action": "inspect"}
+  ],
+  "expect": {
+    "console": ["charge submitted"],
+    "dom": ["button#charge=clicked", "input#amount=42"],
+    "network": [{"method": "POST", "url": "http://payments.local/charge"}]
+  }
+}

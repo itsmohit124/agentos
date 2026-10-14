@@ -4,8 +4,8 @@
 //! Process execution goes through [`agentos_tools`]. Architecture analysis reads the project
 //! knowledge graph; it does not create another one.
 //!
-//! Browser validation is named in the feedback contract and is not part of this crate. It belongs
-//! to the later browser-capability phase.
+//! Browser validation is a [`ValidationProvider`] with kind `browser`. The default capability is
+//! [`agentos_tools::NullBrowser`]. A project without `expected/ui.json` does not select it.
 
 mod architecture;
 mod config;
@@ -30,8 +30,8 @@ pub use error::FeedbackError;
 pub use kind::ValidationKind;
 pub use provider::{CommandPlan, RunRequest, ValidationProvider};
 pub use providers::{
-    CargoTestProvider, GoTestProvider, GradleProvider, JestProvider, MavenProvider, PytestProvider,
-    RSpecProvider, builtin_providers, provider_by_id,
+    BrowserProvider, CargoTestProvider, GoTestProvider, GradleProvider, JestProvider,
+    MavenProvider, PytestProvider, RSpecProvider, builtin_providers, provider_by_id,
 };
 pub use result::{
     CapturedOutput, Diagnostic, FeedbackItem, Outcome, ResultProvenance, ValidationResult,

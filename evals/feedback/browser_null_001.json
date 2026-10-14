@@ -1,0 +1,7 @@
+{
+  "id": "browser_null_001",
+  "kind": "browser",
+  "description": "NullBrowser reports unavailable and does not record the page URL.",
+  "fixture": "typescript-react",
+  "oracle": "null-unavailable"
+}

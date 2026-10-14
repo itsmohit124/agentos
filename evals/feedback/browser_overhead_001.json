@@ -1,0 +1,8 @@
+{
+  "id": "browser_overhead_001",
+  "kind": "browser",
+  "description": "A non-web project has no browser provider and no browser text in its Context Pack.",
+  "fixture": "go",
+  "oracle": "non-web-overhead",
+  "task": "register a user"
+}
