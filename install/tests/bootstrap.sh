@@ -39,6 +39,15 @@ case "$cmd" in
     echo "doctor ok"
     exit 0
     ;;
+  adapter)
+    echo "adapter $*"
+    if [ -n "${AGENTOS_ADAPTER_LOG:-}" ]; then
+      echo "$2" >> "$AGENTOS_ADAPTER_LOG"
+    fi
+    ;;
+  scan)
+    echo "scanned $root"
+    ;;
   *)
     echo "unexpected $cmd" >&2
     exit 2

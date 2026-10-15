@@ -2,7 +2,7 @@
 # First-run: ensure the CLI, then init this project.
 # Copied by `npx skills add` into .agents/skills/setup-agentos/scripts/.
 # npx does not run this file; you (or /setup-agentos) do.
-# Usage: sh setup.sh [--root DIR] [--prefix DIR] [--skip-skills] [--skip-init]
+# Usage: sh setup.sh [--root DIR] [--prefix DIR] [--skip-skills] [--skip-init] [--skip-adapters]
 set -eu
 
 HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
@@ -11,6 +11,7 @@ ROOT="${AGENTOS_ROOT:-.}"
 PREFIX="${AGENTOS_PREFIX:-${HOME}/.local}"
 SKIP_SKILLS=0
 SKIP_INIT=0
+SKIP_ADAPTERS=0
 REPO="${AGENTOS_REPO:-itsmohit124/agentos}"
 
 while [ $# -gt 0 ]; do
@@ -29,6 +30,10 @@ while [ $# -gt 0 ]; do
       ;;
     --skip-init)
       SKIP_INIT=1
+      shift
+      ;;
+    --skip-adapters)
+      SKIP_ADAPTERS=1
       shift
       ;;
     -h|--help)
@@ -228,9 +233,31 @@ run_init() {
   fi
 }
 
+install_adapters() {
+  if [ "$SKIP_ADAPTERS" -eq 1 ]; then
+    echo "adapters: skipped" >&2
+    return
+  fi
+  # Every adapter writes a different managed path. A normal prompt in that agent
+  # only follows AgentOS after the adapter is installed.
+  for adapter in generic cursor claude codex; do
+    echo "adapters: agentos adapter install ${adapter}" >&2
+    "${BIN_DIR}/agentos" adapter install "$adapter" --root "$ROOT"
+  done
+  echo "scan: agentos scan --root $ROOT" >&2
+  set +e
+  "${BIN_DIR}/agentos" scan --root "$ROOT"
+  scan=$?
+  set -e
+  if [ "$scan" -ne 0 ]; then
+    echo "scan exited $scan (you can re-run: agentos scan)" >&2
+  fi
+}
+
 install_skills
 ensure_cli
 run_init
+install_adapters
 
 echo
 echo "Done. Skills live under $ROOT/.agents/skills when installed."

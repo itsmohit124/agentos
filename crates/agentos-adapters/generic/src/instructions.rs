@@ -13,8 +13,17 @@ pub fn render(adapter: &str, exposure: &SkillExposure) -> String {
         "AgentOS is the source of truth for skills, permissions, context, workflow, and validation.\n",
     );
     out.push_str(
-        "This file tells the agent when to call the `agentos` CLI. It does not run those commands.\n\n",
+        "This file tells the agent when to call the `agentos` CLI. It does not run those commands.\n",
     );
+    out.push_str(
+        "A normal chat is the same as the CLI: do not skip AgentOS because the human typed in the agent instead of the terminal.\n\n",
+    );
+    out.push_str("## Every task\n\n");
+    out.push_str("Before editing, for the user's current task:\n");
+    out.push_str("1. Run `agentos scan` if the project has not been scanned or files changed.\n");
+    out.push_str("2. Run `agentos context build \"<task>\"` with the user's request as `<task>`.\n");
+    out.push_str("3. Follow that Context Pack and a model-invocable skill. Do not start from an unguided repo search when `agentos` is installed.\n");
+    out.push_str("4. User-only skills stay user-invoked (`/grilling`, `/setup-agentos`, and the rest in that list).\n\n");
     out.push_str("## Commands\n\n");
     out.push_str("- Build a Context Pack: `agentos context build \"<task>\"`\n");
     out.push_str("- Validate the project: `agentos validate --kind unit_test`\n");
