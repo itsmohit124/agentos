@@ -7,9 +7,6 @@ set -eu
 
 HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
 SRC=""
-if [ -f "$HERE/../../../Cargo.toml" ] && [ -d "$HERE/../../../crates/agentos-cli" ]; then
-  SRC=$(CDPATH= cd -- "$HERE/../../.." && pwd)
-fi
 ROOT="${AGENTOS_ROOT:-.}"
 PREFIX="${AGENTOS_PREFIX:-${HOME}/.local}"
 SKIP_SKILLS=0
@@ -62,27 +59,47 @@ ROOT=$(CDPATH= cd -- "$ROOT" && pwd)
 BIN_DIR="${PREFIX}/bin"
 mkdir -p "$BIN_DIR"
 
-echo "project: $ROOT"
+looks_like_src() {
+  [ -f "$1/Cargo.toml" ] && [ -d "$1/crates/agentos-cli" ]
+}
+
+# Canonical tree: skills/setup-agentos/scripts. Copied tree: .agents/skills/setup-agentos/scripts
+# (four parents is the project, which may itself be AgentOS).
+# If AGENTOS_SRC is set, do not guess another tree (tests and explicit overrides).
+if [ -n "${AGENTOS_SRC:-}" ]; then
+  SRC=$AGENTOS_SRC
+elif looks_like_src "$ROOT"; then
+  SRC=$ROOT
+elif looks_like_src "$HERE/../../.."; then
+  SRC=$(CDPATH= cd -- "$HERE/../../.." && pwd)
+elif looks_like_src "$HERE/../../../.."; then
+  SRC=$(CDPATH= cd -- "$HERE/../../../.." && pwd)
+fi
+
+echo "project: $ROOT" >&2
+if [ -n "$SRC" ]; then
+  echo "source: $SRC" >&2
+fi
 
 install_skills() {
   if [ "$SKIP_SKILLS" -eq 1 ]; then
-    echo "skills: skipped"
+    echo "skills: skipped" >&2
     return
   fi
   if [ -f "$ROOT/.agents/skills/tdd/SKILL.md" ]; then
-    echo "skills: already present under $ROOT/.agents/skills (not overwritten)"
+    echo "skills: already present under $ROOT/.agents/skills (not overwritten)" >&2
     return
   fi
   if [ -n "${AGENTOS_SKILLS_CMD:-}" ]; then
     (CDPATH= cd -- "$ROOT" && sh -c "$AGENTOS_SKILLS_CMD")
-    echo "skills: installed via AGENTOS_SKILLS_CMD"
+    echo "skills: installed via AGENTOS_SKILLS_CMD" >&2
     return
   fi
   if ! command -v npx >/dev/null 2>&1; then
     echo "error: npx is required to install remaining skills, or pass --skip-skills" >&2
     exit 1
   fi
-  echo "skills: npx skills@latest add ${REPO}"
+  echo "skills: npx skills@latest add ${REPO}" >&2
   (CDPATH= cd -- "$ROOT" && npx --yes skills@latest add "$REPO" -s '*' -y --copy)
 }
 
@@ -100,7 +117,35 @@ find_cli() {
     return
   fi
   src=${AGENTOS_SRC:-$SRC}
-  if [ -n "$src" ] && [ -x "${src}/target/release/agentos" ]; then
+  built=$(release_bin "$src")
+  if [ -n "$built" ]; then
+    printf '%s\n' "$built"
+    return
+  fi
+  cache="${AGENTOS_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/agentos-src}"
+  built=$(release_bin "$cache")
+  if [ -n "$built" ]; then
+    printf '%s\n' "$built"
+    return
+  fi
+  return 1
+}
+
+release_bin() {
+  src=$1
+  [ -n "$src" ] || return 1
+  if [ -n "${CARGO_TARGET_DIR:-}" ]; then
+    case "${CARGO_TARGET_DIR}" in
+      /*) ;;
+      *)
+        if [ -x "${src}/${CARGO_TARGET_DIR}/release/agentos" ]; then
+          printf '%s\n' "${src}/${CARGO_TARGET_DIR}/release/agentos"
+          return
+        fi
+        ;;
+    esac
+  fi
+  if [ -x "${src}/target/release/agentos" ]; then
     printf '%s\n' "${src}/target/release/agentos"
     return
   fi
@@ -125,27 +170,28 @@ build_cli_from_source() {
         echo "error: git is required to fetch AgentOS source" >&2
         exit 1
       fi
-      echo "cli: cloning ${REPO} into $cache"
+      echo "cli: cloning ${REPO} into $cache" >&2
       mkdir -p "$(dirname "$cache")"
       git clone --depth 1 "https://github.com/${REPO}.git" "$cache"
     fi
     src=$cache
   fi
-  echo "cli: cargo build --release (source $src)"
-  (CDPATH= cd -- "$src" && cargo build --release -p agentos-cli)
-  if [ ! -x "$src/target/release/agentos" ]; then
-    echo "error: cargo build did not produce target/release/agentos" >&2
+  echo "cli: cargo build --release (source $src)" >&2
+  (CDPATH= cd -- "$src" && CARGO_TARGET_DIR="$src/target" cargo build --release -p agentos-cli >&2)
+  built=$(release_bin "$src" || true)
+  if [ -z "$built" ]; then
+    echo "error: cargo build did not produce a release agentos binary" >&2
     exit 1
   fi
-  printf '%s\n' "$src/target/release/agentos"
+  printf '%s\n' "$built"
 }
 
 ensure_cli() {
   if bin=$(find_cli); then
-    echo "cli: using $bin"
+    echo "cli: using $bin" >&2
   else
     if [ -n "${AGENTOS_RELEASE_BASE:-}" ] || { [ -n "${AGENTOS_VERSION:-}" ] && [ "${AGENTOS_VERSION}" != "latest" ]; }; then
-      echo "cli: installing from release"
+      echo "cli: installing from release" >&2
       install_cli_from_release
       bin="${BIN_DIR}/agentos"
     else
@@ -159,7 +205,7 @@ ensure_cli() {
   if [ "$bin" != "${BIN_DIR}/agentos" ]; then
     cp "$bin" "${BIN_DIR}/agentos"
     chmod 755 "${BIN_DIR}/agentos"
-    echo "cli: installed ${BIN_DIR}/agentos"
+    echo "cli: installed ${BIN_DIR}/agentos" >&2
   fi
   export PATH="${BIN_DIR}:${PATH}"
   "${BIN_DIR}/agentos" --version
@@ -167,12 +213,12 @@ ensure_cli() {
 
 run_init() {
   if [ "$SKIP_INIT" -eq 1 ]; then
-    echo "init: skipped"
+    echo "init: skipped" >&2
     return
   fi
-  echo "init: agentos init --root $ROOT"
+  echo "init: agentos init --root $ROOT" >&2
   "${BIN_DIR}/agentos" init --root "$ROOT"
-  echo "init: agentos doctor --root $ROOT"
+  echo "init: agentos doctor --root $ROOT" >&2
   set +e
   "${BIN_DIR}/agentos" doctor --root "$ROOT"
   doctor=$?

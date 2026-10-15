@@ -5,6 +5,8 @@ ROOT=$(CDPATH= cd -- "$(dirname "$0")/../.." && pwd)
 BOOTSTRAP="$ROOT/install/bootstrap.sh"
 WORKDIR=$(mktemp -d)
 trap 'rm -rf "$WORKDIR"' EXIT
+# Do not pick up a real ~/.cache/agentos-src binary from this machine.
+export AGENTOS_CACHE="$WORKDIR/empty-cache"
 
 fail() {
   echo "FAIL: $*" >&2
@@ -99,5 +101,26 @@ echo "keep-body" > "$WORKDIR/copied/.agents/skills/tdd/SKILL.md"
 AGENTOS_BIN="$FAKE" AGENTOS_PREFIX="$PREFIX" \
   sh "$COPIED/scripts/setup.sh" --root "$WORKDIR/copied"
 [ -f "$WORKDIR/copied/.agentos/config.toml" ] || fail "copied skill setup did not init"
+
+# cargo prints to stdout; that must not become the installed path.
+FAKESRC="$WORKDIR/fakesrc"
+mkdir -p "$FAKESRC/crates/agentos-cli" "$WORKDIR/fake-cargo"
+echo '[workspace]' > "$FAKESRC/Cargo.toml"
+cat >"$WORKDIR/fake-cargo/cargo" <<'EOF'
+#!/bin/sh
+echo "Compiling agentos-cli"
+mkdir -p target/release
+printf '#!/bin/sh\necho agentos 0.1.0-test\n' > target/release/agentos
+chmod 755 target/release/agentos
+EOF
+chmod 755 "$WORKDIR/fake-cargo/cargo"
+PROJ4="$WORKDIR/proj4"
+mkdir -p "$PROJ4"
+PREFIX4="$WORKDIR/prefix4"
+PATH="$WORKDIR/fake-cargo:/usr/bin:/bin" AGENTOS_SRC="$FAKESRC" AGENTOS_PREFIX="$PREFIX4" \
+  sh "$BOOTSTRAP" --root "$PROJ4" --skip-skills
+[ -x "$PREFIX4/bin/agentos" ] || fail "noisy cargo did not install the binary"
+out=$("$PREFIX4/bin/agentos" --version)
+[ "$out" = "agentos 0.1.0-test" ] || fail "installed binary was $out"
 
 echo "bootstrap tests passed"

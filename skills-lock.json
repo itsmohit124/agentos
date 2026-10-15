@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "skills": {
+    "architecture-review": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/architecture-review/SKILL.md",
+      "computedHash": "c41b2044556a4de3c7725897a424e4911e5415e7f139a0f96c797b3a618a8eee"
+    },
+    "code-review": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/code-review/SKILL.md",
+      "computedHash": "baf1d4d257c11f9895ec3776fb5c975c2fadb96e195b9d07decf678a619557ed"
+    },
+    "domain-modeling": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/domain-modeling/SKILL.md",
+      "computedHash": "ea0a81f1e41d0c1f17a09ebde4343ccc055de11c1e88513caabef2bc43d27756"
+    },
+    "engineering-router": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/engineering-router/SKILL.md",
+      "computedHash": "c5ab4c594715c2557ad94665023a83c0fcbddcf4682e602d6eb98457c8463740"
+    },
+    "grilling": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/grilling/SKILL.md",
+      "computedHash": "da6fc661a20d3bb4233c66e6048027b8059599b2bf16421adbccda186533fe74"
+    },
+    "implementation": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/implementation/SKILL.md",
+      "computedHash": "6348e390c9b4c67d8391ef9caa46578c36d0654c81de1a596b52bd2ed985d075"
+    },
+    "improve-codebase-architecture": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/improve-codebase-architecture/SKILL.md",
+      "computedHash": "f3c4c8265a7690156997528653497dffa6bb649158a1755181b668e2cbfbf3e9"
+    },
+    "interface-design": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/interface-design/SKILL.md",
+      "computedHash": "c0a1d32980be1bc1e0bccee752a14b0885e6fc6869265ca9eede4942a1f00e35"
+    },
+    "research": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/research/SKILL.md",
+      "computedHash": "5574b9271aedb4706d14c82db8d3f2643d13e54e388aa1eb6074640296b2fa66"
+    },
+    "setup-agentos": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/setup-agentos/SKILL.md",
+      "computedHash": "01b266d43feb20423af81c837f97711db306cb4e56efffdf03d60b87c8a49eeb"
+    },
+    "tdd": {
+      "source": "itsmohit124/agentos",
+      "sourceType": "github",
+      "skillPath": "skills/tdd/SKILL.md",
+      "computedHash": "b2a33092c140762d4f7eaf7e42dcc281368309331fad5b5524ecf40e6452a8b0"
+    }
+  }
+}
