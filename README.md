@@ -14,20 +14,15 @@ guardrails for a task — without replacing the agent.
 From the project you want AgentOS to manage:
 
 ```bash
-sh /path/to/agentos/install/bootstrap.sh
+npx skills@latest add itsmohit124/agentos
+sh .agents/skills/setup-agentos/scripts/setup.sh
 ```
 
-That copies skills if they are missing, installs the CLI into `~/.local/bin`, and runs `init`.
-It does not overwrite existing skills or `.agentos/config.toml`.
+`npx` copies the skills, including the setup script. It does not run the script. The second
+command installs the CLI into `~/.local/bin` and runs `init`. It does not overwrite existing
+skills or `.agentos/config.toml`.
 
-`npx skills@latest add itsmohit124/agentos` is skills only. It does not install the CLI or run `init`.
-
-Until a GitHub Release exists, bootstrap needs Rust (or an `agentos` binary already on PATH).
-After a release:
-
-```bash
-sh install/install.sh --version v0.1.0 --prefix "$HOME/.local"
-```
+Until a GitHub Release exists, setup needs Rust (or an `agentos` binary already on PATH).
 
 Supported agents for skills: anything the [skills CLI](https://github.com/vercel-labs/skills)
 lists, including Cursor, Claude Code, and Codex. A missing agent binary is not a skills-install

@@ -90,4 +90,14 @@ AGENTOS_BIN="$FAKE" AGENTOS_PREFIX="$PREFIX" \
   sh "$BOOTSTRAP" --root "$PROJ3"
 [ -f "$MARKER" ] || fail "skills command was not run"
 
+# Copied skill layout (what `npx skills add` leaves in a project).
+COPIED="$WORKDIR/copied/.agents/skills/setup-agentos"
+mkdir -p "$COPIED/scripts" "$WORKDIR/copied/.agents/skills/tdd"
+cp "$ROOT/skills/setup-agentos/scripts/setup.sh" "$COPIED/scripts/"
+cp "$ROOT/skills/setup-agentos/scripts/install-cli.sh" "$COPIED/scripts/"
+echo "keep-body" > "$WORKDIR/copied/.agents/skills/tdd/SKILL.md"
+AGENTOS_BIN="$FAKE" AGENTOS_PREFIX="$PREFIX" \
+  sh "$COPIED/scripts/setup.sh" --root "$WORKDIR/copied"
+[ -f "$WORKDIR/copied/.agentos/config.toml" ] || fail "copied skill setup did not init"
+
 echo "bootstrap tests passed"

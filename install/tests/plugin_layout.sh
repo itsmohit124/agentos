@@ -27,4 +27,13 @@ if [ "$listed" != "$found" ]; then
   echo "$found" >&2
   exit 1
 fi
+[ -f "$ROOT/skills/setup-agentos/scripts/setup.sh" ] || {
+  echo "missing skills/setup-agentos/scripts/setup.sh" >&2
+  exit 1
+}
+[ -f "$ROOT/skills/setup-agentos/scripts/install-cli.sh" ] || {
+  echo "missing skills/setup-agentos/scripts/install-cli.sh" >&2
+  exit 1
+}
+
 echo "plugin layout ok"

@@ -16,10 +16,17 @@ eval_cases:
 ---
 # Set up AgentOS
 
-This skill configures AgentOS in the current project. It does not compile Rust, does not
-download a binary, and does not grant extra permissions. The one-command setup is
-`sh install/bootstrap.sh` from this repository (skills if missing, CLI, then `init`).
-`npx skills add` copies skill files only.
+This skill ships the setup script that `npx skills add` copies into the project.
+`npx` only copies files. It does not run the script and does not install the CLI.
+
+After skills are copied, the human runs:
+
+```bash
+sh .agents/skills/setup-agentos/scripts/setup.sh
+```
+
+That installs the `agentos` binary (release if published, otherwise a source build)
+and runs `init`. It does not overwrite existing skills or `.agentos/config.toml`.
 
 ## When to use
 The human asked to install, initialize, or first-run AgentOS, or the project has skills from
@@ -28,15 +35,15 @@ this repository and no `.agentos/` yet.
 ## Inputs
 - The current project directory.
 - Whether `agentos` is already on PATH.
+- The bundled script at `.agents/skills/setup-agentos/scripts/setup.sh`.
 
 ## Procedure
 1. Detect coding agents from **files**, not binaries. Look for `.cursor/`, `CLAUDE.md`,
    `AGENTS.md`, `.codex/`, and `.claude/`. A missing `cursor`, `claude`, or `codex` binary is
    not a failure. Record what you found.
 2. Check the CLI: run `agentos --version`. If that fails, tell the human to run
-   `sh /path/to/agentos/install/bootstrap.sh` from this project (see `docs/INSTALL.md`) and
-   stop. Do not pipe a download into a shell unless the human asked, and never skip
-   checksum verification.
+   `sh .agents/skills/setup-agentos/scripts/setup.sh` from this project and stop. Do not
+   invent another download. The script verifies release checksums. Do not skip that.
 3. If the CLI is present, run `agentos doctor --root .`. An uninitialized project is expected
    to fail some checks. Then run `agentos init --root .`. Init is idempotent and does not
    overwrite `.agentos/config.toml`.
@@ -51,17 +58,17 @@ this repository and no `.agentos/` yet.
    markers unchanged. Do not restore pre-seal bytes. Do not copy skills into a second tree.
 
 ## Outputs
-- Whether `agentos` is on PATH and its version, or the install command that is still needed
+- Whether `agentos` is on PATH and its version, or the setup script that is still needed
 - Which agent config directories exist
 - Whether `.agentos/` was created
 - The permission list the human would grant for a later `plan` or `validate`
 
 ## Must not
-- Claim that `npx skills add` installed the Rust CLI.
+- Claim that `npx skills add` installed the Rust CLI or ran `init`.
 - Overwrite `.agentos/config.toml` or user skill files.
 - Start Cursor, Claude Code, or Codex, or treat a missing binary as a pass.
 - Request API keys for local scan, context, plan, or evaluate.
 
 ## Validation
 The project has `.agentos/` only after a successful `agentos init`, user files are unchanged,
-and the human was told whether the CLI is still missing.
+and the human was told to run the bundled `setup.sh` if the CLI is missing.

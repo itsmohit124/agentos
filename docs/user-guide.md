@@ -5,10 +5,11 @@ result. It does not call a model and it does not send telemetry.
 
 ## Start
 
-One command from the target project. See [INSTALL.md](INSTALL.md).
+See [INSTALL.md](INSTALL.md).
 
 ```bash
-sh /path/to/agentos/install/bootstrap.sh
+npx skills@latest add itsmohit124/agentos
+sh .agents/skills/setup-agentos/scripts/setup.sh
 agentos doctor
 ```
 
