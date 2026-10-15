@@ -10,8 +10,10 @@ sh .agents/skills/setup-agentos/scripts/setup.sh
 
 The second command installs `agentos` into `~/.local/bin`, adds that directory to your
 shell rc (`~/.zshrc`, `~/.bashrc`, or Fish config) if it is not already there, runs
-`init`, installs every adapter (`generic`, `cursor`, `claude`, `codex`) so a normal
-prompt in those agents is told to use AgentOS, and runs `scan`. It does not overwrite
+`init`, installs adapters detected from files already in the project (not from the
+`npx` agent picker), and runs `scan`. Cursor: `.cursor/` or `.agents/skills/`.
+Claude: `.claude/` or `CLAUDE.md`. Codex: `.codex/` or `agents/openai.yaml`.
+Always `generic`. Pass `--all-adapters` to install all four. It does not overwrite
 existing skills or `.agentos/config.toml`. No API key is required.
 
 `sh setup.sh` cannot change PATH in the terminal that launched it. Open a new terminal

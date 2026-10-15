@@ -26,9 +26,11 @@ sh .agents/skills/setup-agentos/scripts/setup.sh
 ```
 
 That installs the `agentos` binary (release if published, otherwise a source build),
-runs `init`, installs every adapter (`generic`, `cursor`, `claude`, `codex`) so a
-normal prompt in those agents is told to call `agentos`, and runs `scan`. It does not
-overwrite existing skills or `.agentos/config.toml`.
+runs `init`, installs adapters that match files already in the project (Cursor when
+`.cursor/` or `.agents/skills/` exists; Claude when `.claude/` or `CLAUDE.md` exists;
+Codex when `.codex/` or `agents/openai.yaml` exists; always `generic`), and runs
+`scan`. Use `--all-adapters` to install every adapter. It does not overwrite existing
+skills or `.agentos/config.toml`.
 
 ## When to use
 The human asked to install, initialize, or first-run AgentOS, or the project has skills from

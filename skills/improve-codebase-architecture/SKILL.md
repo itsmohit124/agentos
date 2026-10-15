@@ -39,11 +39,20 @@ first). This skill is user-invoked only because it makes broad changes.
 - The structural goal.
 
 ## Procedure
+0. If this project has `.agentos/` or `agentos` on PATH, do **not** start by walking the
+   tree. `--root` is this application, not a vendored AgentOS checkout. Run:
+   `agentos scan` (if needed),
+   `agentos context build "<the user's task>"`,
+   `agentos skills inspect improve-codebase-architecture`,
+   `agentos architecture analyze`.
+   Optionally `agentos plan "<task>" --workflow refactor` (planning does not edit files).
+   Treat CLI output as the review. Then continue with the steps below.
 1. Pick the highest-impact finding and state the target structure for it.
 2. Make sure tests cover the behaviour of the code that will move; add tests first if not.
 3. Apply one behaviour-preserving refactoring step.
 4. Run the full checks; revert the step if anything fails.
-5. Repeat until the finding is resolved, then re-run `architecture-review` on the scope.
+5. Repeat until the finding is resolved, then re-run `architecture-review` on the scope
+   (again via `agentos architecture analyze` when AgentOS is installed).
 
 ## Outputs
 Small, separately verified refactoring steps and a before/after summary.
@@ -52,6 +61,7 @@ Small, separately verified refactoring steps and a before/after summary.
 - Change behaviour while restructuring.
 - Combine refactoring with feature work.
 - Start without an explicit request from the human.
+- Walk the whole tree first when AgentOS is installed in this project.
 
 ## Validation
 All checks pass after every step, and the follow-up architecture review no longer reports the

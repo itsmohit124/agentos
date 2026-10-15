@@ -2,7 +2,7 @@
 # First-run: ensure the CLI, then init this project.
 # Copied by `npx skills add` into .agents/skills/setup-agentos/scripts/.
 # npx does not run this file; you (or /setup-agentos) do.
-# Usage: sh setup.sh [--root DIR] [--prefix DIR] [--skip-skills] [--skip-init] [--skip-adapters] [--skip-path]
+# Usage: sh setup.sh [--root DIR] [--prefix DIR] [--skip-skills] [--skip-init] [--skip-adapters] [--skip-path] [--all-adapters]
 set -eu
 
 HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
@@ -13,6 +13,7 @@ SKIP_SKILLS=0
 SKIP_INIT=0
 SKIP_ADAPTERS=0
 SKIP_PATH=0
+ALL_ADAPTERS=0
 REPO="${AGENTOS_REPO:-itsmohit124/agentos}"
 
 while [ $# -gt 0 ]; do
@@ -39,6 +40,10 @@ while [ $# -gt 0 ]; do
       ;;
     --skip-path)
       SKIP_PATH=1
+      shift
+      ;;
+    --all-adapters)
+      ALL_ADAPTERS=1
       shift
       ;;
     -h|--help)
@@ -282,17 +287,34 @@ run_init() {
   fi
 }
 
+install_one_adapter() {
+  echo "adapters: agentos adapter install $1" >&2
+  "${BIN_DIR}/agentos" adapter install "$1" --root "$ROOT"
+}
+
 install_adapters() {
   if [ "$SKIP_ADAPTERS" -eq 1 ]; then
     echo "adapters: skipped" >&2
     return
   fi
-  # Every adapter writes a different managed path. A normal prompt in that agent
-  # only follows AgentOS after the adapter is installed.
-  for adapter in generic cursor claude codex; do
-    echo "adapters: agentos adapter install ${adapter}" >&2
-    "${BIN_DIR}/agentos" adapter install "$adapter" --root "$ROOT"
-  done
+  # Detect from files on disk. `npx skills add` does not tell this script which
+  # agent was selected. --all-adapters installs every adapter regardless.
+  if [ "$ALL_ADAPTERS" -eq 1 ] || [ -n "${AGENTOS_ALL_ADAPTERS:-}" ]; then
+    for adapter in generic cursor claude codex; do
+      install_one_adapter "$adapter"
+    done
+  else
+    install_one_adapter generic
+    if [ -d "$ROOT/.cursor" ] || [ -d "$ROOT/.agents/skills" ]; then
+      install_one_adapter cursor
+    fi
+    if [ -d "$ROOT/.claude" ] || [ -f "$ROOT/CLAUDE.md" ]; then
+      install_one_adapter claude
+    fi
+    if [ -d "$ROOT/.codex" ] || [ -f "$ROOT/agents/openai.yaml" ]; then
+      install_one_adapter codex
+    fi
+  fi
   echo "scan: agentos scan --root $ROOT" >&2
   set +e
   "${BIN_DIR}/agentos" scan --root "$ROOT"

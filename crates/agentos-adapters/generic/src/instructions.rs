@@ -19,13 +19,16 @@ pub fn render(adapter: &str, exposure: &SkillExposure) -> String {
         "A normal chat is the same as the CLI: do not skip AgentOS because the human typed in the agent instead of the terminal.\n\n",
     );
     out.push_str("## Every task\n\n");
-    out.push_str("Before editing, for the user's current task:\n");
+    out.push_str("Before editing **or** walking the tree, for the user's current task (including `/improve-codebase-architecture` and `/architecture-review`):\n");
     out.push_str("1. Run `agentos scan` if the project has not been scanned or files changed.\n");
     out.push_str("2. Run `agentos context build \"<task>\"` with the user's request as `<task>`.\n");
-    out.push_str("3. Follow that Context Pack and a model-invocable skill. Do not start from an unguided repo search when `agentos` is installed.\n");
-    out.push_str("4. User-only skills stay user-invoked (`/grilling`, `/setup-agentos`, and the rest in that list).\n\n");
+    out.push_str("3. For architecture work, also run `agentos architecture analyze` and `agentos skills inspect <skill>`.\n");
+    out.push_str("4. Follow that Context Pack. Do not start from an unguided repo search when `agentos` is installed.\n");
+    out.push_str("5. `--root` is the application Git root. Do not scan a nested AgentOS source tree unless that is the project.\n");
+    out.push_str("6. User-only skills stay user-invoked (`/grilling`, `/setup-agentos`, `/improve-codebase-architecture`, and the rest in that list).\n\n");
     out.push_str("## Commands\n\n");
     out.push_str("- Build a Context Pack: `agentos context build \"<task>\"`\n");
+    out.push_str("- Architecture: `agentos architecture analyze`\n");
     out.push_str("- Validate the project: `agentos validate --kind unit_test`\n");
     out.push_str("- Plan a workflow: `agentos plan \"<task>\"`\n");
     out.push_str("- Execute a saved plan: `agentos run <plan-id> --runner manual`\n\n");
