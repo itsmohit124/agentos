@@ -44,6 +44,8 @@ jobs:
         run: sh install/tests/plugin_layout.sh
       - name: Installer
         run: sh install/tests/run.sh
+      - name: Bootstrap
+        run: sh install/tests/bootstrap.sh
       - name: Skills CLI discovers canonical skills
         run: npx --yes skills@latest add "$GITHUB_WORKSPACE" -l | tee /tmp/skills-list.txt
       - name: Skills CLI lists setup-agentos

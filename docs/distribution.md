@@ -1,6 +1,7 @@
 # Distribution
 
-AgentOS ships as portable skills plus a native CLI. Do not treat `npx skills add` as a
+AgentOS ships as portable skills plus a native CLI. The first-run command is
+`install/bootstrap.sh` (skills if missing, CLI, `init`). Do not treat `npx skills add` as a
 runtime installer.
 
 ## Skills layout

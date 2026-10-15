@@ -17,8 +17,9 @@ eval_cases:
 # Set up AgentOS
 
 This skill configures AgentOS in the current project. It does not compile Rust, does not
-download a binary, and does not grant extra permissions. `npx skills add` copies skill files
-only. The CLI is a separate install.
+download a binary, and does not grant extra permissions. The one-command setup is
+`sh install/bootstrap.sh` from this repository (skills if missing, CLI, then `init`).
+`npx skills add` copies skill files only.
 
 ## When to use
 The human asked to install, initialize, or first-run AgentOS, or the project has skills from
@@ -32,9 +33,10 @@ this repository and no `.agentos/` yet.
 1. Detect coding agents from **files**, not binaries. Look for `.cursor/`, `CLAUDE.md`,
    `AGENTS.md`, `.codex/`, and `.claude/`. A missing `cursor`, `claude`, or `codex` binary is
    not a failure. Record what you found.
-2. Check the CLI: run `agentos --version`. If that fails, print the documented install
-   commands from `docs/INSTALL.md` and stop for the human. Do not pipe a download into a
-   shell unless the human asked, and never skip checksum verification.
+2. Check the CLI: run `agentos --version`. If that fails, tell the human to run
+   `sh /path/to/agentos/install/bootstrap.sh` from this project (see `docs/INSTALL.md`) and
+   stop. Do not pipe a download into a shell unless the human asked, and never skip
+   checksum verification.
 3. If the CLI is present, run `agentos doctor --root .`. An uninitialized project is expected
    to fail some checks. Then run `agentos init --root .`. Init is idempotent and does not
    overwrite `.agentos/config.toml`.

@@ -5,13 +5,11 @@ result. It does not call a model and it does not send telemetry.
 
 ## Start
 
-Install skills and the CLI separately. See [INSTALL.md](INSTALL.md).
+One command from the target project. See [INSTALL.md](INSTALL.md).
 
 ```bash
-npx skills@latest add itsmohit124/agentos
-cargo build --release   # or install/install.sh after a GitHub Release
-./target/release/agentos init
-./target/release/agentos doctor
+sh /path/to/agentos/install/bootstrap.sh
+agentos doctor
 ```
 
 `--root` selects the project. Without it, AgentOS uses the Git root of the current directory.

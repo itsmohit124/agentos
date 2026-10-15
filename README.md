@@ -11,24 +11,22 @@ guardrails for a task — without replacing the agent.
 
 ## Quick start
 
-Skills and the CLI are separate. `npx skills add` copies `SKILL.md` files. It does not install
-the Rust binary.
+From the project you want AgentOS to manage:
 
 ```bash
-# 1. Skills for Cursor, Claude Code, Codex, or another supported agent
-npx skills@latest add itsmohit124/agentos
+sh /path/to/agentos/install/bootstrap.sh
+```
 
-# 2. CLI (after a GitHub Release exists)
+That copies skills if they are missing, installs the CLI into `~/.local/bin`, and runs `init`.
+It does not overwrite existing skills or `.agentos/config.toml`.
+
+`npx skills@latest add itsmohit124/agentos` is skills only. It does not install the CLI or run `init`.
+
+Until a GitHub Release exists, bootstrap needs Rust (or an `agentos` binary already on PATH).
+After a release:
+
+```bash
 sh install/install.sh --version v0.1.0 --prefix "$HOME/.local"
-
-# Until a release exists:
-cargo build --release
-./target/release/agentos --version
-
-# 3. In the project you want to analyze
-agentos init
-agentos doctor
-agentos scan
 ```
 
 Supported agents for skills: anything the [skills CLI](https://github.com/vercel-labs/skills)
