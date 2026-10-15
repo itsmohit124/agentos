@@ -1,8 +1,8 @@
 //! Cursor adapter.
 //!
-//! Installs `.cursor/rules/agentos.mdc`. The rule tells Cursor when to call `agentos`.
-//! It does not execute a workflow. Skills stay in `.agents/skills/`; this adapter does not
-//! copy them into `.cursor/skills/`.
+//! Installs `.cursor/rules/agentos.mdc` and a `beforeSubmitPrompt` hook that injects a
+//! budgeted Context Pack. The rule still does not execute a workflow. Skills stay in
+//! `.agents/skills/`; this adapter does not copy them into `.cursor/skills/`.
 //!
 //! Checked against <https://cursor.com/docs/rules> on 2026-10-14. Project rules are `.mdc`
 //! files with `description`, `globs`, and `alwaysApply`. `alwaysApply: true` includes the
@@ -11,9 +11,13 @@
 //! user-only skill under `.agents/skills/`. That field restates AgentOS invocation. It does
 //! not grant tools.
 
+mod hooks;
+
+use std::path::Path;
+
 use agentos_adapter_generic::{
-    AdapterCapabilities, AdapterError, AgentAdapter, ManagedWrite, SkillExposure, Support,
-    WritePolicy, cursor_prelude, render_instructions,
+    AdapterCapabilities, AdapterError, AgentAdapter, InstallReport, ManagedWrite, SkillExposure,
+    Support, WritePolicy, cursor_prelude, install_adapter, render_instructions,
 };
 
 /// Cursor project integration.
@@ -47,13 +51,21 @@ impl AgentAdapter for CursorAdapter {
     }
 
     fn artifacts(&self, exposure: &SkillExposure) -> Result<Vec<ManagedWrite>, AdapterError> {
-        Ok(vec![ManagedWrite {
+        let writes = vec![ManagedWrite {
             path: ".cursor/rules/agentos.mdc".to_owned(),
             policy: WritePolicy::Markers {
                 prelude: cursor_prelude(),
                 body: render_instructions(Self::ID, exposure),
             },
-        }])
+        }];
+        Ok(writes)
+    }
+
+    fn install(&self, project: &Path) -> Result<InstallReport, AdapterError> {
+        let exposure = self.expose_skills(project)?;
+        let mut writes = self.artifacts(&exposure)?;
+        writes.extend(hooks::artifacts(project)?);
+        install_adapter(project, self.id(), &writes)
     }
 }
 
@@ -97,7 +109,15 @@ mod tests {
                 .any(|name| name == "manual-only" || name == "grilling")
         );
         assert!(!dir.path().join(".cursor/skills").exists());
-        assert!(rule.contains("does not execute"));
+        assert!(rule.contains("does not execute a workflow"));
+        let hooks = fs::read_to_string(dir.path().join(".cursor/hooks.json")).unwrap();
+        assert!(hooks.contains("beforeSubmitPrompt"));
+        assert!(hooks.contains("python3 .cursor/hooks/agentos-context.py"));
+        assert!(
+            dir.path()
+                .join(".cursor/hooks/agentos-context.py")
+                .is_file()
+        );
         assert!(rule.contains("disable-model-invocation: true"));
         let canonical = fs::read_to_string(skill.join("SKILL.md")).unwrap();
         assert!(canonical.contains("disable-model-invocation: true"));

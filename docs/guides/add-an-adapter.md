@@ -12,6 +12,11 @@ The contract is `AgentAdapter` in `agentos-adapter-generic`:
 - `report_result` rejects a claimed pass
 - `doctor` checks the install without starting the external agent
 
+The Cursor adapter also installs a `beforeSubmitPrompt` hook that injects a budgeted
+Context Pack so a normal chat does not start by dumping the tree. The hook fails open
+if `agentos` is missing. Adapters must prefer that pack over extra file reads. Do not
+invent a numeric token-reduction target; measure from the context engine.
+
 Markdown instructions use `<!-- agentos:begin -->` and `<!-- agentos:end -->`. The manifest at
 `.agentos/adapters/manifest.json` records the path. Two adapters do not share a path. Uninstall
 removes the managed block and leaves text outside it in place.

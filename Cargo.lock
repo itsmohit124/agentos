@@ -23,6 +23,7 @@ name = "agentos-adapter-cursor"
 version = "0.1.0"
 dependencies = [
  "agentos-adapter-generic",
+ "serde_json",
  "tempfile",
 ]
 

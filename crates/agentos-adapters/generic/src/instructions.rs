@@ -25,7 +25,17 @@ pub fn render(adapter: &str, exposure: &SkillExposure) -> String {
     out.push_str("3. For architecture work, also run `agentos architecture analyze` and `agentos skills inspect <skill>`.\n");
     out.push_str("4. Follow that Context Pack. Do not start from an unguided repo search when `agentos` is installed.\n");
     out.push_str("5. `--root` is the application Git root. Do not scan a nested AgentOS source tree unless that is the project.\n");
-    out.push_str("6. User-only skills stay user-invoked (`/grilling`, `/setup-agentos`, `/improve-codebase-architecture`, and the rest in that list).\n\n");
+    out.push_str("6. User-only skills stay user-only (`/grilling`, `/setup-agentos`, `/improve-codebase-architecture`, and the rest in that list).\n\n");
+    out.push_str("## Token budget\n\n");
+    out.push_str(
+        "The Context Pack is the map for this task. Prefer it over reading whole files or dumping the tree.\n",
+    );
+    out.push_str(
+        "Do not attach extra files that the pack already covered. Implementation stays correct: if the pack is missing a cited path, open only that path.\n",
+    );
+    out.push_str(
+        "Do not invent a numeric reduction target. The pack already applies the project's measured budget.\n\n",
+    );
     out.push_str("## Commands\n\n");
     out.push_str("- Build a Context Pack: `agentos context build \"<task>\"`\n");
     out.push_str("- Architecture: `agentos architecture analyze`\n");
@@ -69,7 +79,8 @@ pub fn render(adapter: &str, exposure: &SkillExposure) -> String {
              Install writes `disable-model-invocation: true` into a user-only skill's front matter. That is Cursor's documented control.\n\
              It does not grant tools and it does not make a user-only skill model-invocable.\n\
              This adapter does not copy skills into `.cursor/skills/`.\n\
-             The rule file does not execute `agentos`; the agent must run the command.\n",
+             A `beforeSubmitPrompt` hook injects a budgeted Context Pack when `agentos` is on PATH.\n\
+             The rule file does not execute a workflow; the hook fails open if the CLI is missing.\n",
         ),
         "claude" => out.push_str(
             "Passthrough files under `.claude/skills/<name>/SKILL.md` set `disable-model-invocation` from the AgentOS flag.\n\

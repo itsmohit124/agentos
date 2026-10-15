@@ -8,6 +8,7 @@ publish.workspace = true
 
 [dependencies]
 agentos-adapter-generic.workspace = true
+serde_json.workspace = true
 
 [dev-dependencies]
 tempfile.workspace = true

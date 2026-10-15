@@ -15,6 +15,7 @@ mod types;
 
 pub use contract::AgentAdapter;
 pub use error::AdapterError;
+pub use runtime::install_adapter;
 pub use generic::{GenericAdapter, claude_passthrough, cursor_prelude, safe_skill_dir};
 pub use instructions::render as render_instructions;
 pub use skills::{authorize, invocation_violations, model_section_names};
