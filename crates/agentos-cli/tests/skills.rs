@@ -6,7 +6,7 @@ use agentos_testkit::{CliRunner, TempProject, copy_fixture, fixture_path};
 use predicates::prelude::*;
 use serde_json::Value;
 
-const BUILTIN_NAMES: [&str; 10] = [
+const BUILTIN_NAMES: [&str; 11] = [
     "architecture-review",
     "code-review",
     "domain-modeling",
@@ -16,6 +16,7 @@ const BUILTIN_NAMES: [&str; 10] = [
     "improve-codebase-architecture",
     "interface-design",
     "research",
+    "setup-agentos",
     "tdd",
 ];
 
@@ -100,7 +101,7 @@ fn list_text_shows_the_invocation_column() {
         .args(["skills", "list"])
         .assert()
         .success()
-        .stdout(predicate::str::contains("Skills: 10"))
+        .stdout(predicate::str::contains("Skills: 11"))
         .stdout(predicate::str::contains("INVOKE"))
         .stdout(
             predicate::str::is_match(r"grilling\s+0\.1\.0\s+builtin\s+skill\s+user\s").unwrap(),
@@ -240,7 +241,7 @@ fn validate_passes_for_the_builtin_skills() {
         .assert()
         .success()
         .stdout(predicate::str::contains(
-            "Validated 10 skill(s): 0 error(s), 0 warning(s)",
+            "Validated 11 skill(s): 0 error(s), 0 warning(s)",
         ))
         .stdout(predicate::str::contains("Result: OK"));
 }
@@ -289,7 +290,7 @@ fn graph_is_deterministic_and_has_a_dot_form() {
     let text = run(&["skills", "graph"]);
     assert_eq!(text, run(&["skills", "graph"]));
     let text = String::from_utf8(text).unwrap();
-    assert!(text.starts_with("Skill graph: 10 skills, "), "{text}");
+    assert!(text.starts_with("Skill graph: 11 skills, "), "{text}");
     assert!(text.contains("  requires -> interface-design ^0.1"));
 
     let dot = run(&["skills", "graph", "--format", "dot"]);
@@ -300,7 +301,7 @@ fn graph_is_deterministic_and_has_a_dot_form() {
 
     let (code, graph) = json(&p, &["skills", "graph"]);
     assert_eq!(code, 0);
-    assert_eq!(graph["nodes"].as_array().unwrap().len(), 10);
+    assert_eq!(graph["nodes"].as_array().unwrap().len(), 11);
 
     agentos(&p)
         .args(["skills", "graph", "--format", "dot", "--json"])

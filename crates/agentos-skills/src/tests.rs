@@ -979,7 +979,7 @@ fn install_from_git_url_is_a_clear_stub() {
 
 // ---------------------------------------------------------------- built-ins
 
-const BUILTINS: [&str; 10] = [
+const BUILTINS: [&str; 11] = [
     "architecture-review",
     "code-review",
     "domain-modeling",
@@ -989,6 +989,7 @@ const BUILTINS: [&str; 10] = [
     "improve-codebase-architecture",
     "interface-design",
     "research",
+    "setup-agentos",
     "tdd",
 ];
 
@@ -1031,7 +1032,7 @@ fn builtin_router_is_a_user_invoked_router_over_the_nine_skills() {
     let expected: Vec<&str> = BUILTINS
         .iter()
         .copied()
-        .filter(|n| *n != "engineering-router")
+        .filter(|n| *n != "engineering-router" && *n != "setup-agentos")
         .collect();
     assert_eq!(routes, expected);
     assert!(router.manifest().permissions.is_empty());

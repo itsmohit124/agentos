@@ -5,8 +5,11 @@ result. It does not call a model and it does not send telemetry.
 
 ## Start
 
+Install skills and the CLI separately. See [INSTALL.md](INSTALL.md).
+
 ```bash
-cargo build --release
+npx skills@latest add itsmohit124/agentos
+cargo build --release   # or install/install.sh after a GitHub Release
 ./target/release/agentos init
 ./target/release/agentos doctor
 ```

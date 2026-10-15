@@ -32,3 +32,19 @@ jobs:
         run: cargo run --release -p agentos-cli --offline -- evaluate
       - name: Evaluate end to end
         run: cargo run --release -p agentos-cli --offline -- evaluate e2e
+
+  packaging:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Plugin layout
+        run: sh install/tests/plugin_layout.sh
+      - name: Installer
+        run: sh install/tests/run.sh
+      - name: Skills CLI discovers canonical skills
+        run: npx --yes skills@latest add "$GITHUB_WORKSPACE" -l | tee /tmp/skills-list.txt
+      - name: Skills CLI lists setup-agentos
+        run: grep -q setup-agentos /tmp/skills-list.txt

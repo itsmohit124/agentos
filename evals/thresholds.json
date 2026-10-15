@@ -1,5 +1,5 @@
 {
-  "derivation": "min_passed is the number of cases each suite reported on the Phase 9 release run recorded in PROGRESS.md (knowledge 10, ddd 6, context 14, skills 79, feedback 41, architecture 2, workflow 21, memory 10, adapters 12). Those runs used the committed oracles. Context max_observed_tokens is the largest max_tokens already stored on an evals/context case (ambiguous_service_012.json, 1577). max_irrelevant_ratio is 0 because every Phase 4 context case measured 0 irrelevant tokens. No number in this file was chosen as a target before that measurement. A later suite that passes fewer cases than min_passed, or a context pack larger than 1577 tokens, fails the dashboard.",
+  "derivation": "min_passed is the number of cases each suite reported on the Phase 9 release run recorded in PROGRESS.md, except skills, which was re-measured at 81 after adding the setup-agentos built-in (knowledge 10, ddd 6, context 14, skills 81, feedback 41, architecture 2, workflow 21, memory 10, adapters 12). Context max_observed_tokens is the largest max_tokens already stored on an evals/context case (ambiguous_service_012.json, 1577). max_irrelevant_ratio is 0 because every Phase 4 context case measured 0 irrelevant tokens. No number in this file was chosen as a target before that measurement. A later suite that passes fewer cases than min_passed, or a context pack larger than 1577 tokens, fails the dashboard.",
   "areas": {
     "adapters": { "min_passed": 12 },
     "architecture": { "min_passed": 2 },
@@ -8,7 +8,7 @@
     "feedback": { "min_passed": 41 },
     "knowledge": { "min_passed": 10 },
     "memory": { "min_passed": 10 },
-    "skills": { "min_passed": 79 },
+    "skills": { "min_passed": 81 },
     "workflow": { "min_passed": 21 }
   },
   "context": {

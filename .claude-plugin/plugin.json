@@ -1,0 +1,32 @@
+{
+  "name": "agentos-skills",
+  "version": "0.1.0",
+  "description": "AgentOS portable engineering skills. The Rust CLI is a separate install; this plugin copies SKILL.md packages only.",
+  "author": {
+    "name": "Mohit Sharma",
+    "url": "https://github.com/itsmohit124/agentos"
+  },
+  "homepage": "https://github.com/itsmohit124/agentos",
+  "repository": "https://github.com/itsmohit124/agentos",
+  "license": "MIT OR Apache-2.0",
+  "keywords": [
+    "agentos",
+    "engineering",
+    "skills",
+    "tdd",
+    "domain-modeling"
+  ],
+  "skills": [
+    "./skills/architecture-review",
+    "./skills/code-review",
+    "./skills/domain-modeling",
+    "./skills/engineering-router",
+    "./skills/grilling",
+    "./skills/implementation",
+    "./skills/improve-codebase-architecture",
+    "./skills/interface-design",
+    "./skills/research",
+    "./skills/setup-agentos",
+    "./skills/tdd"
+  ]
+}

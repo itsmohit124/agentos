@@ -4,6 +4,7 @@ description: Recommend the engineering skill that fits a goal (research, grillin
 version: "0.1.0"
 kind: router
 invocation: user
+disable-model-invocation: true
 routes:
   - research
   - grilling

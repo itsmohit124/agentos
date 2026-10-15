@@ -9,6 +9,39 @@ guardrails for a task — without replacing the agent.
 > memory, and install an adapter for Cursor, Claude Code, Codex, or a generic agent. `agentos evaluate`
 > reports the measured suites. It does not replace the coding agent. AgentOS does not send telemetry.
 
+## Quick start
+
+Skills and the CLI are separate. `npx skills add` copies `SKILL.md` files. It does not install
+the Rust binary.
+
+```bash
+# 1. Skills for Cursor, Claude Code, Codex, or another supported agent
+npx skills@latest add itsmohit124/agentos
+
+# 2. CLI (after a GitHub Release exists)
+sh install/install.sh --version v0.1.0 --prefix "$HOME/.local"
+
+# Until a release exists:
+cargo build --release
+./target/release/agentos --version
+
+# 3. In the project you want to analyze
+agentos init
+agentos doctor
+agentos scan
+```
+
+Supported agents for skills: anything the [skills CLI](https://github.com/vercel-labs/skills)
+lists, including Cursor, Claude Code, and Codex. A missing agent binary is not a skills-install
+failure. Live Cursor, Claude, or Codex sessions are a separate check.
+
+Runtime: macOS and Linux x86_64/arm64 via the installer when those artifacts exist; Windows via
+`install/install.ps1`. Untested targets are not claimed. No API key is required for local
+workflows.
+
+Details: [docs/INSTALL.md](docs/INSTALL.md), [docs/distribution.md](docs/distribution.md),
+[docs/user-guide.md](docs/user-guide.md).
+
 ## Build
 
 Requirements: Rust (stable, edition 2024) and Git. SQLite is bundled; no system install needed.
@@ -178,8 +211,9 @@ Logs are written to stderr; command results to stdout.
 scripts/check.sh   # fmt, clippy, tests, agentos evaluate, agentos evaluate e2e
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and
-[docs/user-guide.md](docs/user-guide.md). Guides: [write a skill](docs/guides/write-a-skill.md),
+See [CONTRIBUTING.md](CONTRIBUTING.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md),
+[docs/INSTALL.md](docs/INSTALL.md), and [docs/user-guide.md](docs/user-guide.md). Guides:
+[write a skill](docs/guides/write-a-skill.md),
 [add a language extractor](docs/guides/add-a-language-extractor.md),
 [add an adapter](docs/guides/add-an-adapter.md).
 

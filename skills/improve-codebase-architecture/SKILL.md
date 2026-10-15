@@ -3,6 +3,7 @@ name: improve-codebase-architecture
 description: Improve the structure of a codebase in small, behaviour-preserving steps - deepen shallow modules, fix dependency direction, reduce coupling.
 version: "0.1.0"
 invocation: user
+disable-model-invocation: true
 requires:
   - name: architecture-review
     version: "^0.1"

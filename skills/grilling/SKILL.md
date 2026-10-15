@@ -3,6 +3,7 @@ name: grilling
 description: Stress-test a plan, design or decision by asking hard questions one at a time until its assumptions and risks are explicit.
 version: "0.1.0"
 invocation: user
+disable-model-invocation: true
 inputs:
   - name: subject
     description: The plan, design or decision to challenge.
