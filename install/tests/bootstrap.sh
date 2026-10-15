@@ -7,6 +7,8 @@ WORKDIR=$(mktemp -d)
 trap 'rm -rf "$WORKDIR"' EXIT
 # Do not pick up a real ~/.cache/agentos-src binary from this machine.
 export AGENTOS_CACHE="$WORKDIR/empty-cache"
+# Do not append PATH to the developer machine's ~/.zshrc.
+export AGENTOS_SKIP_PATH=1
 
 fail() {
   echo "FAIL: $*" >&2
@@ -131,5 +133,25 @@ PATH="$WORKDIR/fake-cargo:/usr/bin:/bin" AGENTOS_SRC="$FAKESRC" AGENTOS_PREFIX="
 [ -x "$PREFIX4/bin/agentos" ] || fail "noisy cargo did not install the binary"
 out=$("$PREFIX4/bin/agentos" --version)
 [ "$out" = "agentos 0.1.0-test" ] || fail "installed binary was $out"
+
+# PATH persistence: append once, keep existing rc text, skip a second time.
+RC="$WORKDIR/home/.zshrc"
+mkdir -p "$WORKDIR/home"
+echo "keep-rc" > "$RC"
+PROJ5="$WORKDIR/proj5"
+mkdir -p "$PROJ5/.agents/skills/tdd"
+echo x > "$PROJ5/.agents/skills/tdd/SKILL.md"
+env -u AGENTOS_SKIP_PATH HOME="$WORKDIR/home" AGENTOS_SHELL_RC="$RC" \
+  AGENTOS_BIN="$FAKE" AGENTOS_PREFIX="$PREFIX" \
+  sh "$BOOTSTRAP" --root "$PROJ5"
+grep -q "keep-rc" "$RC" || fail "shell rc overwritten"
+grep -q "agentos:path-begin" "$RC" || fail "PATH block missing"
+grep -q "$PREFIX/bin" "$RC" || fail "bin dir not on PATH in rc"
+before=$(wc -l < "$RC")
+env -u AGENTOS_SKIP_PATH HOME="$WORKDIR/home" AGENTOS_SHELL_RC="$RC" \
+  AGENTOS_BIN="$FAKE" AGENTOS_PREFIX="$PREFIX" \
+  sh "$BOOTSTRAP" --root "$PROJ5"
+after=$(wc -l < "$RC")
+[ "$before" -eq "$after" ] || fail "PATH block duplicated"
 
 echo "bootstrap tests passed"

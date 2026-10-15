@@ -2,7 +2,7 @@
 # First-run: ensure the CLI, then init this project.
 # Copied by `npx skills add` into .agents/skills/setup-agentos/scripts/.
 # npx does not run this file; you (or /setup-agentos) do.
-# Usage: sh setup.sh [--root DIR] [--prefix DIR] [--skip-skills] [--skip-init] [--skip-adapters]
+# Usage: sh setup.sh [--root DIR] [--prefix DIR] [--skip-skills] [--skip-init] [--skip-adapters] [--skip-path]
 set -eu
 
 HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
@@ -12,6 +12,7 @@ PREFIX="${AGENTOS_PREFIX:-${HOME}/.local}"
 SKIP_SKILLS=0
 SKIP_INIT=0
 SKIP_ADAPTERS=0
+SKIP_PATH=0
 REPO="${AGENTOS_REPO:-itsmohit124/agentos}"
 
 while [ $# -gt 0 ]; do
@@ -34,6 +35,10 @@ while [ $# -gt 0 ]; do
       ;;
     --skip-adapters)
       SKIP_ADAPTERS=1
+      shift
+      ;;
+    --skip-path)
+      SKIP_PATH=1
       shift
       ;;
     -h|--help)
@@ -216,6 +221,50 @@ ensure_cli() {
   "${BIN_DIR}/agentos" --version
 }
 
+# Append PREFIX/bin to the user's shell rc so later terminals see `agentos`.
+# A child `sh setup.sh` cannot change PATH in the parent shell.
+persist_path() {
+  if [ "$SKIP_PATH" -eq 1 ] || [ -n "${AGENTOS_SKIP_PATH:-}" ]; then
+    echo "path: skipped" >&2
+    return
+  fi
+  line="export PATH=\"${BIN_DIR}:\$PATH\""
+  rc=${AGENTOS_SHELL_RC:-}
+  if [ -z "$rc" ]; then
+    shell_name=${SHELL:-/bin/sh}
+    shell_name=${shell_name##*/}
+    case "$shell_name" in
+      zsh) rc="${HOME}/.zshrc" ;;
+      bash) rc="${HOME}/.bashrc" ;;
+      fish) rc="${HOME}/.config/fish/config.fish" ;;
+      *) rc="${HOME}/.profile" ;;
+    esac
+  fi
+  mkdir -p "$(dirname "$rc")"
+  if [ -f "$rc" ] && grep -q "agentos:path-begin" "$rc"; then
+    echo "path: already configured in $rc" >&2
+    return
+  fi
+  if [ ! -f "$rc" ]; then
+    touch "$rc"
+  fi
+  begin="# agentos:path-begin"
+  end="# agentos:path-end"
+  if [ "${rc##*/}" = "config.fish" ]; then
+    block="${begin}
+# AgentOS CLI — managed by setup.sh; do not edit this block
+fish_add_path -m ${BIN_DIR}
+${end}"
+  else
+    block="${begin}
+# AgentOS CLI — managed by setup.sh; do not edit this block
+${line}
+${end}"
+  fi
+  printf '\n%s\n' "$block" >> "$rc"
+  echo "path: added ${BIN_DIR} to $rc" >&2
+}
+
 run_init() {
   if [ "$SKIP_INIT" -eq 1 ]; then
     echo "init: skipped" >&2
@@ -256,12 +305,13 @@ install_adapters() {
 
 install_skills
 ensure_cli
+persist_path
 run_init
 install_adapters
 
 echo
 echo "Done. Skills live under $ROOT/.agents/skills when installed."
 echo "CLI: ${BIN_DIR}/agentos"
-echo "Add ${BIN_DIR} to PATH if your shell does not see agentos."
-echo "Next, from this project: agentos scan"
+echo "PATH includes ${BIN_DIR} in this setup process and in your shell rc for new terminals."
+echo "This terminal: export PATH=\"${BIN_DIR}:\$PATH\"   (or open a new terminal)"
 echo "No API key is required for local scan, context, plan, or evaluate."

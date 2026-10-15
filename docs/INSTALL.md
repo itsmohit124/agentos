@@ -8,10 +8,14 @@ npx skills@latest add itsmohit124/agentos
 sh .agents/skills/setup-agentos/scripts/setup.sh
 ```
 
-The second command installs `agentos` into `~/.local/bin`, runs `init`, installs every
-adapter (`generic`, `cursor`, `claude`, `codex`) so a normal prompt in those agents is
-told to use AgentOS, and runs `scan`. It does not overwrite existing skills or
-`.agentos/config.toml`. No API key is required.
+The second command installs `agentos` into `~/.local/bin`, adds that directory to your
+shell rc (`~/.zshrc`, `~/.bashrc`, or Fish config) if it is not already there, runs
+`init`, installs every adapter (`generic`, `cursor`, `claude`, `codex`) so a normal
+prompt in those agents is told to use AgentOS, and runs `scan`. It does not overwrite
+existing skills or `.agentos/config.toml`. No API key is required.
+
+`sh setup.sh` cannot change PATH in the terminal that launched it. Open a new terminal
+(or `source` your rc) once so `agentos` is on PATH there.
 
 Until a GitHub Release exists, the CLI step needs a local binary or Rust
 (`cargo build --release`).
