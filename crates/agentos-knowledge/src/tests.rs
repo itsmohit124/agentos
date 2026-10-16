@@ -635,3 +635,23 @@ fn typescript_scan_links_implements() {
     );
     assert!(store.provenance_complete().unwrap());
 }
+
+#[test]
+fn repeated_symbol_in_one_file_keeps_the_first_node() {
+    let tmp = tempfile::tempdir().unwrap();
+    let root = tmp.path();
+    touch(
+        root,
+        "src/orders.ts",
+        "function createOrder(id: string) { return id; }\nfunction createOrder(id: number) { return String(id); }\n",
+    );
+    scan(root).unwrap();
+    let store = crate::KnowledgeStore::open(root).unwrap();
+    let functions: Vec<_> = store
+        .nodes()
+        .unwrap()
+        .into_iter()
+        .filter(|node| node.node_type == NodeKind::Function && node.name == "createOrder")
+        .collect();
+    assert_eq!(functions.len(), 1, "{functions:?}");
+}

@@ -69,6 +69,7 @@ pub fn draft_code(
     let mut edges = Vec::new();
     let mut fragments = Vec::new();
     let mut seen_imports = BTreeSet::new();
+    let mut seen_ids = BTreeSet::new();
 
     let file_id = id::container_id(&module, "file");
     let module_id = id::container_id(&module, "module");
@@ -99,6 +100,8 @@ pub fn draft_code(
         extractor_version,
         "L1-L1",
     ));
+    seen_ids.insert(file_id);
+    seen_ids.insert(module_id.clone());
 
     for symbol in &symbols {
         if symbol.kind == NodeKind::Import {
@@ -118,6 +121,9 @@ pub fn draft_code(
             _ => symbol.name.clone(),
         };
         let id = id::symbol_id(&module, kind.as_str(), &qualifier);
+        if !seen_ids.insert(id.clone()) {
+            continue;
+        }
         let mut payload = BTreeMap::new();
         if !symbol.bases.is_empty() {
             payload.insert("bases".to_owned(), symbol.bases.join(","));
