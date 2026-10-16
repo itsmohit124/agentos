@@ -22,7 +22,8 @@ sh .agents/skills/setup-agentos/scripts/setup.sh
 command installs the CLI into `~/.local/bin` and runs `init`. It does not overwrite existing
 skills or `.agentos/config.toml`.
 
-Until a GitHub Release exists, setup needs Rust (or an `agentos` binary already on PATH).
+Until a GitHub Release exists, setup uses an `agentos` binary already on PATH or
+builds from source. If Rust is missing, `setup.sh` installs it with rustup.
 
 Supported agents for skills: anything the [skills CLI](https://github.com/vercel-labs/skills)
 lists, including Cursor, Claude Code, and Codex. A missing agent binary is not a skills-install

@@ -19,8 +19,8 @@ existing skills or `.agentos/config.toml`. No API key is required.
 `sh setup.sh` cannot change PATH in the terminal that launched it. Open a new terminal
 (or `source` your rc) once so `agentos` is on PATH there.
 
-Until a GitHub Release exists, the CLI step needs a local binary or Rust
-(`cargo build --release`).
+Until a GitHub Release exists, the CLI step uses a local binary or builds from
+source. If `cargo` is missing, `setup.sh` installs stable Rust with rustup first.
 
 Equivalent, if you already have this repository:
 

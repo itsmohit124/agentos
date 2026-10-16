@@ -87,7 +87,7 @@ EMPTY="$WORKDIR/empty-bin"
 mkdir -p "$EMPTY"
 PROJ2="$WORKDIR/proj2"
 mkdir -p "$PROJ2"
-if PATH="$EMPTY:/usr/bin:/bin" AGENTOS_PREFIX="$WORKDIR/noprefix" AGENTOS_SRC="$WORKDIR/nosrc" \
+if PATH="$EMPTY:/usr/bin:/bin" AGENTOS_SKIP_RUSTUP=1 AGENTOS_PREFIX="$WORKDIR/noprefix" AGENTOS_SRC="$WORKDIR/nosrc" \
   sh "$BOOTSTRAP" --root "$PROJ2" --skip-skills 2>"$WORKDIR/nocli.err"; then
   fail "missing cli should fail"
 fi
@@ -153,5 +153,23 @@ env -u AGENTOS_SKIP_PATH HOME="$WORKDIR/home" AGENTOS_SHELL_RC="$RC" \
   sh "$BOOTSTRAP" --root "$PROJ5"
 after=$(wc -l < "$RC")
 [ "$before" -eq "$after" ] || fail "PATH block duplicated"
+
+# No cargo on PATH and no prebuilt binary: setup installs Rust (fake rustup), then builds.
+HOME_RUST="$WORKDIR/rust-home"
+mkdir -p "$HOME_RUST"
+FAKESRC2="$WORKDIR/fakesrc-norust"
+mkdir -p "$FAKESRC2/crates/agentos-cli"
+echo '[workspace]' > "$FAKESRC2/Cargo.toml"
+RUST_MARK="$WORKDIR/rustup-ran"
+PROJ6="$WORKDIR/proj6"
+mkdir -p "$PROJ6"
+PREFIX6="$WORKDIR/prefix6"
+PATH="$EMPTY:/usr/bin:/bin" HOME="$HOME_RUST" AGENTOS_SRC="$FAKESRC2" AGENTOS_PREFIX="$PREFIX6" \
+  AGENTOS_RUSTUP_CMD="mkdir -p \"\$HOME/.cargo/bin\" && cp '$WORKDIR/fake-cargo/cargo' \"\$HOME/.cargo/bin/cargo\" && chmod 755 \"\$HOME/.cargo/bin/cargo\" && touch '$RUST_MARK'" \
+  sh "$BOOTSTRAP" --root "$PROJ6" --skip-skills
+[ -f "$RUST_MARK" ] || fail "rustup was not run when cargo was missing"
+[ -x "$PREFIX6/bin/agentos" ] || fail "setup did not build after installing rust"
+out=$("$PREFIX6/bin/agentos" --version)
+[ "$out" = "agentos 0.1.0-test" ] || fail "post-rustup binary was $out"
 
 echo "bootstrap tests passed"

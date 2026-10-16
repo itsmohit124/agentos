@@ -59,7 +59,8 @@ CLI resolution order:
   2. A release binary via install-cli.sh (checksummed)
   3. cargo build --release in AGENTOS_SRC, this AgentOS repo, or a cache clone
 
-Until a GitHub Release exists, step 2 fails and step 3 needs Rust.
+Until a GitHub Release exists, step 2 fails and step 3 builds from source.
+If cargo is missing, this script installs stable Rust with rustup first.
 EOF
       exit 0
       ;;
@@ -171,13 +172,53 @@ install_cli_from_release() {
   sh "$HERE/install-cli.sh" --prefix "$PREFIX"
 }
 
-build_cli_from_source() {
-  src=${AGENTOS_SRC:-$SRC}
-  if ! command -v cargo >/dev/null 2>&1; then
+# rustup's default install is ~/.cargo/bin, which a fresh shell may not have on PATH yet.
+prepend_cargo_bin() {
+  if [ -x "${HOME}/.cargo/bin/cargo" ]; then
+    PATH="${HOME}/.cargo/bin:${PATH}"
+    export PATH
+  fi
+}
+
+install_rustup() {
+  if [ -n "${AGENTOS_RUSTUP_CMD:-}" ]; then
+    sh -c "$AGENTOS_RUSTUP_CMD"
+    return
+  fi
+  if ! command -v curl >/dev/null 2>&1; then
+    echo "error: curl is required to install Rust from https://rustup.rs" >&2
+    exit 1
+  fi
+  echo "rust: installing stable toolchain with rustup" >&2
+  curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+}
+
+ensure_cargo() {
+  prepend_cargo_bin
+  if command -v cargo >/dev/null 2>&1; then
+    return 0
+  fi
+  if [ -n "${AGENTOS_SKIP_RUSTUP:-}" ]; then
     echo "error: no agentos binary and cargo is not installed." >&2
     echo "Install Rust from https://rustup.rs then re-run, or publish/install a GitHub Release." >&2
     exit 1
   fi
+  install_rustup
+  if [ -f "${HOME}/.cargo/env" ]; then
+    # shellcheck disable=SC1091
+    . "${HOME}/.cargo/env"
+  fi
+  prepend_cargo_bin
+  if ! command -v cargo >/dev/null 2>&1; then
+    echo "error: Rust install finished but cargo is still not on PATH." >&2
+    exit 1
+  fi
+  echo "rust: cargo is on PATH" >&2
+}
+
+build_cli_from_source() {
+  src=${AGENTOS_SRC:-$SRC}
+  ensure_cargo
   if [ -z "$src" ] || [ ! -f "$src/Cargo.toml" ]; then
     cache="${AGENTOS_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/agentos-src}"
     if [ ! -f "$cache/Cargo.toml" ]; then

@@ -25,7 +25,8 @@ After skills are copied, the human runs:
 sh .agents/skills/setup-agentos/scripts/setup.sh
 ```
 
-That installs the `agentos` binary (release if published, otherwise a source build)
+That installs the `agentos` binary (release if published, otherwise a source build;
+Rust is installed with rustup when `cargo` is missing)
 and runs `init`. It does not overwrite existing skills or `.agentos/config.toml`.
 
 ## When to use

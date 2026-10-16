@@ -25,7 +25,8 @@ After skills are copied, the human runs:
 sh .agents/skills/setup-agentos/scripts/setup.sh
 ```
 
-That installs the `agentos` binary (release if published, otherwise a source build),
+That installs the `agentos` binary (release if published, otherwise a source build;
+Rust is installed with rustup when `cargo` is missing),
 runs `init`, installs adapters that match files already in the project (Cursor when
 `.cursor/` or `.agents/skills/` exists; Claude when `.claude/` or `CLAUDE.md` exists;
 Codex when `.codex/` or `agents/openai.yaml` exists; always `generic`), and runs
