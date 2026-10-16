@@ -190,7 +190,9 @@ install_rustup() {
     exit 1
   fi
   echo "rust: installing stable toolchain with rustup" >&2
-  curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+  # rustup prints "Rust is installed now..." on stdout. Callers capture this
+  # function's stdout as the agentos path, so the installer must not write there.
+  curl --proto '=https' --tlsv1.2 -fsSL https://sh.rustup.rs | sh -s -- -y --default-toolchain stable >&2
 }
 
 ensure_cargo() {
@@ -218,7 +220,6 @@ ensure_cargo() {
 
 build_cli_from_source() {
   src=${AGENTOS_SRC:-$SRC}
-  ensure_cargo
   if [ -z "$src" ] || [ ! -f "$src/Cargo.toml" ]; then
     cache="${AGENTOS_CACHE:-${XDG_CACHE_HOME:-$HOME/.cache}/agentos-src}"
     if [ ! -f "$cache/Cargo.toml" ]; then
@@ -251,6 +252,8 @@ ensure_cli() {
       install_cli_from_release
       bin="${BIN_DIR}/agentos"
     else
+      # Install Rust before capturing stdout. build_cli_from_source's stdout is only the binary path.
+      ensure_cargo
       bin=$(build_cli_from_source)
     fi
   fi

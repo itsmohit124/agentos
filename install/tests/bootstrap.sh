@@ -172,4 +172,20 @@ PATH="$EMPTY:/usr/bin:/bin" HOME="$HOME_RUST" AGENTOS_SRC="$FAKESRC2" AGENTOS_PR
 out=$("$PREFIX6/bin/agentos" --version)
 [ "$out" = "agentos 0.1.0-test" ] || fail "post-rustup binary was $out"
 
+# rustup's success text is stdout. It must not be captured as the agentos path.
+HOME_RUST2="$WORKDIR/rust-home-2"
+mkdir -p "$HOME_RUST2"
+FAKESRC3="$WORKDIR/fakesrc-norust-2"
+mkdir -p "$FAKESRC3/crates/agentos-cli"
+echo '[workspace]' > "$FAKESRC3/Cargo.toml"
+PROJ7="$WORKDIR/proj7"
+mkdir -p "$PROJ7"
+PREFIX7="$WORKDIR/prefix7"
+PATH="$EMPTY:/usr/bin:/bin" HOME="$HOME_RUST2" AGENTOS_SRC="$FAKESRC3" AGENTOS_PREFIX="$PREFIX7" \
+  AGENTOS_RUSTUP_CMD="echo 'Rust is installed now. Great!' && mkdir -p \"\$HOME/.cargo/bin\" && cp '$WORKDIR/fake-cargo/cargo' \"\$HOME/.cargo/bin/cargo\" && chmod 755 \"\$HOME/.cargo/bin/cargo\"" \
+  sh "$BOOTSTRAP" --root "$PROJ7" --skip-skills >/dev/null
+[ -x "$PREFIX7/bin/agentos" ] || fail "rustup stdout replaced the agentos path"
+out=$("$PREFIX7/bin/agentos" --version)
+[ "$out" = "agentos 0.1.0-test" ] || fail "rustup stdout binary was $out"
+
 echo "bootstrap tests passed"
