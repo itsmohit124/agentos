@@ -38,20 +38,37 @@ AgentOS is the shared layer in front of whichever agent the person is using. It 
 
 ## Try it
 
-From the project you want AgentOS to manage:
+`npx skills add` only copies the skill files, including the setup script. It does not install the CLI and it does not index the repo. When it asks for a scope, pick one of the two below. Until a GitHub Release exists, setup uses an `agentos` binary already on `PATH` or builds it from source. Open a new terminal afterward so `~/.local/bin` is on `PATH`.
+
+### Local install
+
+Run this from the project you want AgentOS to manage, and choose the project scope. Skills land in that repo at `.agents/skills/`.
 
 ```bash
+cd /path/to/the/repo
 npx skills@latest add itsmohit124/agentos
-setup=.agents/skills/setup-agentos/scripts/setup.sh
-[ -f "$setup" ] || setup="$HOME/.agents/skills/setup-agentos/scripts/setup.sh"
-sh "$setup"
+sh .agents/skills/setup-agentos/scripts/setup.sh
 agentos doctor
 agentos context build "describe the change you actually want"
 ```
 
-After a global install, `cd` into each repo and run
-`sh ~/.agents/skills/setup-agentos/scripts/setup.sh`. That stores this repo's index in
-`.agentos/` and attaches its Context Pack from there. The next repo gets its own
-`.agentos/` from the same command. Do not run it from your home directory.
+Setup writes this repo's index to `.agentos/`, installs the CLI into `~/.local/bin` if it is missing, and attaches the Context Pack for the agents already present in the repo.
 
-Until a GitHub Release exists, setup uses an `agentos` binary already on `PATH` or builds it from source. Open a new terminal afterward so `~/.local/bin` is on `PATH`.
+### Global install
+
+Choose the global scope. Skills land in `~/.agents/skills/`. PromptScript can report that it does not support a global install; the copies under `~/.agents/skills` are still installed.
+
+```bash
+npx skills@latest add itsmohit124/agentos
+```
+
+The graph and the hook stay inside each repo. From every repo you want indexed, run the setup script that the global install stored. Run it from that repo. The script refuses your home directory.
+
+```bash
+cd /path/to/the/repo
+sh ~/.agents/skills/setup-agentos/scripts/setup.sh
+agentos doctor
+agentos context build "describe the change you actually want"
+```
+
+That stores this repo's index in `.agentos/`, copies the skills into `.agents/skills/`, and attaches its Context Pack from there. The CLI is installed on the first run only. The next repo gets its own `.agentos/` from the same `sh` command.
