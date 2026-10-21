@@ -36,7 +36,8 @@ pub use loader::{
 };
 pub use manifest::{
     EvalExpectation, Invocation, InvocationMode, SkillDependency, SkillEvalCase, SkillIo,
-    SkillKind, SkillManifest, SkillPermission, SkillVersion, Triggers, parse_manifest,
+    SkillKind, SkillManifest, SkillPermission, SkillVersion, Triggers, declares_version,
+    parse_manifest,
 };
 pub use registry::{Shadowed, Skill, SkillError, SkillRegistry};
 pub use resolve::ResolveError;

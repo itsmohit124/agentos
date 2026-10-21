@@ -52,12 +52,8 @@ fn merge_hooks_json(project: &Path) -> Result<String, AdapterError> {
         root = json!({});
     }
     let object = root.as_object_mut().expect("object");
-    object
-        .entry("version")
-        .or_insert(Value::from(1));
-    let hooks = object
-        .entry("hooks")
-        .or_insert_with(|| json!({}));
+    object.entry("version").or_insert(Value::from(1));
+    let hooks = object.entry("hooks").or_insert_with(|| json!({}));
     if !hooks.is_object() {
         *hooks = json!({});
     }

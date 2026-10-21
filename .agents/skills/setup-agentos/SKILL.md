@@ -31,7 +31,7 @@ sh "$setup"
 
 That installs the `agentos` binary (release if published, otherwise a source build;
 Rust is installed with rustup when `cargo` is missing),
-copies globally installed skills into the project when the project does not have them yet,
+copies globally installed AgentOS skills (front matter includes `version`) into the project when the project does not have them yet, and leaves other skills in that directory where they are,
 runs `init`, installs adapters that match files already in the project (Cursor when
 `.cursor/` or `.agents/skills/` exists; Claude when `.claude/` or `CLAUDE.md` exists;
 Codex when `.codex/` or `agents/openai.yaml` exists; always `generic`), and runs

@@ -9,7 +9,7 @@
 use std::fs;
 use std::path::{Path, PathBuf};
 
-use agentos_skills::parse_manifest;
+use agentos_skills::{declares_version, parse_manifest};
 
 use crate::error::AdapterError;
 
@@ -18,9 +18,14 @@ const CODEX_POLICY: &str = "policy:\n  allow_implicit_invocation: false\n";
 const CODEX_LINE: &str = "allow_implicit_invocation: false";
 
 /// Writes the native controls. A second call does not change a file that is already sealed.
+/// A skill with no `version` is a host skill and is left unchanged.
 pub fn seal(root: &Path) -> Result<(), AdapterError> {
     for skill in scan(root)? {
-        let skill = skill.map_err(|message| AdapterError::managed(".agents/skills", message))?;
+        let Some(skill) =
+            skill.map_err(|message| AdapterError::managed(".agents/skills", message))?
+        else {
+            continue;
+        };
         if skill.model_invocable {
             continue;
         }
@@ -38,7 +43,8 @@ pub fn problems(root: &Path) -> Result<Vec<String>, AdapterError> {
     let mut gaps = Vec::new();
     for skill in scan(root)? {
         let skill = match skill {
-            Ok(skill) => skill,
+            Ok(Some(skill)) => skill,
+            Ok(None) => continue,
             Err(message) => {
                 gaps.push(message);
                 continue;
@@ -71,7 +77,7 @@ struct ProjectSkill {
     model_invocable: bool,
 }
 
-fn scan(root: &Path) -> Result<Vec<Result<ProjectSkill, String>>, AdapterError> {
+fn scan(root: &Path) -> Result<Vec<Result<Option<ProjectSkill>, String>>, AdapterError> {
     let base = root.join(".agents/skills");
     if !base.is_dir() {
         return Ok(Vec::new());
@@ -104,9 +110,13 @@ fn collect(dir: &Path, files: &mut Vec<PathBuf>) -> Result<(), AdapterError> {
     Ok(())
 }
 
-fn read_skill(file: &Path) -> Result<ProjectSkill, String> {
+fn read_skill(file: &Path) -> Result<Option<ProjectSkill>, String> {
     let text = fs::read_to_string(file).map_err(|err| format!("{}: {err}", file.display()))?;
     let yaml = frontmatter_yaml(&text).map_err(|err| format!("{}: {err}", file.display()))?;
+    let owned = declares_version(&yaml).map_err(|err| format!("{}: {err}", file.display()))?;
+    if !owned {
+        return Ok(None);
+    }
     let name = file
         .parent()
         .and_then(|dir| dir.file_name())
@@ -114,11 +124,11 @@ fn read_skill(file: &Path) -> Result<ProjectSkill, String> {
         .unwrap_or("skill");
     let manifest = parse_manifest(&yaml, Some(name), &file.display().to_string())
         .map_err(|err| format!("{}: {}", file.display(), err[0].message))?;
-    Ok(ProjectSkill {
+    Ok(Some(ProjectSkill {
         file: file.to_path_buf(),
         dir: file.parent().unwrap_or(file).to_path_buf(),
         model_invocable: manifest.invocation.model_invocable,
-    })
+    }))
 }
 
 fn seal_frontmatter(root: &Path, skill: &ProjectSkill) -> Result<(), AdapterError> {
@@ -301,6 +311,27 @@ mod tests {
             .path()
             .join(".agentos/adapters/originals/invocation/.agents/skills/manual-only/SKILL.md");
         assert_eq!(fs::read(saved).unwrap(), before);
+    }
+
+    #[test]
+    fn a_host_skill_without_version_does_not_block_install() {
+        let dir = tempfile::tempdir().unwrap();
+        skill(dir.path(), "manual-only", "user");
+        let host = dir.path().join(".agents/skills/codebase-design");
+        fs::create_dir_all(&host).unwrap();
+        let host_file = host.join("SKILL.md");
+        let host_text =
+            "---\nname: codebase-design\ndescription: Shared vocabulary.\n---\n\n# Body\n";
+        fs::write(&host_file, host_text).unwrap();
+
+        seal(dir.path()).unwrap();
+
+        assert_eq!(fs::read_to_string(&host_file).unwrap(), host_text);
+        let sealed =
+            fs::read_to_string(dir.path().join(".agents/skills/manual-only/SKILL.md")).unwrap();
+        assert!(sealed.contains("disable-model-invocation: true\n"));
+        assert!(problems(dir.path()).unwrap().is_empty());
+        managed::install(dir.path(), "generic", &[]).unwrap();
     }
 
     #[test]

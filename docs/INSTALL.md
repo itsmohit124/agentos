@@ -12,7 +12,7 @@ sh "$setup"
 
 Run that from the project directory. Project scope writes `setup.sh` into the
 repository. Global scope writes it to `~/.agents/skills/setup-agentos/scripts/setup.sh`;
-the script then copies those skills into the project. It refuses to initialize your
+the script then copies AgentOS skills (front matter includes `version`) into the project. Other skills already in `~/.agents/skills` stay there. It refuses to initialize your
 home directory. PromptScript can report that it does not support a global install;
 the copies under `~/.agents/skills` are still installed, and `setup.sh` uses them.
 

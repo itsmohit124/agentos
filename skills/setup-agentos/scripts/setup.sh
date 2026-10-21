@@ -127,6 +127,15 @@ installed_skills_dir() {
   printf '%s\n' "$base"
 }
 
+# AgentOS skills declare `version`. Host skills in the same directory often do not.
+is_agentos_skill() {
+  awk '
+    NR == 1 && $0 !~ /^---\r?$/ { exit 1 }
+    NR > 1 && $0 ~ /^---\r?$/ { exit (found ? 0 : 1) }
+    NR > 1 && $0 ~ /^version:[[:space:]]/ { found = 1 }
+  ' "$1/SKILL.md"
+}
+
 copy_skill_tree() {
   src=$1
   dest=$2
@@ -136,6 +145,10 @@ copy_skill_tree() {
     [ -d "$skill" ] || continue
     [ -f "$skill/SKILL.md" ] || continue
     name=${skill##*/}
+    if ! is_agentos_skill "$skill"; then
+      echo "skills: skipping $name (no version; left for the host)" >&2
+      continue
+    fi
     if [ -e "$dest/$name" ]; then
       echo "skills: $name already in project (not overwritten)" >&2
       continue

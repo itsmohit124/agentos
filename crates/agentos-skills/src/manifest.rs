@@ -319,6 +319,21 @@ enum RawDependency {
     },
 }
 
+/// Whether this front matter belongs to an AgentOS skill.
+///
+/// AgentOS skills declare `version`. Host skills that share `.agents/skills/`
+/// (Cursor and others) often have only `name` and `description`. Those are not
+/// AgentOS packages and must not be rejected or rewritten for omitting `version`.
+///
+/// Returns an error when the YAML itself cannot be read.
+pub fn declares_version(yaml: &str) -> Result<bool, String> {
+    let value: Value =
+        serde_norway::from_str(yaml).map_err(|err| format!("invalid YAML front-matter: {err}"))?;
+    Ok(value
+        .as_object()
+        .is_some_and(|map| map.contains_key("version")))
+}
+
 /// Parses and validates manifest YAML.
 ///
 /// `dir_name`, if given, must equal the manifest `name`. `location` is used in diagnostics.
@@ -601,6 +616,13 @@ mod tests {
         c.sort_unstable();
         c.dedup();
         c
+    }
+
+    #[test]
+    fn a_host_skill_omits_version() {
+        assert!(!declares_version("name: codebase-design\ndescription: Shared.\n").unwrap());
+        assert!(declares_version(MIN).unwrap());
+        assert!(declares_version("version: [\n").is_err());
     }
 
     #[test]
