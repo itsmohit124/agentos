@@ -15,12 +15,22 @@ From the project you want AgentOS to manage:
 
 ```bash
 npx skills@latest add itsmohit124/agentos
-sh .agents/skills/setup-agentos/scripts/setup.sh
+setup=.agents/skills/setup-agentos/scripts/setup.sh
+[ -f "$setup" ] || setup="$HOME/.agents/skills/setup-agentos/scripts/setup.sh"
+sh "$setup"
 ```
 
-`npx` copies the skills, including the setup script. It does not run the script. The second
-command installs the CLI into `~/.local/bin` and runs `init`. It does not overwrite existing
-skills or `.agentos/config.toml`.
+`npx` copies the skills, including the setup script. It does not run the script.
+Project scope writes that script into this repository. Global scope writes it under
+`~/.agents/skills`. After a global install, `cd` into each repo and run:
+
+```bash
+sh ~/.agents/skills/setup-agentos/scripts/setup.sh
+```
+
+That writes `.agentos/`, a copy of the skills, and the Cursor context hook into that
+repo only. The CLI is installed once, to `~/.local/bin`. Repeat the command in every
+repo you want indexed. Details: [docs/INSTALL.md](docs/INSTALL.md).
 
 Until a GitHub Release exists, setup uses an `agentos` binary already on PATH or
 builds from source. If Rust is missing, `setup.sh` installs it with rustup.

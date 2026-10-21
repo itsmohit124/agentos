@@ -113,6 +113,42 @@ AGENTOS_BIN="$FAKE" AGENTOS_PREFIX="$PREFIX" \
   sh "$COPIED/scripts/setup.sh" --root "$WORKDIR/copied"
 [ -f "$WORKDIR/copied/.agentos/config.toml" ] || fail "copied skill setup did not init"
 
+# Global install: script lives in ~/.agents/skills. Copy skills into the project.
+# Do not call npx (PromptScript and the scope prompt must not run again).
+GHOME="$WORKDIR/global-home"
+GSKILLS="$GHOME/.agents/skills"
+mkdir -p "$GSKILLS/setup-agentos/scripts" "$GSKILLS/tdd" "$GSKILLS/research"
+cp "$ROOT/skills/setup-agentos/scripts/setup.sh" "$GSKILLS/setup-agentos/scripts/"
+cp "$ROOT/skills/setup-agentos/scripts/install-cli.sh" "$GSKILLS/setup-agentos/scripts/"
+cp "$ROOT/skills/setup-agentos/SKILL.md" "$GSKILLS/setup-agentos/SKILL.md"
+echo "global-tdd" > "$GSKILLS/tdd/SKILL.md"
+echo "global-research" > "$GSKILLS/research/SKILL.md"
+GPROJ="$WORKDIR/global-proj"
+mkdir -p "$GPROJ"
+GMARKER="$WORKDIR/global-npx"
+HOME="$GHOME" AGENTOS_BIN="$FAKE" AGENTOS_PREFIX="$PREFIX" \
+  AGENTOS_SKILLS_CMD="touch '$GMARKER'" \
+  sh "$GSKILLS/setup-agentos/scripts/setup.sh" --root "$GPROJ"
+[ -f "$GPROJ/.agentos/config.toml" ] || fail "global setup did not init"
+[ "$(cat "$GPROJ/.agents/skills/tdd/SKILL.md")" = "global-tdd" ] || fail "global skills not copied"
+[ -f "$GPROJ/.agents/skills/research/SKILL.md" ] || fail "research skill not copied"
+[ -f "$GPROJ/.agents/skills/setup-agentos/scripts/setup.sh" ] || fail "setup skill not copied"
+[ ! -f "$GMARKER" ] || fail "global setup invoked the skills installer"
+echo "edited" > "$GPROJ/.agents/skills/tdd/SKILL.md"
+HOME="$GHOME" AGENTOS_BIN="$FAKE" AGENTOS_PREFIX="$PREFIX" \
+  sh "$GSKILLS/setup-agentos/scripts/setup.sh" --root "$GPROJ"
+[ "$(cat "$GPROJ/.agents/skills/tdd/SKILL.md")" = "edited" ] || fail "copied skill overwritten"
+
+# The home directory is not a project. init would walk protected folders and fail.
+HOME_AS_ROOT="$WORKDIR/home-as-root"
+mkdir -p "$HOME_AS_ROOT"
+if HOME="$HOME_AS_ROOT" AGENTOS_BIN="$FAKE" AGENTOS_PREFIX="$PREFIX" \
+  sh "$BOOTSTRAP" --root "$HOME_AS_ROOT" --skip-skills 2>"$WORKDIR/home.err"; then
+  fail "home root should fail"
+fi
+grep -q "home directory" "$WORKDIR/home.err" || fail "home root error was unclear"
+[ ! -d "$HOME_AS_ROOT/.agentos" ] || fail "home root was initialized"
+
 # cargo prints to stdout; that must not become the installed path.
 FAKESRC="$WORKDIR/fakesrc"
 mkdir -p "$FAKESRC/crates/agentos-cli" "$WORKDIR/fake-cargo"

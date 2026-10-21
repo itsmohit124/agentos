@@ -5,10 +5,52 @@ script and does not install the CLI.
 
 ```bash
 npx skills@latest add itsmohit124/agentos
-sh .agents/skills/setup-agentos/scripts/setup.sh
+setup=.agents/skills/setup-agentos/scripts/setup.sh
+[ -f "$setup" ] || setup="$HOME/.agents/skills/setup-agentos/scripts/setup.sh"
+sh "$setup"
 ```
 
-The second command installs `agentos` into `~/.local/bin`, adds that directory to your
+Run that from the project directory. Project scope writes `setup.sh` into the
+repository. Global scope writes it to `~/.agents/skills/setup-agentos/scripts/setup.sh`;
+the script then copies those skills into the project. It refuses to initialize your
+home directory. PromptScript can report that it does not support a global install;
+the copies under `~/.agents/skills` are still installed, and `setup.sh` uses them.
+
+## After a global install
+
+`npx` with Global only stores the skills in `~/.agents/skills`. Cursor can read those
+from any repo. The knowledge graph, the Context Pack, and the Cursor hook stay inside
+each repo, so run setup once inside every repo you want AgentOS to index.
+
+From that repo (not from your home directory):
+
+```bash
+cd /path/to/the/repo
+sh ~/.agents/skills/setup-agentos/scripts/setup.sh
+```
+
+The script writes only into this repo:
+
+| Path | What it is |
+|---|---|
+| `.agentos/` | Config, project profile, and the SQLite index for this repo |
+| `.agents/skills/` | A copy of the skills for this repo. Existing skill folders are left as they are |
+| `.cursor/hooks.json` and `.cursor/hooks/agentos-context.py` | The hook that attaches this repo's Context Pack |
+
+The CLI binary stays at `~/.local/bin/agentos` and is installed on the first repo only.
+Open a new terminal after that first run so `PATH` includes it. In every later repo,
+repeat the `sh` command above. Then, inside the repo:
+
+```bash
+agentos doctor
+agentos scan
+agentos context build "the change you want in this repo"
+```
+
+`context build` reads this repo's `.agentos/` index. A second repo keeps its own index
+and its own pack. Do not point `--root` at your home directory.
+
+The setup script installs `agentos` into `~/.local/bin`, adds that directory to your
 shell rc (`~/.zshrc`, `~/.bashrc`, or Fish config) if it is not already there, runs
 `init`, installs adapters detected from files already in the project (not from the
 `npx` agent picker), and runs `scan`. Cursor: `.cursor/` or `.agents/skills/`.

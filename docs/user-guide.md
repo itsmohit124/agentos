@@ -9,9 +9,26 @@ See [INSTALL.md](INSTALL.md).
 
 ```bash
 npx skills@latest add itsmohit124/agentos
-sh .agents/skills/setup-agentos/scripts/setup.sh
+setup=.agents/skills/setup-agentos/scripts/setup.sh
+[ -f "$setup" ] || setup="$HOME/.agents/skills/setup-agentos/scripts/setup.sh"
+sh "$setup"
 agentos doctor
 ```
+
+After a global install, the skills live in `~/.agents/skills`. Inside each repo you
+want indexed, run:
+
+```bash
+cd /path/to/the/repo
+sh ~/.agents/skills/setup-agentos/scripts/setup.sh
+agentos doctor
+agentos context build "the change you want in this repo"
+```
+
+That creates this repo's `.agentos/` index, copies the skills into `.agents/skills/`,
+and installs the Cursor hook that attaches this repo's Context Pack. The next repo
+gets its own `.agentos/` when you run the same command there. Do not run it from
+your home directory.
 
 `--root` selects the project. Without it, AgentOS uses the Git root of the current directory.
 

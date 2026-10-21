@@ -1,7 +1,9 @@
 #!/usr/bin/env sh
 # First-run: ensure the CLI, then init this project.
-# Copied by `npx skills add` into .agents/skills/setup-agentos/scripts/.
-# npx does not run this file; you (or /setup-agentos) do.
+# `npx skills add` copies this file and does not run it.
+# Project scope: .agents/skills/setup-agentos/scripts/setup.sh
+# Global scope:  ~/.agents/skills/setup-agentos/scripts/setup.sh
+# Run it from the project directory (or pass --root). It does not initialize $HOME.
 # Usage: sh setup.sh [--root DIR] [--prefix DIR] [--skip-skills] [--skip-init] [--skip-adapters] [--skip-path] [--all-adapters]
 set -eu
 
@@ -51,8 +53,11 @@ while [ $# -gt 0 ]; do
 Set up the AgentOS CLI and initialize the current project.
 
   sh .agents/skills/setup-agentos/scripts/setup.sh
+  sh ~/.agents/skills/setup-agentos/scripts/setup.sh
 
-`npx skills add` copies this script. It does not execute it.
+`npx skills add` copies this script. Project scope uses the first path.
+Global scope uses the second. Run it from the project directory, or pass --root.
+This script does not initialize your home directory.
 
 CLI resolution order:
   1. AGENTOS_BIN, or agentos already on PATH, or PREFIX/bin/agentos
@@ -71,7 +76,15 @@ EOF
   esac
 done
 
-ROOT=$(CDPATH= cd -- "$ROOT" && pwd)
+ROOT=$(CDPATH= cd -- "$ROOT" && pwd -P)
+if [ -n "${HOME:-}" ]; then
+  home_dir=$(CDPATH= cd -- "$HOME" && pwd -P)
+  if [ "$ROOT" = "$home_dir" ]; then
+    echo "error: refusing to initialize the home directory ($ROOT)." >&2
+    echo "Run setup from the project, or pass --root /path/to/that/project." >&2
+    exit 1
+  fi
+fi
 BIN_DIR="${PREFIX}/bin"
 mkdir -p "$BIN_DIR"
 
@@ -97,6 +110,46 @@ if [ -n "$SRC" ]; then
   echo "source: $SRC" >&2
 fi
 
+# Directory of an `npx skills add` install: <project-or-home>/.agents/skills.
+# The canonical repo tree (skills/setup-agentos/scripts) does not match.
+installed_skills_dir() {
+  base=$(CDPATH= cd -- "$HERE/../.." && pwd -P)
+  parent=$(dirname "$base")
+  if [ "$(basename "$base")" != "skills" ]; then
+    return 1
+  fi
+  if [ "$(basename "$parent")" != ".agents" ]; then
+    return 1
+  fi
+  if [ ! -f "$base/setup-agentos/SKILL.md" ]; then
+    return 1
+  fi
+  printf '%s\n' "$base"
+}
+
+copy_skill_tree() {
+  src=$1
+  dest=$2
+  mkdir -p "$dest"
+  copied=0
+  for skill in "$src"/*; do
+    [ -d "$skill" ] || continue
+    [ -f "$skill/SKILL.md" ] || continue
+    name=${skill##*/}
+    if [ -e "$dest/$name" ]; then
+      echo "skills: $name already in project (not overwritten)" >&2
+      continue
+    fi
+    cp -R "$skill" "$dest/$name"
+    copied=1
+  done
+  if [ "$copied" -eq 1 ]; then
+    echo "skills: copied from $src into $dest" >&2
+    return 0
+  fi
+  return 1
+}
+
 install_skills() {
   if [ "$SKIP_SKILLS" -eq 1 ]; then
     echo "skills: skipped" >&2
@@ -105,6 +158,23 @@ install_skills() {
   if [ -f "$ROOT/.agents/skills/tdd/SKILL.md" ]; then
     echo "skills: already present under $ROOT/.agents/skills (not overwritten)" >&2
     return
+  fi
+  # Global (or project) install already has the files next to this script.
+  # Copy them into the project. Do not run `npx skills add` again: that prompts
+  # for scope and retries agents that cannot install globally.
+  if tree=$(installed_skills_dir); then
+    dest="$ROOT/.agents/skills"
+    dest_real=""
+    if [ -d "$dest" ]; then
+      dest_real=$(CDPATH= cd -- "$dest" && pwd -P)
+    fi
+    if [ -n "$dest_real" ] && [ "$tree" = "$dest_real" ]; then
+      echo "skills: using $tree" >&2
+      return
+    fi
+    if copy_skill_tree "$tree" "$dest"; then
+      return
+    fi
   fi
   if [ -n "${AGENTOS_SKILLS_CMD:-}" ]; then
     (CDPATH= cd -- "$ROOT" && sh -c "$AGENTOS_SKILLS_CMD")

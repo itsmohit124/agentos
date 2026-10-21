@@ -1,8 +1,10 @@
 #!/usr/bin/env sh
 # First-run: ensure the CLI, then init this project.
-# Copied by `npx skills add` into .agents/skills/setup-agentos/scripts/.
-# npx does not run this file; you (or /setup-agentos) do.
-# Usage: sh setup.sh [--root DIR] [--prefix DIR] [--skip-skills] [--skip-init]
+# `npx skills add` copies this file and does not run it.
+# Project scope: .agents/skills/setup-agentos/scripts/setup.sh
+# Global scope:  ~/.agents/skills/setup-agentos/scripts/setup.sh
+# Run it from the project directory (or pass --root). It does not initialize $HOME.
+# Usage: sh setup.sh [--root DIR] [--prefix DIR] [--skip-skills] [--skip-init] [--skip-adapters] [--skip-path] [--all-adapters]
 set -eu
 
 HERE=$(CDPATH= cd -- "$(dirname "$0")" && pwd)
@@ -11,6 +13,9 @@ ROOT="${AGENTOS_ROOT:-.}"
 PREFIX="${AGENTOS_PREFIX:-${HOME}/.local}"
 SKIP_SKILLS=0
 SKIP_INIT=0
+SKIP_ADAPTERS=0
+SKIP_PATH=0
+ALL_ADAPTERS=0
 REPO="${AGENTOS_REPO:-itsmohit124/agentos}"
 
 while [ $# -gt 0 ]; do
@@ -31,13 +36,28 @@ while [ $# -gt 0 ]; do
       SKIP_INIT=1
       shift
       ;;
+    --skip-adapters)
+      SKIP_ADAPTERS=1
+      shift
+      ;;
+    --skip-path)
+      SKIP_PATH=1
+      shift
+      ;;
+    --all-adapters)
+      ALL_ADAPTERS=1
+      shift
+      ;;
     -h|--help)
       cat <<'EOF'
 Set up the AgentOS CLI and initialize the current project.
 
   sh .agents/skills/setup-agentos/scripts/setup.sh
+  sh ~/.agents/skills/setup-agentos/scripts/setup.sh
 
-`npx skills add` copies this script. It does not execute it.
+`npx skills add` copies this script. Project scope uses the first path.
+Global scope uses the second. Run it from the project directory, or pass --root.
+This script does not initialize your home directory.
 
 CLI resolution order:
   1. AGENTOS_BIN, or agentos already on PATH, or PREFIX/bin/agentos
@@ -56,7 +76,15 @@ EOF
   esac
 done
 
-ROOT=$(CDPATH= cd -- "$ROOT" && pwd)
+ROOT=$(CDPATH= cd -- "$ROOT" && pwd -P)
+if [ -n "${HOME:-}" ]; then
+  home_dir=$(CDPATH= cd -- "$HOME" && pwd -P)
+  if [ "$ROOT" = "$home_dir" ]; then
+    echo "error: refusing to initialize the home directory ($ROOT)." >&2
+    echo "Run setup from the project, or pass --root /path/to/that/project." >&2
+    exit 1
+  fi
+fi
 BIN_DIR="${PREFIX}/bin"
 mkdir -p "$BIN_DIR"
 
@@ -82,6 +110,46 @@ if [ -n "$SRC" ]; then
   echo "source: $SRC" >&2
 fi
 
+# Directory of an `npx skills add` install: <project-or-home>/.agents/skills.
+# The canonical repo tree (skills/setup-agentos/scripts) does not match.
+installed_skills_dir() {
+  base=$(CDPATH= cd -- "$HERE/../.." && pwd -P)
+  parent=$(dirname "$base")
+  if [ "$(basename "$base")" != "skills" ]; then
+    return 1
+  fi
+  if [ "$(basename "$parent")" != ".agents" ]; then
+    return 1
+  fi
+  if [ ! -f "$base/setup-agentos/SKILL.md" ]; then
+    return 1
+  fi
+  printf '%s\n' "$base"
+}
+
+copy_skill_tree() {
+  src=$1
+  dest=$2
+  mkdir -p "$dest"
+  copied=0
+  for skill in "$src"/*; do
+    [ -d "$skill" ] || continue
+    [ -f "$skill/SKILL.md" ] || continue
+    name=${skill##*/}
+    if [ -e "$dest/$name" ]; then
+      echo "skills: $name already in project (not overwritten)" >&2
+      continue
+    fi
+    cp -R "$skill" "$dest/$name"
+    copied=1
+  done
+  if [ "$copied" -eq 1 ]; then
+    echo "skills: copied from $src into $dest" >&2
+    return 0
+  fi
+  return 1
+}
+
 install_skills() {
   if [ "$SKIP_SKILLS" -eq 1 ]; then
     echo "skills: skipped" >&2
@@ -90,6 +158,23 @@ install_skills() {
   if [ -f "$ROOT/.agents/skills/tdd/SKILL.md" ]; then
     echo "skills: already present under $ROOT/.agents/skills (not overwritten)" >&2
     return
+  fi
+  # Global (or project) install already has the files next to this script.
+  # Copy them into the project. Do not run `npx skills add` again: that prompts
+  # for scope and retries agents that cannot install globally.
+  if tree=$(installed_skills_dir); then
+    dest="$ROOT/.agents/skills"
+    dest_real=""
+    if [ -d "$dest" ]; then
+      dest_real=$(CDPATH= cd -- "$dest" && pwd -P)
+    fi
+    if [ -n "$dest_real" ] && [ "$tree" = "$dest_real" ]; then
+      echo "skills: using $tree" >&2
+      return
+    fi
+    if copy_skill_tree "$tree" "$dest"; then
+      return
+    fi
   fi
   if [ -n "${AGENTOS_SKILLS_CMD:-}" ]; then
     (CDPATH= cd -- "$ROOT" && sh -c "$AGENTOS_SKILLS_CMD")
@@ -255,6 +340,50 @@ ensure_cli() {
   "${BIN_DIR}/agentos" --version
 }
 
+# Append PREFIX/bin to the user's shell rc so later terminals see `agentos`.
+# A child `sh setup.sh` cannot change PATH in the parent shell.
+persist_path() {
+  if [ "$SKIP_PATH" -eq 1 ] || [ -n "${AGENTOS_SKIP_PATH:-}" ]; then
+    echo "path: skipped" >&2
+    return
+  fi
+  line="export PATH=\"${BIN_DIR}:\$PATH\""
+  rc=${AGENTOS_SHELL_RC:-}
+  if [ -z "$rc" ]; then
+    shell_name=${SHELL:-/bin/sh}
+    shell_name=${shell_name##*/}
+    case "$shell_name" in
+      zsh) rc="${HOME}/.zshrc" ;;
+      bash) rc="${HOME}/.bashrc" ;;
+      fish) rc="${HOME}/.config/fish/config.fish" ;;
+      *) rc="${HOME}/.profile" ;;
+    esac
+  fi
+  mkdir -p "$(dirname "$rc")"
+  if [ -f "$rc" ] && grep -q "agentos:path-begin" "$rc"; then
+    echo "path: already configured in $rc" >&2
+    return
+  fi
+  if [ ! -f "$rc" ]; then
+    touch "$rc"
+  fi
+  begin="# agentos:path-begin"
+  end="# agentos:path-end"
+  if [ "${rc##*/}" = "config.fish" ]; then
+    block="${begin}
+# AgentOS CLI — managed by setup.sh; do not edit this block
+fish_add_path -m ${BIN_DIR}
+${end}"
+  else
+    block="${begin}
+# AgentOS CLI — managed by setup.sh; do not edit this block
+${line}
+${end}"
+  fi
+  printf '\n%s\n' "$block" >> "$rc"
+  echo "path: added ${BIN_DIR} to $rc" >&2
+}
+
 run_init() {
   if [ "$SKIP_INIT" -eq 1 ]; then
     echo "init: skipped" >&2
@@ -272,13 +401,53 @@ run_init() {
   fi
 }
 
+install_one_adapter() {
+  echo "adapters: agentos adapter install $1" >&2
+  "${BIN_DIR}/agentos" adapter install "$1" --root "$ROOT"
+}
+
+install_adapters() {
+  if [ "$SKIP_ADAPTERS" -eq 1 ]; then
+    echo "adapters: skipped" >&2
+    return
+  fi
+  # Detect from files on disk. `npx skills add` does not tell this script which
+  # agent was selected. --all-adapters installs every adapter regardless.
+  if [ "$ALL_ADAPTERS" -eq 1 ] || [ -n "${AGENTOS_ALL_ADAPTERS:-}" ]; then
+    for adapter in generic cursor claude codex; do
+      install_one_adapter "$adapter"
+    done
+  else
+    install_one_adapter generic
+    if [ -d "$ROOT/.cursor" ] || [ -d "$ROOT/.agents/skills" ]; then
+      install_one_adapter cursor
+    fi
+    if [ -d "$ROOT/.claude" ] || [ -f "$ROOT/CLAUDE.md" ]; then
+      install_one_adapter claude
+    fi
+    if [ -d "$ROOT/.codex" ] || [ -f "$ROOT/agents/openai.yaml" ]; then
+      install_one_adapter codex
+    fi
+  fi
+  echo "scan: agentos scan --root $ROOT" >&2
+  set +e
+  "${BIN_DIR}/agentos" scan --root "$ROOT"
+  scan=$?
+  set -e
+  if [ "$scan" -ne 0 ]; then
+    echo "scan exited $scan (you can re-run: agentos scan)" >&2
+  fi
+}
+
 install_skills
 ensure_cli
+persist_path
 run_init
+install_adapters
 
 echo
 echo "Done. Skills live under $ROOT/.agents/skills when installed."
 echo "CLI: ${BIN_DIR}/agentos"
-echo "Add ${BIN_DIR} to PATH if your shell does not see agentos."
-echo "Next, from this project: agentos scan"
+echo "PATH includes ${BIN_DIR} in this setup process and in your shell rc for new terminals."
+echo "This terminal: export PATH=\"${BIN_DIR}:\$PATH\"   (or open a new terminal)"
 echo "No API key is required for local scan, context, plan, or evaluate."
